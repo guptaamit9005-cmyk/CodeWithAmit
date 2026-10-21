@@ -1,0 +1,336 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ practice_set.title }} — Practice Sets | CodeWithAmit{% endblock %}
+{% block meta_description %}{{ practice_set.description|default:"Solve curated coding practice problems with step-by-step YouTube video solutions and progress tracking." }}{% endblock %}
+
+{% block content %}
+<div class="py-4 py-lg-5" style="background: var(--bg-canvas, #f8fafc); min-height: 90vh;">
+    <div class="container" style="max-width: 1240px;">
+
+        <!-- ==================================================================
+             BREADCRUMB
+             ================================================================== -->
+        <nav aria-label="breadcrumb" class="mb-3">
+            <ol class="breadcrumb smaller mb-0">
+                <li class="breadcrumb-item"><a href="{% url 'coding_practice:problem_list' %}" class="text-decoration-none">Practice Sets</a></li>
+                <li class="breadcrumb-item active text-muted" aria-current="page">{{ practice_set.title }}</li>
+            </ol>
+        </nav>
+
+        <!-- ==================================================================
+             HERO BANNER: Course-like Header
+             ================================================================== -->
+        <div class="rounded-4 p-4 p-md-5 mb-4 text-white shadow-sm position-relative overflow-hidden" 
+             style="background: {{ practice_set.banner_gradient|default:'linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)' }};">
+            <div class="position-relative z-1">
+                <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        {% if practice_set.badge %}
+                            <span class="badge bg-white text-dark rounded-pill px-3 py-1.5 fw-bold smaller shadow-xs">
+                                <i class="{{ practice_set.icon|default:'bi-collection-play-fill' }} me-1 text-primary"></i> {{ practice_set.badge }}
+                            </span>
+                        {% endif %}
+                        <span class="badge rounded-pill px-3 py-1.5 fw-semibold smaller" style="background: rgba(255,255,255,0.2); backdrop-filter: blur(8px);">
+                            <i class="bi bi-bar-chart-fill me-1"></i> {{ practice_set.difficulty|default:'All Levels' }}
+                        </span>
+                        <span class="badge rounded-pill px-3 py-1.5 fw-semibold smaller" style="background: rgba(255,255,255,0.2); backdrop-filter: blur(8px);">
+                            <i class="bi bi-code-slash me-1"></i> {{ stats.total }} Challenges
+                        </span>
+                    </div>
+
+                    {% if is_admin %}
+                        <div class="d-flex align-items-center gap-2">
+                            <a href="{% url 'coding_practice:add_question' %}?set={{ practice_set.slug }}" class="btn btn-light rounded-pill px-3.5 py-1.5 fw-semibold shadow-xs smaller d-flex align-items-center gap-1.5">
+                                <i class="bi bi-plus-circle-fill text-primary"></i> Add Problem to this Set
+                            </a>
+                            <a href="{% url 'coding_practice:edit_practice_set' practice_set.slug %}" class="btn btn-outline-light rounded-pill px-3 py-1.5 fw-semibold smaller d-flex align-items-center gap-1.5">
+                                <i class="bi bi-pencil-square"></i> Edit Set
+                            </a>
+                            <a href="{% url 'coding_practice:delete_practice_set' practice_set.slug %}" class="btn btn-outline-danger bg-white text-danger border-0 rounded-circle d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;" title="Delete Set">
+                                <i class="bi bi-trash-fill smaller"></i>
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+
+                <h1 class="display-6 fw-bold mb-2 font-heading" style="letter-spacing: -0.02em;">
+                    {{ practice_set.title }}
+                </h1>
+                <p class="mb-4 text-white-50 small" style="max-width: 780px; line-height: 1.6; font-size: 0.95rem;">
+                    {{ practice_set.description|default:"Comprehensive problem collection curated to build deep algorithmic intuition and problem-solving mastery." }}
+                </p>
+
+                <!-- Track Progress Bar -->
+                <div class="p-3 rounded-3" style="background: rgba(0, 0, 0, 0.2); backdrop-filter: blur(10px); max-width: 600px;">
+                    <div class="d-flex justify-content-between align-items-center mb-1.5 small">
+                        <span class="fw-semibold text-white-50">Your Track Progress:</span>
+                        <span class="fw-bold text-white">{{ stats.solved }} / {{ stats.total }} Solved ({{ stats.progress_percent }}%)</span>
+                    </div>
+                    <div class="progress rounded-pill" style="height: 8px; background: rgba(255,255,255,0.2);">
+                        <div class="progress-bar bg-success rounded-pill" role="progressbar" style="width: {{ stats.progress_percent }}%;" aria-valuenow="{{ stats.progress_percent }}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================================================================
+             METRIC STATS CARDS
+             ================================================================== -->
+        <div class="row g-3 mb-4">
+            <div class="col-6 col-lg-3">
+                <div class="card p-3 rounded-4 interactive-card h-100 bg-surface border">
+                    <div class="d-flex align-items-center justify-content-between mb-1.5">
+                        <span class="smaller fw-bold text-uppercase text-muted" style="letter-spacing: 0.5px;">Total Challenges</span>
+                        <div class="rounded-3 p-1.5 d-inline-flex align-items-center justify-content-center" style="background: rgba(99, 102, 241, 0.12); color: var(--cwa-indigo, #6366f1); width: 32px; height: 32px;">
+                            <i class="bi bi-collection-fill"></i>
+                        </div>
+                    </div>
+                    <div class="h3 fw-bold mb-0 font-heading" style="color: var(--text-primary, #0f172a);">
+                        {{ stats.total }} <span class="fs-6 fw-normal text-muted">Questions</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6 col-lg-3">
+                <div class="card p-3 rounded-4 interactive-card h-100 bg-surface border">
+                    <div class="d-flex align-items-center justify-content-between mb-1.5">
+                        <span class="smaller fw-bold text-uppercase text-muted" style="letter-spacing: 0.5px;">Difficulty Tiers</span>
+                        <div class="rounded-3 p-1.5 d-inline-flex align-items-center justify-content-center" style="background: rgba(245, 158, 11, 0.12); color: #d97706; width: 32px; height: 32px;">
+                            <i class="bi bi-bar-chart-fill"></i>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2 fw-bold font-heading" style="font-size: 1.15rem;">
+                        <span class="text-success">{{ stats.easy }} Easy</span>
+                        <span class="text-muted">/</span>
+                        <span class="text-warning">{{ stats.medium }} Med</span>
+                        <span class="text-muted">/</span>
+                        <span class="text-danger">{{ stats.hard }} Hard</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6 col-lg-3">
+                <div class="card p-3 rounded-4 interactive-card h-100 bg-surface border">
+                    <div class="d-flex align-items-center justify-content-between mb-1.5">
+                        <span class="smaller fw-bold text-uppercase text-muted" style="letter-spacing: 0.5px;">Completed</span>
+                        <div class="rounded-3 p-1.5 d-inline-flex align-items-center justify-content-center" style="background: rgba(16, 185, 129, 0.12); color: #059669; width: 32px; height: 32px;">
+                            <i class="bi bi-check2-circle"></i>
+                        </div>
+                    </div>
+                    <div class="h3 fw-bold mb-0 font-heading text-success">
+                        {{ stats.solved }} <span class="fs-6 fw-normal text-muted">/ {{ stats.total }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-6 col-lg-3">
+                <div class="card p-3 rounded-4 interactive-card h-100 bg-surface border">
+                    <div class="d-flex align-items-center justify-content-between mb-1.5">
+                        <span class="smaller fw-bold text-uppercase text-muted" style="letter-spacing: 0.5px;">Completion</span>
+                        <span class="badge bg-success-subtle text-success rounded-pill px-2 py-0.5 smaller fw-bold">{{ stats.progress_percent }}%</span>
+                    </div>
+                    <div class="h3 fw-bold mb-0 font-heading" style="color: var(--text-primary, #0f172a);">
+                        {{ stats.progress_percent }}% <span class="fs-6 fw-normal text-muted">Achieved</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================================================================
+             FILTER & SEARCH BAR
+             ================================================================== -->
+        <div class="card rounded-4 p-3 mb-4 bg-surface border shadow-xs">
+            <form method="GET" class="row g-2 align-items-center">
+                <div class="col-12 col-md-4">
+                    <div class="input-group input-group-sm rounded-pill overflow-hidden border">
+                        <span class="input-group-text bg-transparent border-0 text-muted ps-3"><i class="bi bi-search"></i></span>
+                        <input type="text" name="q" class="form-control bg-transparent border-0 py-1.5" placeholder="Search questions in this set..." value="{{ query|default:'' }}" style="font-size: 0.88rem;">
+                    </div>
+                </div>
+
+                <div class="col-6 col-md-3">
+                    <select name="difficulty" class="form-select form-select-sm rounded-pill border py-1.5" style="font-size: 0.85rem;" onchange="this.form.submit()">
+                        <option value="">All Difficulties</option>
+                        {% for diff_val, diff_label in difficulty_choices %}
+                            <option value="{{ diff_val }}" {% if selected_difficulty == diff_val %}selected{% endif %}>{{ diff_label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-6 col-md-3">
+                    <select name="status" class="form-select form-select-sm rounded-pill border py-1.5" style="font-size: 0.85rem;" onchange="this.form.submit()">
+                        <option value="">All Statuses</option>
+                        <option value="solved" {% if selected_status == 'solved' %}selected{% endif %}>Solved</option>
+                        <option value="attempted" {% if selected_status == 'attempted' %}selected{% endif %}>Attempted</option>
+                        <option value="unattempted" {% if selected_status == 'unattempted' %}selected{% endif %}>Unattempted</option>
+                    </select>
+                </div>
+
+                <div class="col-12 col-md-2 d-flex gap-2">
+                    <button type="submit" class="btn btn-primary btn-sm rounded-pill w-100 py-1.5 fw-semibold">
+                        Filter
+                    </button>
+                    {% if query or selected_difficulty or selected_status or selected_category %}
+                        <a href="{% url 'coding_practice:practice_set_detail' practice_set.slug %}" class="btn btn-outline-secondary btn-sm rounded-pill py-1.5 px-2.5" title="Reset Filters">
+                            <i class="bi bi-arrow-counterclockwise"></i>
+                        </a>
+                    {% endif %}
+                </div>
+            </form>
+
+            <!-- Topic Pills Filter -->
+            {% if categories %}
+                <div class="d-flex align-items-center gap-1.5 flex-wrap pt-3 mt-3 border-top">
+                    <span class="smaller fw-bold text-muted me-1"><i class="bi bi-tag-fill me-1"></i>Topics:</span>
+                    <a href="{% url 'coding_practice:practice_set_detail' practice_set.slug %}" class="badge rounded-pill px-2.5 py-1 text-decoration-none {% if not selected_category %}bg-primary text-white{% else %}bg-light text-secondary border{% endif %}">
+                        All ({{ stats.total }})
+                    </a>
+                    {% for cat in categories %}
+                        <a href="{% url 'coding_practice:practice_set_detail' practice_set.slug %}?category={{ cat.slug }}" class="badge rounded-pill px-2.5 py-1 text-decoration-none {% if selected_category == cat.slug %}bg-primary text-white{% else %}bg-light text-secondary border{% endif %}">
+                            {{ cat.name }}
+                        </a>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- ==================================================================
+             PROBLEMS TABLE
+             ================================================================== -->
+        <div class="card rounded-4 border bg-surface overflow-hidden shadow-xs">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light border-bottom">
+                        <tr class="smaller fw-bold text-uppercase text-muted" style="letter-spacing: 0.5px;">
+                            <th class="ps-3 text-center" style="width: 60px;">Status</th>
+                            <th>Problem Title</th>
+                            <th>Topic</th>
+                            <th>Difficulty</th>
+                            <th>Official Solution</th>
+                            <th class="text-end pe-4" style="width: 180px;">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for q in questions %}
+                            <tr>
+                                <!-- 1-Click Status Tracking -->
+                                <td class="ps-3 text-center">
+                                    {% if user.is_authenticated %}
+                                        <a href="{% url 'coding_practice:toggle_solved' q.slug %}?next={{ request.get_full_path|urlencode }}" 
+                                           class="text-decoration-none"
+                                           title="{% if q.current_user_status == 'solved' %}Mark as Unsolved{% else %}Click to Mark as Solved after completing on LeetCode{% endif %}">
+                                            {% if q.current_user_status == 'solved' %}
+                                                <i class="bi bi-check-circle-fill text-success fs-5"></i>
+                                            {% else %}
+                                                <i class="bi bi-circle text-muted fs-5 opacity-40"></i>
+                                            {% endif %}
+                                        </a>
+                                    {% else %}
+                                        <span class="opacity-40" title="Log in to track status">
+                                            <i class="bi bi-circle text-muted fs-5"></i>
+                                        </span>
+                                    {% endif %}
+                                </td>
+
+                                <!-- Title & Details (Direct LeetCode Link) -->
+                                <td>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <a href="{{ q.leetcode_url|default:q.get_solve_url|default:'https://leetcode.com/problemset/' }}" 
+                                           target="_blank" rel="noopener noreferrer" 
+                                           class="fw-bold text-decoration-none text-dark hover-primary d-inline-flex align-items-center gap-1.5" 
+                                           style="font-size: 0.95rem;" 
+                                           title="Solve #{{ q.id }} on LeetCode">
+                                            <span>{{ q.id }}. {{ q.title }}</span>
+                                            <i class="bi bi-box-arrow-up-right text-warning opacity-75" style="font-size: 0.72rem;"></i>
+                                        </a>
+                                        {% if q.is_daily_challenge %}
+                                            <span class="badge bg-warning text-dark rounded-pill smaller px-2 py-0.5 fw-semibold" style="font-size: 0.68rem;">POTD</span>
+                                        {% endif %}
+                                    </div>
+                                    {% if q.company_tags %}
+                                        <div class="smaller text-muted mt-0.5" style="font-size: 0.75rem;">
+                                            <i class="bi bi-building me-1 opacity-60"></i>{{ q.company_tags }}
+                                        </div>
+                                    {% endif %}
+                                </td>
+
+                                <!-- Topic Badge -->
+                                <td>
+                                    <span class="badge bg-light text-secondary border rounded-pill px-2.5 py-1 smaller">
+                                        {{ q.category.name|default:'General' }}
+                                    </span>
+                                </td>
+
+                                <!-- Difficulty Badge -->
+                                <td>
+                                    {% if q.difficulty == 'Easy' %}
+                                        <span class="badge bg-success-subtle text-success rounded-pill px-2.5 py-1 smaller fw-semibold">Easy</span>
+                                    {% elif q.difficulty == 'Medium' %}
+                                        <span class="badge bg-warning-subtle text-warning rounded-pill px-2.5 py-1 smaller fw-semibold">Medium</span>
+                                    {% else %}
+                                        <span class="badge bg-danger-subtle text-danger rounded-pill px-2.5 py-1 smaller fw-semibold">Hard</span>
+                                    {% endif %}
+                                </td>
+
+                                <!-- YOUTUBE SOLUTION LINK (HIGHLIGHTED) -->
+                                <td>
+                                    {% if q.youtube_solution_url %}
+                                        <a href="{{ q.youtube_solution_url }}" target="_blank" rel="noopener noreferrer" 
+                                           class="btn btn-outline-danger btn-sm rounded-pill px-3 py-1 smaller fw-semibold d-inline-flex align-items-center gap-1.5"
+                                           title="Watch Video Solution on YouTube">
+                                            <i class="bi bi-youtube text-danger fs-6"></i>
+                                            <span>YouTube Solution</span>
+                                            <i class="bi bi-box-arrow-up-right ms-0.5 opacity-60" style="font-size: 0.7rem;"></i>
+                                        </a>
+                                    {% else %}
+                                        <span class="smaller text-muted opacity-60">—</span>
+                                    {% endif %}
+                                </td>
+
+                                <!-- Action Buttons: Direct LeetCode Solving -->
+                                <td class="text-end pe-4">
+                                    <div class="d-inline-flex align-items-center gap-1.5">
+                                        <a href="{{ q.leetcode_url|default:q.get_solve_url|default:'https://leetcode.com/problemset/' }}" 
+                                           target="_blank" rel="noopener noreferrer" 
+                                           class="btn btn-warning btn-sm rounded-pill px-3 py-1 smaller fw-semibold d-inline-flex align-items-center gap-1.5 shadow-xs text-dark"
+                                           style="background-color: #ffa116; border-color: #ffa116;"
+                                           title="Solve on LeetCode">
+                                            <i class="bi bi-box-arrow-up-right" style="font-size: 0.75rem;"></i>
+                                            <span>Solve on LeetCode</span>
+                                        </a>
+
+                                        {% if is_admin %}
+                                            <a href="{% url 'coding_practice:edit_question' q.slug %}" class="btn btn-outline-secondary btn-sm rounded-circle d-inline-flex align-items-center justify-content-center p-0" style="width: 28px; height: 28px;" title="Edit Problem">
+                                                <i class="bi bi-pencil" style="font-size: 0.75rem;"></i>
+                                            </a>
+                                            <a href="{% url 'coding_practice:delete_question' q.slug %}" class="btn btn-outline-danger btn-sm rounded-circle d-inline-flex align-items-center justify-content-center p-0" style="width: 28px; height: 28px;" title="Delete Problem">
+                                                <i class="bi bi-trash" style="font-size: 0.75rem;"></i>
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center py-5 text-muted">
+                                    <div class="py-4">
+                                        <i class="bi bi-inbox fs-1 d-block mb-2 text-secondary opacity-50"></i>
+                                        <p class="mb-2 fw-semibold">No problems found in this set matching your criteria.</p>
+                                        {% if is_admin %}
+                                            <a href="{% url 'coding_practice:add_question' %}?set={{ practice_set.slug }}" class="btn btn-primary btn-sm rounded-pill px-3">
+                                                <i class="bi bi-plus-circle me-1"></i> Add First Problem
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

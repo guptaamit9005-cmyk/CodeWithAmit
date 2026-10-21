@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ lesson.title }} — {{ course.title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4 px-lg-5">
+    <div class="row g-4">
+        <!-- Sidebar Navigation -->
+        <div class="col-lg-3">
+            <div class="card bg-surface border-secondary p-3 rounded-4 shadow-sm sticky-top" style="top: 80px;">
+                <div class="mb-3">
+                    <a href="{% url 'courses:course_detail' course.slug %}" class="smaller text-cyan text-decoration-none d-flex align-items-center gap-1 mb-2">
+                        <i class="bi bi-chevron-left"></i> Back to Course Overview
+                    </a>
+                    <h6 class="text-light font-heading fw-bold mb-1">{{ course.title }}</h6>
+                    <div class="d-flex justify-content-between smaller text-muted mb-1">
+                        <span>Course Progress</span>
+                        <span class="text-cyan fw-bold">{{ course_progress }}%</span>
+                    </div>
+                    <div class="progress bg-surface-dark" style="height: 6px;">
+                        <div class="progress-bar bg-cyan" style="width: {{ course_progress }}%;"></div>
+                    </div>
+                </div>
+
+                <div class="lessons-sidebar-list overflow-auto" style="max-height: 60vh;">
+                    {% for l in lessons %}
+                        <a href="{% url 'courses:lesson_detail' course.slug l.slug %}" class="d-flex align-items-center justify-content-between p-2 rounded-3 mb-1 text-decoration-none {% if l.id == lesson.id %}bg-primary-subtle text-cyan fw-semibold border border-cyan-subtle{% else %}text-secondary hover-bg-surface-elevated{% endif %}">
+                            <div class="d-flex align-items-center gap-2 overflow-hidden">
+                                {% if l.id in completed_lesson_ids %}
+                                    <i class="bi bi-check-circle-fill text-success"></i>
+                                {% else %}
+                                    <span class="badge bg-surface-dark text-muted smaller">{{ forloop.counter }}</span>
+                                {% endif %}
+                                <span class="smaller text-truncate">{{ l.title }}</span>
+                            </div>
+                            <span class="smaller text-muted text-nowrap ms-2">{{ l.duration_minutes }}m</span>
+                        </a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Lesson Player & Content -->
+        <div class="col-lg-9">
+            <!-- Video Player Section -->
+            {% if lesson.youtube_embed_id %}
+                <div class="ratio ratio-16x9 rounded-4 overflow-hidden border border-secondary shadow-lg mb-4 bg-black">
+                    <iframe src="https://www.youtube.com/embed/{{ lesson.youtube_embed_id }}?rel=0" title="{{ lesson.title }}" allowfullscreen></iframe>
+                </div>
+            {% elif lesson.video_url %}
+                <div class="ratio ratio-16x9 rounded-4 overflow-hidden border border-secondary shadow-lg mb-4 bg-black">
+                    <iframe src="{{ lesson.video_url }}" title="{{ lesson.title }}" allowfullscreen></iframe>
+                </div>
+            {% endif %}
+
+            <!-- Lesson Header & Progress Check -->
+            <div class="card bg-surface border-secondary p-4 rounded-4 shadow-sm mb-4">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-3">
+                    <div>
+                        <span class="text-cyan smaller text-uppercase fw-bold">Lesson #{{ lesson.order }}</span>
+                        <h2 class="h3 fw-bold text-light font-heading mb-1">{{ lesson.title }}</h2>
+                        <span class="smaller text-muted"><i class="bi bi-clock me-1"></i> {{ lesson.duration_minutes }} Minutes Estimated</span>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        {% if progress.is_completed %}
+                            <span class="btn btn-outline-success btn-sm rounded-pill px-3 disabled">
+                                <i class="bi bi-check2-circle me-1"></i> Completed
+                            </span>
+                        {% else %}
+                            <a href="{% url 'courses:complete_lesson' course.slug lesson.slug %}" class="btn btn-success btn-sm rounded-pill px-4 fw-semibold">
+                                <i class="bi bi-check-lg me-1"></i> Mark as Complete
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <hr class="border-secondary my-3">
+
+                <!-- Lesson Content -->
+                <div class="lesson-content text-light mb-4 line-height-relaxed" style="white-space: pre-line;">
+                    {{ lesson.content }}
+                </div>
+
+                <!-- Code Snippet Box -->
+                {% if lesson.code_snippet %}
+                    <div class="code-container rounded-3 border border-secondary overflow-hidden mb-4">
+                        <div class="bg-surface-dark px-3 py-2 border-bottom border-secondary d-flex justify-content-between align-items-center">
+                            <span class="smaller text-cyan font-monospace">
+                                <i class="bi bi-code-slash me-1"></i> {{ lesson.code_language }} snippet
+                            </span>
+                            <button class="btn btn-outline-light btn-sm rounded-pill py-0 px-3 copy-btn smaller" type="button">
+                                <i class="bi bi-clipboard me-1"></i> Copy Code
+                            </button>
+                        </div>
+                        <pre class="m-0 p-3 bg-surface-dark font-monospace text-light"><code id="lesson-code-content">{{ lesson.code_snippet }}</code></pre>
+                    </div>
+                {% endif %}
+
+                <!-- Previous / Next Navigation Buttons -->
+                <div class="d-flex justify-content-between align-items-center pt-3 border-top border-secondary">
+                    {% if prev_lesson %}
+                        <a href="{% url 'courses:lesson_detail' course.slug prev_lesson.slug %}" class="btn btn-outline-secondary rounded-pill px-4 btn-sm">
+                            <i class="bi bi-arrow-left me-1"></i> Previous Lesson
+                        </a>
+                    {% else %}
+                        <div></div>
+                    {% endif %}
+
+                    {% if next_lesson %}
+                        <a href="{% url 'courses:lesson_detail' course.slug next_lesson.slug %}" class="btn btn-cyan rounded-pill px-4 btn-sm fw-semibold">
+                            Next Lesson <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    {% else %}
+                        <a href="{% url 'courses:course_detail' course.slug %}" class="btn btn-success rounded-pill px-4 btn-sm fw-semibold">
+                            Complete Course <i class="bi bi-trophy-fill ms-1"></i>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Quiz Section (if attached) -->
+            {% if quiz %}
+                <div class="card bg-surface border-secondary p-4 rounded-4 shadow-sm mb-4" id="lesson-quiz">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <div class="badge bg-warning-subtle text-warning p-2 rounded-3"><i class="bi bi-patch-question fs-5"></i></div>
+                        <div>
+                            <h4 class="text-light font-heading fw-bold mb-0">{{ quiz.title }}</h4>
+                            <span class="smaller text-muted">Passing Score: {{ quiz.passing_score }}%</span>
+                        </div>
+                    </div>
+
+                    {% if quiz.description %}
+                        <p class="text-secondary smaller mb-4">{{ quiz.description }}</p>
+                    {% endif %}
+
+                    <form action="{% url 'courses:submit_quiz' course.slug lesson.slug %}" method="POST">
+                        {% csrf_token %}
+                        {% for q in quiz.questions.all %}
+                            <div class="card bg-surface-dark border-secondary p-3 rounded-3 mb-3">
+                                <h6 class="text-light fw-bold mb-3">
+                                    <span class="text-cyan me-1">Q{{ forloop.counter }}.</span> {{ q.question_text }}
+                                </h6>
+
+                                <div class="d-flex flex-column gap-2">
+                                    <label class="quiz-option-label p-2 rounded border border-secondary d-flex align-items-center gap-2 cursor-pointer">
+                                        <input type="radio" name="question_{{ q.id }}" value="A" required class="form-check-input my-0">
+                                        <span class="text-secondary smaller">A) {{ q.option_a }}</span>
+                                    </label>
+                                    <label class="quiz-option-label p-2 rounded border border-secondary d-flex align-items-center gap-2 cursor-pointer">
+                                        <input type="radio" name="question_{{ q.id }}" value="B" required class="form-check-input my-0">
+                                        <span class="text-secondary smaller">B) {{ q.option_b }}</span>
+                                    </label>
+                                    <label class="quiz-option-label p-2 rounded border border-secondary d-flex align-items-center gap-2 cursor-pointer">
+                                        <input type="radio" name="question_{{ q.id }}" value="C" required class="form-check-input my-0">
+                                        <span class="text-secondary smaller">C) {{ q.option_c }}</span>
+                                    </label>
+                                    <label class="quiz-option-label p-2 rounded border border-secondary d-flex align-items-center gap-2 cursor-pointer">
+                                        <input type="radio" name="question_{{ q.id }}" value="D" required class="form-check-input my-0">
+                                        <span class="text-secondary smaller">D) {{ q.option_d }}</span>
+                                    </label>
+                                </div>
+                            </div>
+                        {% endfor %}
+
+                        <button type="submit" class="btn btn-warning rounded-pill px-5 fw-bold text-dark mt-2">
+                            Submit Quiz Answers <i class="bi bi-send-check ms-1"></i>
+                        </button>
+                    </form>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

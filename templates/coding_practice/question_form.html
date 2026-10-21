@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if is_edit %}Edit Problem{% else %}Add Practice Problem{% endif %} — CodeWithAmit{% endblock %}
+
+{% block content %}
+<div class="container py-4 py-md-5" style="max-width: 900px;">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb smaller mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'coding_practice:problem_list' %}" class="text-decoration-none">Practice Sets</a></li>
+            {% if preselected_set %}
+                <li class="breadcrumb-item"><a href="{% url 'coding_practice:practice_set_detail' preselected_set.slug %}" class="text-decoration-none">{{ preselected_set.title }}</a></li>
+            {% elif question.practice_set %}
+                <li class="breadcrumb-item"><a href="{% url 'coding_practice:practice_set_detail' question.practice_set.slug %}" class="text-decoration-none">{{ question.practice_set.title }}</a></li>
+            {% endif %}
+            <li class="breadcrumb-item active text-muted" aria-current="page">{% if is_edit %}Edit Problem{% else %}Add Problem{% endif %}</li>
+        </ol>
+    </nav>
+
+    <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5" style="background: var(--cwa-bg-card, #ffffff); border: 1px solid var(--cwa-border, #e2e8f0) !important;">
+        <div class="d-flex align-items-center justify-content-between pb-3 mb-4 border-bottom" style="border-color: var(--cwa-border, #e2e8f0) !important;">
+            <div>
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-1 rounded-pill mb-2 fw-semibold smaller">
+                    <i class="bi bi-shield-lock-fill me-1"></i> Admin Creator Studio
+                </span>
+                <h1 class="h3 fw-bold mb-1" style="color: var(--cwa-text-heading, #0f172a);">
+                    {% if is_edit %}Edit Problem: {{ question.title }}{% else %}Add New Practice Problem{% endif %}
+                </h1>
+                <p class="text-secondary small mb-0">
+                    Add problems for any subject (DSA, Python, Web Dev, SQL, Java). Provide an optional YouTube video solution link for students to learn.
+                </p>
+            </div>
+            {% if preselected_set %}
+                <a href="{% url 'coding_practice:practice_set_detail' preselected_set.slug %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                    <i class="bi bi-arrow-left me-1"></i> Back to Set
+                </a>
+            {% elif question.practice_set %}
+                <a href="{% url 'coding_practice:practice_set_detail' question.practice_set.slug %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                    <i class="bi bi-arrow-left me-1"></i> Back to Set
+                </a>
+            {% else %}
+                <a href="{% url 'coding_practice:problem_list' %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                    <i class="bi bi-arrow-left me-1"></i> Back to List
+                </a>
+            {% endif %}
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger py-2 small rounded-3">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <!-- SECTION 1: Practice Set / Course Track Assignment -->
+            <div class="p-3 mb-4 rounded-3" style="background: #f8fafc; border: 1.5px solid #e2e8f0;">
+                <div class="d-flex align-items-center justify-content-between mb-2">
+                    <span class="small fw-bold text-uppercase" style="letter-spacing: 0.5px; color: #475569;">
+                        <i class="bi bi-collection-fill me-1 text-primary"></i> 1. Practice Set (Course / Track)
+                    </span>
+                    <a href="{% url 'coding_practice:add_practice_set' %}" target="_blank" class="smaller fw-semibold text-primary text-decoration-none">
+                        + Create New Practice Set
+                    </a>
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small">Choose Practice Set</label>
+                        {{ form.practice_set }}
+                        {% if form.practice_set.errors %}<div class="text-danger smaller mt-1">{{ form.practice_set.errors }}</div>{% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold small">Or Type New Practice Set Name</label>
+                        {{ form.new_practice_set_title }}
+                        <div class="form-text smaller text-muted">e.g. Python Mastery Set, SQL Practice, React Track</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 2: Problem Identity -->
+            <div class="row g-3 mb-3">
+                <div class="col-md-8">
+                    <label class="form-label fw-semibold small">Problem Title <span class="text-danger">*</span></label>
+                    {{ form.title }}
+                    {% if form.title.errors %}<div class="text-danger smaller mt-1">{{ form.title.errors }}</div>{% endif %}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold small">Platform</label>
+                    {{ form.platform }}
+                </div>
+            </div>
+
+            <!-- SECTION 3: YOUTUBE SOLUTION LINK (HIGHLIGHTED) -->
+            <div class="p-3 mb-3 rounded-3" style="background: #fff1f2; border: 1.5px solid #fecdd3;">
+                <label class="form-label fw-bold small text-danger d-flex align-items-center gap-1.5 mb-1">
+                    <i class="bi bi-youtube fs-5"></i> YouTube Video Solution Link (External Link)
+                </label>
+                {{ form.youtube_solution_url }}
+                <div class="form-text smaller text-muted mt-1">
+                    <i class="bi bi-info-circle me-1"></i> Paste the full YouTube video link (e.g. <code>https://www.youtube.com/watch?v=...</code> or <code>https://youtu.be/...</code>). Students clicking "Watch Solution on YouTube" will open this link in a new tab (no embedded video player on site).
+                </div>
+                {% if form.youtube_solution_url.errors %}<div class="text-danger smaller mt-1">{{ form.youtube_solution_url.errors }}</div>{% endif %}
+            </div>
+
+            <!-- SECTION 4: External Online Judge URLs -->
+            <div class="row g-3 mb-3">
+                <div class="col-md-7">
+                    <label class="form-label fw-semibold small">
+                        <i class="bi bi-box-arrow-up-right text-warning me-1"></i> LeetCode URL (Optional)
+                    </label>
+                    {{ form.leetcode_url }}
+                    <div class="form-text smaller text-muted">e.g. <code>https://leetcode.com/problems/two-sum/</code></div>
+                    {% if form.leetcode_url.errors %}<div class="text-danger smaller mt-1">{{ form.leetcode_url.errors }}</div>{% endif %}
+                </div>
+                <div class="col-md-5">
+                    <label class="form-label fw-semibold small">GeeksforGeeks / Alt URL (Optional)</label>
+                    {{ form.gfg_url }}
+                </div>
+            </div>
+
+            <!-- SECTION 5: Topic / Sub-Category & Difficulty -->
+            <div class="row g-3 mb-3">
+                <div class="col-md-5">
+                    <label class="form-label fw-semibold small">Topic / Sub-category</label>
+                    {{ form.category }}
+                    {% if form.category.errors %}<div class="text-danger smaller mt-1">{{ form.category.errors }}</div>{% endif %}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold small">Or Type New Topic</label>
+                    {{ form.new_category_name }}
+                    <div class="form-text smaller text-muted">e.g. Arrays, OOPs, Joins, Recursion</div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold small">Difficulty</label>
+                    {{ form.difficulty }}
+                </div>
+            </div>
+
+            <!-- SECTION 6: Company Tags & Points & POTD -->
+            <div class="row g-3 mb-3">
+                <div class="col-md-8">
+                    <label class="form-label fw-semibold small">Company Tags</label>
+                    {{ form.company_tags }}
+                    <div class="form-text smaller text-muted">e.g. Amazon, Google, Microsoft, Meta, TCS, Infosys</div>
+                </div>
+                <div class="col-md-2">
+                    <label class="form-label fw-semibold small">XP Points</label>
+                    {{ form.points }}
+                </div>
+                <div class="col-md-2 d-flex align-items-center pt-4">
+                    <div class="form-check">
+                        {{ form.is_daily_challenge }}
+                        <label class="form-check-label small fw-semibold" for="{{ form.is_daily_challenge.id_for_label }}">Daily Challenge</label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 7: Problem Description -->
+            <div class="mb-3">
+                <label class="form-label fw-semibold small">Problem Brief / Summary (Optional)</label>
+                {{ form.description }}
+                <div class="form-text smaller text-muted">Key objective or problem statement shown to students.</div>
+            </div>
+
+            <!-- SECTION 8: Complexity & Hints -->
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold small">Expected Time Complexity (Optional)</label>
+                    {{ form.time_complexity }}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold small">Expected Space Complexity (Optional)</label>
+                    {{ form.space_complexity }}
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label fw-semibold small">Hints (Optional)</label>
+                {{ form.hints }}
+                <div class="form-text smaller text-muted">One hint per line. Students can expand these if stuck.</div>
+            </div>
+
+            <!-- Submit Buttons -->
+            <div class="d-flex align-items-center justify-content-end gap-3 pt-3 border-top" style="border-color: var(--cwa-border, #e2e8f0) !important;">
+                {% if preselected_set %}
+                    <a href="{% url 'coding_practice:practice_set_detail' preselected_set.slug %}" class="btn btn-outline-secondary px-4 rounded-pill">Cancel</a>
+                {% else %}
+                    <a href="{% url 'coding_practice:problem_list' %}" class="btn btn-outline-secondary px-4 rounded-pill">Cancel</a>
+                {% endif %}
+                <button type="submit" class="btn btn-primary px-4 py-2 rounded-pill fw-semibold shadow-sm">
+                    <i class="bi bi-check-lg me-1"></i> {% if is_edit %}Save Changes{% else %}Publish Problem to Practice Set{% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

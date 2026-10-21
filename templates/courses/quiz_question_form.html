@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Quiz Question — {{ lesson.title }} — CodeWithAmit{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="max-width: 860px;">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb smaller mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'courses:course_list' %}" class="text-decoration-none">Courses</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'courses:course_detail' course.slug %}" class="text-decoration-none">{{ course.title }}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'courses:lesson_detail' course.slug lesson.slug %}" class="text-decoration-none">{{ lesson.title }}</a></li>
+            <li class="breadcrumb-item active text-muted" aria-current="page">Quiz Questions</li>
+        </ol>
+    </nav>
+
+    <div class="card flowable-card border p-4 p-md-5 rounded-4 shadow-sm bg-white mb-4">
+        <div class="d-flex align-items-center justify-content-between pb-3 mb-4 border-bottom">
+            <div>
+                <span class="badge bg-warning-subtle text-dark border px-3 py-1 rounded-pill mb-2">
+                    <i class="bi bi-patch-question-fill text-warning me-1"></i> Interactive Quiz Creator
+                </span>
+                <h1 class="h3 fw-bold mb-1 text-slate-900 font-heading">Add Quiz Question</h1>
+                <p class="text-secondary small mb-0">Course: <strong>{{ course.title }}</strong> &bull; Lesson: <strong>{{ lesson.title }}</strong></p>
+            </div>
+            <a href="{% url 'courses:lesson_detail' course.slug lesson.slug %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                <i class="bi bi-arrow-left me-1"></i> Back to Lesson
+            </a>
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold small text-slate-700">Question Statement <span class="text-danger">*</span></label>
+                {{ form.question_text }}
+                {% if form.question_text.errors %}<div class="text-danger smaller mt-1">{{ form.question_text.errors }}</div>{% endif %}
+            </div>
+
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold small text-slate-700">Option A <span class="text-danger">*</span></label>
+                    {{ form.option_a }}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold small text-slate-700">Option B <span class="text-danger">*</span></label>
+                    {{ form.option_b }}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold small text-slate-700">Option C <span class="text-danger">*</span></label>
+                    {{ form.option_c }}
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold small text-slate-700">Option D <span class="text-danger">*</span></label>
+                    {{ form.option_d }}
+                </div>
+            </div>
+
+            <div class="row g-3 mb-3">
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold small text-slate-700">Correct Option <span class="text-danger">*</span></label>
+                    {{ form.correct_option }}
+                </div>
+                <div class="col-md-8">
+                    <label class="form-label fw-semibold small text-slate-700">Explanation for Answer</label>
+                    {{ form.explanation }}
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 pt-3 border-top">
+                <a href="{% url 'courses:lesson_detail' course.slug lesson.slug %}" class="btn btn-outline-secondary rounded-pill px-4">Done</a>
+                <button type="submit" name="add_another" class="btn btn-outline-primary rounded-pill px-4 fw-semibold">
+                    <i class="bi bi-plus-lg me-1"></i> Save & Add Another Question
+                </button>
+                <button type="submit" class="btn btn-primary rounded-pill px-4 fw-semibold shadow-sm">
+                    <i class="bi bi-check-lg me-1"></i> Save Question
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Existing Questions for this Lesson -->
+    {% if existing_questions %}
+    <div class="card border rounded-4 p-4 bg-white shadow-sm">
+        <h5 class="fw-bold mb-3"><i class="bi bi-list-check text-primary me-2"></i> Questions in this Quiz ({{ existing_questions|length }})</h5>
+        <div class="list-group list-group-flush">
+            {% for eq in existing_questions %}
+                <div class="list-group-item px-0 py-3 border-bottom">
+                    <div class="d-flex justify-content-between align-items-start gap-2">
+                        <div>
+                            <span class="badge bg-secondary-subtle text-secondary me-2">Q{{ forloop.counter }}</span>
+                            <span class="fw-semibold text-slate-900">{{ eq.question_text }}</span>
+                            <div class="row g-2 mt-1 small text-muted">
+                                <div class="col-md-6">A) {{ eq.option_a }} {% if eq.correct_option == 'A' %}<span class="text-success fw-bold">✓ (Correct)</span>{% endif %}</div>
+                                <div class="col-md-6">B) {{ eq.option_b }} {% if eq.correct_option == 'B' %}<span class="text-success fw-bold">✓ (Correct)</span>{% endif %}</div>
+                                <div class="col-md-6">C) {{ eq.option_c }} {% if eq.correct_option == 'C' %}<span class="text-success fw-bold">✓ (Correct)</span>{% endif %}</div>
+                                <div class="col-md-6">D) {{ eq.option_d }} {% if eq.correct_option == 'D' %}<span class="text-success fw-bold">✓ (Correct)</span>{% endif %}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

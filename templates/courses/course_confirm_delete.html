@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Course: {{ course.title }} — CodeWithAmit{% endblock %}
+
+{% block content %}
+<div class="container py-5" style="max-width: 600px;">
+    <div class="card border-danger-subtle border p-4 p-md-5 rounded-4 shadow-sm bg-white text-center">
+        <div class="rounded-circle bg-danger-subtle text-danger mx-auto d-flex align-items-center justify-content-center mb-3" style="width: 64px; height: 64px;">
+            <i class="bi bi-exclamation-triangle-fill fs-2"></i>
+        </div>
+        <h3 class="fw-bold text-slate-900 mb-2">Delete Course?</h3>
+        <p class="text-secondary small mb-4">
+            Are you sure you want to permanently delete the course <strong>"{{ course.title }}"</strong>?
+            All associated lessons, quizzes, and enrollments will also be removed. This action cannot be undone.
+        </p>
+
+        <form method="POST" class="d-flex justify-content-center gap-2">
+            {% csrf_token %}
+            <a href="{% url 'courses:course_detail' course.slug %}" class="btn btn-outline-secondary rounded-pill px-4">
+                Cancel
+            </a>
+            <button type="submit" class="btn btn-danger rounded-pill px-4 fw-semibold shadow-sm">
+                <i class="bi bi-trash3-fill me-1"></i> Yes, Delete Permanently
+            </button>
+        </form>
+    </div>
+</div>
+{% endblock %}

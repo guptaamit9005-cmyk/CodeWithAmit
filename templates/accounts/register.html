@@ -1,0 +1,295 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Create Account — Student & Admin Registration | CodeWithAmit{% endblock %}
+
+{% block content %}
+<div class="login-wrapper py-5 my-md-2 position-relative">
+    <!-- Ambient Glow Orbs -->
+    <div class="hero-glow-purple" style="top: 10%; left: 20%; opacity: 0.22;"></div>
+    <div class="hero-glow-fire" style="bottom: 15%; right: 15%; opacity: 0.18;"></div>
+
+    <div class="container position-relative" style="z-index: 2;">
+        <div class="row justify-content-center">
+            <div class="col-md-9 col-lg-7 col-xl-6">
+
+                {% if request.user.is_authenticated %}
+                <div class="alert alert-info border-0 rounded-4 shadow-sm mb-4 d-flex align-items-center justify-content-between flex-wrap gap-2" style="background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.3) !important; color: #bae6fd;">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-info-circle-fill text-info fs-5"></i>
+                        <span class="smaller">Currently signed in as <strong>@{{ request.user.username }}</strong>. Creating a new account will switch your session.</span>
+                    </div>
+                    <a href="{% url 'dashboard:student_dashboard' %}" class="btn btn-info btn-sm py-1 px-3 rounded-pill text-dark fw-bold smaller">
+                        Go to Dashboard
+                    </a>
+                </div>
+                {% endif %}
+
+                <div class="student-card-glass p-4 p-md-4.5 rounded-4 border-primary-glow shadow-lg">
+
+                    <!-- Header -->
+                    <div class="text-center mb-4">
+                        <div class="brand-logo-icon mx-auto mb-2.5 transition-all" id="registerLogoIcon" style="width: 52px; height: 52px; font-size: 1.5rem; background: var(--gradient-brand);">
+                            <i class="bi bi-person-plus-fill text-white" id="registerHeaderIcon"></i>
+                        </div>
+                        <h3 class="fw-bold text-light font-heading mb-1" id="registerTitle" style="font-size: 1.45rem;">
+                            Join CodeWithAmit Ecosystem
+                        </h3>
+                        <p class="text-secondary smaller mb-0" id="registerSubtitle">
+                            Choose your role to get instant access to learning resources or creator controls
+                        </p>
+                    </div>
+
+                    <!-- Interactive Role Selector Cards (Student vs Admin) -->
+                    <div class="mb-4">
+                        <label class="form-label text-secondary fw-semibold smaller mb-2">Select Account Type:</label>
+                        <div class="row g-2">
+                            <!-- Student Option -->
+                            <div class="col-6">
+                                <div class="p-3 rounded-3 cursor-pointer text-center transition-all h-100 position-relative role-choice-card {% if initial_role != 'admin' %}active-student-role{% endif %}" id="cardRoleStudent" onclick="selectRole('student')" style="border: 2px solid {% if initial_role != 'admin' %}var(--primary-purple){% else %}var(--border-color){% endif %}; background: {% if initial_role != 'admin' %}rgba(139, 92, 246, 0.12){% else %}rgba(255, 255, 255, 0.02){% endif %}; cursor: pointer;">
+                                    <div class="mb-1.5 fs-4 text-primary">
+                                        <i class="bi bi-mortarboard-fill"></i>
+                                    </div>
+                                    <div class="fw-bold text-light smaller mb-0.5">Student Account</div>
+                                    <div class="text-secondary" style="font-size: 0.72rem; line-height: 1.3;">450 DSA Sheet, Courses & Streaks</div>
+                                    <span class="position-absolute top-0 end-0 m-1.5 badge rounded-pill {% if initial_role != 'admin' %}bg-primary text-white{% else %}d-none{% endif %}" id="studentCheckBadge">
+                                        <i class="bi bi-check2"></i>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Admin Option -->
+                            <div class="col-6">
+                                <div class="p-3 rounded-3 cursor-pointer text-center transition-all h-100 position-relative role-choice-card {% if initial_role == 'admin' %}active-admin-role{% endif %}" id="cardRoleAdmin" onclick="selectRole('admin')" style="border: 2px solid {% if initial_role == 'admin' %}#f59e0b{% else %}var(--border-color){% endif %}; background: {% if initial_role == 'admin' %}rgba(245, 158, 11, 0.12){% else %}rgba(255, 255, 255, 0.02){% endif %}; cursor: pointer;">
+                                    <div class="mb-1.5 fs-4 text-warning">
+                                        <i class="bi bi-shield-lock-fill"></i>
+                                    </div>
+                                    <div class="fw-bold text-light smaller mb-0.5">Administrator</div>
+                                    <div class="text-secondary" style="font-size: 0.72rem; line-height: 1.3;">Creator Studio & Full Control</div>
+                                    <span class="position-absolute top-0 end-0 m-1.5 badge rounded-pill {% if initial_role == 'admin' %}bg-warning text-dark{% else %}d-none{% endif %}" id="adminCheckBadge">
+                                        <i class="bi bi-check2"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Global Form Errors Alert if any -->
+                    {% if form.errors %}
+                    <div class="alert alert-danger border-0 rounded-3 mb-3.5 p-3" style="background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.3) !important;">
+                        <div class="d-flex align-items-center gap-2 fw-semibold text-danger small mb-1.5">
+                            <i class="bi bi-exclamation-triangle-fill"></i>
+                            <span>Please fix the following issues:</span>
+                        </div>
+                        <ul class="mb-0 ps-3 smaller text-light">
+                            {% for field in form %}
+                                {% for error in field.errors %}
+                                    <li><strong>{{ field.label }}:</strong> {{ error }}</li>
+                                {% endfor %}
+                            {% endfor %}
+                            {% for error in form.non_field_errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+
+                    <form method="POST" action="{% url 'accounts:register' %}" id="registrationForm">
+                        {% csrf_token %}
+                        <input type="hidden" name="role" id="selectedRoleInput" value="{{ initial_role|default:'student' }}">
+
+                        <!-- Name Fields -->
+                        <div class="row g-2.5 mb-3">
+                            <div class="col-sm-6">
+                                <label class="form-label text-secondary fw-semibold smaller mb-1">First Name</label>
+                                <div class="input-group" style="background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm);">
+                                    <span class="input-group-text bg-transparent border-0 text-muted ps-2.5 pe-1">
+                                        <i class="bi bi-person text-primary"></i>
+                                    </span>
+                                    <input type="text" name="first_name" class="form-control bg-transparent border-0 text-light smaller py-2" placeholder="First name" value="{{ form.first_name.value|default:'' }}" required>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="form-label text-secondary fw-semibold smaller mb-1">Last Name</label>
+                                <div class="input-group" style="background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm);">
+                                    <span class="input-group-text bg-transparent border-0 text-muted ps-2.5 pe-1">
+                                        <i class="bi bi-person text-primary"></i>
+                                    </span>
+                                    <input type="text" name="last_name" class="form-control bg-transparent border-0 text-light smaller py-2" placeholder="Last name" value="{{ form.last_name.value|default:'' }}" required>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Username -->
+                        <div class="mb-3">
+                            <label class="form-label text-secondary fw-semibold smaller mb-1">Choose Username</label>
+                            <div class="input-group" style="background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm);">
+                                <span class="input-group-text bg-transparent border-0 text-muted ps-2.5 pe-1">
+                                    <i class="bi bi-at text-primary"></i>
+                                </span>
+                                <input type="text" name="username" required class="form-control bg-transparent border-0 text-light smaller py-2" placeholder="e.g. amit_gupta" value="{{ form.username.value|default:'' }}" id="regUsernameInput">
+                            </div>
+                            {% if form.username.errors %}
+                                <div class="text-danger smaller mt-1"><i class="bi bi-exclamation-circle me-1"></i>{{ form.username.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Email -->
+                        <div class="mb-3">
+                            <label class="form-label text-secondary fw-semibold smaller mb-1">Email Address</label>
+                            <div class="input-group" style="background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm);">
+                                <span class="input-group-text bg-transparent border-0 text-muted ps-2.5 pe-1">
+                                    <i class="bi bi-envelope text-primary"></i>
+                                </span>
+                                <input type="email" name="email" required class="form-control bg-transparent border-0 text-light smaller py-2" placeholder="name@example.com" value="{{ form.email.value|default:'' }}" id="regEmailInput">
+                            </div>
+                            {% if form.email.errors %}
+                                <div class="text-danger smaller mt-1"><i class="bi bi-exclamation-circle me-1"></i>{{ form.email.errors.0 }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Passwords -->
+                        <div class="row g-2.5 mb-3.5">
+                            <div class="col-sm-6">
+                                <label class="form-label text-secondary fw-semibold smaller mb-1">Password</label>
+                                <div class="input-group" style="background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm);">
+                                    <span class="input-group-text bg-transparent border-0 text-muted ps-2.5 pe-1">
+                                        <i class="bi bi-lock text-primary"></i>
+                                    </span>
+                                    <input type="password" name="password" required class="form-control bg-transparent border-0 text-light smaller py-2" placeholder="Min 6 characters" id="regPasswordInput">
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="form-label text-secondary fw-semibold smaller mb-1">Confirm Password</label>
+                                <div class="input-group" style="background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-color); border-radius: var(--border-radius-sm);">
+                                    <span class="input-group-text bg-transparent border-0 text-muted ps-2.5 pe-1">
+                                        <i class="bi bi-shield-check text-primary"></i>
+                                    </span>
+                                    <input type="password" name="confirm_password" required class="form-control bg-transparent border-0 text-light smaller py-2" placeholder="Repeat password" id="regConfirmPasswordInput">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Quick Test Autofill Helper (to make testing effortless) -->
+                        <div class="d-flex align-items-center justify-content-between mb-3.5 px-2">
+                            <span class="text-secondary smaller" style="font-size: 0.74rem;">
+                                <i class="bi bi-magic text-warning me-1"></i> Quick Test:
+                            </span>
+                            <div class="d-flex gap-2">
+                                <button type="button" class="btn btn-codehelp-glass btn-sm py-0.5 px-2 smaller" onclick="fillSample('student')">
+                                    <i class="bi bi-mortarboard me-1"></i> Fill Student Sample
+                                </button>
+                                <button type="button" class="btn btn-codehelp-glass btn-sm py-0.5 px-2 smaller" onclick="fillSample('admin')">
+                                    <i class="bi bi-shield me-1"></i> Fill Admin Sample
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <button type="submit" class="btn btn-codehelp-primary w-100 rounded-pill py-2.5 fw-semibold mb-3 shadow-sm d-flex align-items-center justify-content-center gap-2" id="submitRegBtn">
+                            <span id="submitRegBtnText">
+                                {% if initial_role == 'admin' %}Create Administrator Account{% else %}Create Student Account{% endif %}
+                            </span>
+                            <i class="bi bi-arrow-right"></i>
+                        </button>
+
+                        <div class="text-center smaller text-secondary">
+                            Already have an account? 
+                            <a href="{% url 'accounts:login' %}?role=student" class="text-primary text-decoration-none fw-semibold">Student Sign In</a>
+                            <span class="mx-1">&bull;</span>
+                            <a href="{% url 'accounts:login' %}?role=admin" class="text-warning text-decoration-none fw-semibold">Admin Sign In</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function selectRole(role) {
+    var roleInput = document.getElementById('selectedRoleInput');
+    var cardStudent = document.getElementById('cardRoleStudent');
+    var cardAdmin = document.getElementById('cardRoleAdmin');
+    var studentBadge = document.getElementById('studentCheckBadge');
+    var adminBadge = document.getElementById('adminCheckBadge');
+    var submitBtn = document.getElementById('submitRegBtn');
+    var submitBtnText = document.getElementById('submitRegBtnText');
+    var logoIcon = document.getElementById('registerLogoIcon');
+    var headerIcon = document.getElementById('registerHeaderIcon');
+    var title = document.getElementById('registerTitle');
+    var subtitle = document.getElementById('registerSubtitle');
+
+    roleInput.value = role;
+
+    if (role === 'admin') {
+        cardAdmin.style.borderColor = '#f59e0b';
+        cardAdmin.style.background = 'rgba(245, 158, 11, 0.12)';
+        adminBadge.className = 'position-absolute top-0 end-0 m-1.5 badge rounded-pill bg-warning text-dark';
+
+        cardStudent.style.borderColor = 'var(--border-color)';
+        cardStudent.style.background = 'rgba(255, 255, 255, 0.02)';
+        studentBadge.className = 'position-absolute top-0 end-0 m-1.5 badge rounded-pill d-none';
+
+        submitBtn.className = 'btn btn-warning w-100 rounded-pill py-2.5 fw-semibold mb-3 shadow-sm d-flex align-items-center justify-content-center gap-2 text-dark';
+        submitBtnText.innerText = 'Create Administrator Account';
+
+        logoIcon.style.background = 'linear-gradient(135deg, #f59e0b, #d97706)';
+        headerIcon.className = 'bi bi-shield-lock-fill text-dark';
+        title.innerText = 'Administrator Registration';
+        subtitle.innerText = 'Create an administrative profile with Creator Hub & Django Admin access';
+    } else {
+        cardStudent.style.borderColor = 'var(--primary-purple)';
+        cardStudent.style.background = 'rgba(139, 92, 246, 0.12)';
+        studentBadge.className = 'position-absolute top-0 end-0 m-1.5 badge rounded-pill bg-primary text-white';
+
+        cardAdmin.style.borderColor = 'var(--border-color)';
+        cardAdmin.style.background = 'rgba(255, 255, 255, 0.02)';
+        adminBadge.className = 'position-absolute top-0 end-0 m-1.5 badge rounded-pill d-none';
+
+        submitBtn.className = 'btn btn-codehelp-primary w-100 rounded-pill py-2.5 fw-semibold mb-3 shadow-sm d-flex align-items-center justify-content-center gap-2';
+        submitBtnText.innerText = 'Create Student Account';
+
+        logoIcon.style.background = 'var(--gradient-brand)';
+        headerIcon.className = 'bi bi-person-plus-fill text-white';
+        title.innerText = 'Join CodeWithAmit Ecosystem';
+        subtitle.innerText = 'Create a student profile to solve 450 Sheet, enroll in batches & earn XP';
+    }
+}
+
+function fillSample(role) {
+    selectRole(role);
+    var rand = Math.floor(1000 + Math.random() * 9000);
+    var fName = document.querySelector('input[name="first_name"]');
+    var lName = document.querySelector('input[name="last_name"]');
+    var uName = document.getElementById('regUsernameInput');
+    var email = document.getElementById('regEmailInput');
+    var pass = document.getElementById('regPasswordInput');
+    var cpass = document.getElementById('regConfirmPasswordInput');
+
+    if (role === 'admin') {
+        if (fName) fName.value = 'Admin';
+        if (lName) lName.value = 'User';
+        if (uName) uName.value = 'admin_' + rand;
+        if (email) email.value = 'admin' + rand + '@codebyamit.dev';
+        if (pass) pass.value = 'Admin@123';
+        if (cpass) cpass.value = 'Admin@123';
+    } else {
+        if (fName) fName.value = 'Student';
+        if (lName) lName.value = 'Learner';
+        if (uName) uName.value = 'student_' + rand;
+        if (email) email.value = 'student' + rand + '@codebyamit.dev';
+        if (pass) pass.value = 'Student@123';
+        if (cpass) cpass.value = 'Student@123';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    var params = new URLSearchParams(window.location.search);
+    var r = params.get('role');
+    if (r === 'admin') {
+        selectRole('admin');
+    }
+});
+</script>
+{% endblock %}

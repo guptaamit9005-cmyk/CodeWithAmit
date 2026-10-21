@@ -1,0 +1,168 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if is_edit %}Edit Category: {{ category.name }}{% else %}Create Tutorial Category{% endif %} — CodeWithAmit Studio{% endblock %}
+
+{% block content %}
+<div class="container py-4 py-md-5" style="max-width: 860px;">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb smaller mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'tutorials:tutorial_list' %}" class="text-decoration-none">Tutorials</a></li>
+            <li class="breadcrumb-item active text-muted" aria-current="page">{% if is_edit %}Edit Category{% else %}New Category{% endif %}</li>
+        </ol>
+    </nav>
+
+    <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5 bg-surface position-relative overflow-hidden">
+        <!-- Top subtle accent bar -->
+        <div class="position-absolute top-0 start-0 w-100" style="height: 4px; background: linear-gradient(90deg, #2563eb, #10b981, #f59e0b);"></div>
+
+        <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 pb-3 mb-4 border-bottom">
+            <div class="d-flex align-items-center gap-3">
+                <div class="p-3 rounded-4 d-flex align-items-center justify-content-center shadow-sm" id="categoryIconPreview" style="width: 56px; height: 56px; background: rgba(37, 99, 235, 0.1); color: #2563eb;">
+                    <i class="bi {{ form.icon.value|default:'bi-diagram-3' }} fs-3" id="iconPreviewElement"></i>
+                </div>
+                <div>
+                    <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-1 rounded-pill mb-1">
+                        <i class="bi bi-folder-plus me-1"></i> Admin Category Studio
+                    </span>
+                    <h1 class="h3 fw-bold mb-0 text-slate-900">
+                        {% if is_edit %}Edit Category: {{ category.name }}{% else %}Create New Tutorial Track / Category{% endif %}
+                    </h1>
+                    <p class="text-secondary smaller mb-0">Create tracks like DSA, Python, Java, C++, System Design, SQL, or Web Dev.</p>
+                </div>
+            </div>
+            <a href="{% url 'tutorials:tutorial_list' %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3 shadow-sm hover-lift">
+                <i class="bi bi-arrow-left me-1"></i> Back to Tracks
+            </a>
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger py-2 small rounded-3 mb-3">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <!-- Category Name & Sequence Order -->
+            <div class="row g-3 mb-3">
+                <div class="col-md-8">
+                    <label class="form-label fw-semibold small">Category / Track Name <span class="text-danger">*</span></label>
+                    {{ form.name }}
+                    <div class="form-text smaller text-muted">e.g. Data Structures & Algorithms, Python Mastery, System Design</div>
+                    {% if form.name.errors %}<div class="text-danger smaller mt-1">{{ form.name.errors }}</div>{% endif %}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold small">Display Order</label>
+                    {{ form.order }}
+                    <div class="form-text smaller text-muted">Lower number appears first (0, 1, 2...)</div>
+                </div>
+            </div>
+
+            <!-- Icon Picker & Color Theme -->
+            <div class="card bg-light border-0 rounded-4 p-3 mb-3">
+                <div class="row g-3 align-items-center">
+                    <div class="col-md-5">
+                        <label class="form-label fw-semibold small">Quick Pick Common Icon</label>
+                        {{ form.icon_choice }}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold small">Custom Bootstrap Icon Class</label>
+                        {{ form.icon }}
+                        <div class="form-text smaller text-muted">e.g. <code>bi-diagram-3</code>, <code>bi-cpu</code>, <code>bi-code-slash</code></div>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold small">Accent Theme Color</label>
+                        <div class="d-flex align-items-center gap-2">
+                            {{ form.color_theme }}
+                            <span class="smaller text-muted" id="colorHexText">{{ form.color_theme.value|default:'#2563eb' }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Description -->
+            <div class="mb-3">
+                <label class="form-label fw-semibold small">Track Description</label>
+                {{ form.description }}
+                <div class="form-text smaller text-muted">Detailed overview shown on the track card to guide students about this course or category.</div>
+                {% if form.description.errors %}<div class="text-danger smaller mt-1">{{ form.description.errors }}</div>{% endif %}
+            </div>
+
+            <!-- Badge Text & Featured Switch -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-7">
+                    <label class="form-label fw-semibold small">Badge Text (Optional)</label>
+                    {{ form.badge_text }}
+                    <div class="form-text smaller text-muted">e.g. "Most Popular", "Interview Sheet", "Delta Series"</div>
+                </div>
+                <div class="col-md-5 d-flex align-items-center pt-3">
+                    <div class="form-check form-switch p-2 bg-white rounded-3 border w-100">
+                        {{ form.is_featured }}
+                        <label class="form-check-label fw-semibold small ms-2" for="{{ form.is_featured.id_for_label }}">
+                            <i class="bi bi-star-fill text-warning me-1"></i> Highlight as Featured Track
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Buttons -->
+            <div class="d-flex align-items-center justify-content-between pt-3 border-top">
+                {% if is_edit %}
+                    <a href="{% url 'tutorials:delete_category' category.slug %}" class="btn btn-outline-danger btn-sm rounded-pill px-3">
+                        <i class="bi bi-trash me-1"></i> Delete Track
+                    </a>
+                {% else %}
+                    <div></div>
+                {% endif %}
+
+                <div class="d-flex gap-2">
+                    <a href="{% url 'tutorials:tutorial_list' %}" class="btn btn-outline-secondary px-4 rounded-pill">Cancel</a>
+                    <button type="submit" class="btn btn-primary px-4 py-2 rounded-pill fw-semibold shadow-sm hover-lift">
+                        <i class="bi bi-check-lg me-1"></i> {% if is_edit %}Save Changes{% else %}Create Track & Start Adding Content{% endif %}
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const iconInput = document.getElementById('{{ form.icon.id_for_label }}');
+    const iconSelect = document.getElementById('quickIconPicker');
+    const iconPreview = document.getElementById('iconPreviewElement');
+    const colorInput = document.getElementById('{{ form.color_theme.id_for_label }}');
+    const colorBox = document.getElementById('categoryIconPreview');
+    const colorHex = document.getElementById('colorHexText');
+
+    if (iconSelect && iconInput) {
+        iconSelect.addEventListener('change', function() {
+            if (this.value) {
+                iconInput.value = this.value;
+                updateIcon(this.value);
+            }
+        });
+
+        iconInput.addEventListener('input', function() {
+            updateIcon(this.value);
+        });
+    }
+
+    function updateIcon(val) {
+        if (!val) val = 'bi-code-slash';
+        iconPreview.className = 'bi ' + val + ' fs-3';
+    }
+
+    if (colorInput) {
+        colorInput.addEventListener('input', function() {
+            const hex = this.value;
+            colorBox.style.color = hex;
+            colorBox.style.backgroundColor = hex + '1a';
+            if (colorHex) colorHex.textContent = hex;
+        });
+    }
+});
+</script>
+{% endblock %}

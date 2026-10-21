@@ -1,0 +1,1750 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Student Command Hub — CodeWithAmit{% endblock %}
+
+{% block content %}
+<div class="py-4 py-lg-5" style="background: var(--bg-canvas); min-height: 90vh;">
+    <div class="container" style="max-width: 1180px;">
+
+        <!-- ==================================================================
+             STUDENT COMMAND HEADER & PROFILE CONTROL BAR
+             ================================================================== -->
+        <div class="card p-4 rounded-4 mb-4 interactive-card shadow-xs" style="background: var(--bg-surface); border: 1px solid var(--border-color);">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                <div class="d-flex align-items-center gap-3">
+                    <div class="avatar-student-circle position-relative animate-pulse-glow" style="width: 60px; height: 60px; border-radius: 50%; background: var(--gradient-brand); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #fff; font-weight: bold; flex-shrink: 0; box-shadow: 0 0 20px rgba(139, 92, 246, 0.45);">
+                        {% if profile.avatar %}
+                            <img src="{{ profile.avatar.url }}" alt="{{ request.user.username }}" class="w-100 h-100 rounded-circle object-fit-cover">
+                        {% else %}
+                            <span>{{ request.user.username|make_list|first|upper }}</span>
+                        {% endif %}
+                        <span class="position-absolute bottom-0 end-0 p-1 bg-success border border-dark rounded-circle" title="Online"></span>
+                    </div>
+                    <div>
+                        <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                            <h1 class="h4 fw-bold font-heading mb-0" style="color: var(--text-primary); letter-spacing: -0.02em;">
+                                Welcome back, {{ request.user.get_full_name|default:request.user.username }}!
+                            </h1>
+                            <span class="badge badge-glow-purple rounded-pill smaller px-2.5 py-0.5 fw-semibold">
+                                Level {{ level }} Student
+                            </span>
+                            <span class="badge badge-glow-emerald rounded-pill smaller px-2.5 py-0.5 fw-semibold">
+                                <span class="live-pulse-dot me-1"></span> All 8 Tools Active
+                            </span>
+                        </div>
+                        <div class="d-flex align-items-center gap-3 small text-secondary">
+                            <span><i class="bi bi-person-badge text-primary me-1"></i> {{ profile.headline|default:'Computer Science Engineering Student' }}</span>
+                            <span class="d-none d-sm-inline">&bull;</span>
+                            <span class="d-none d-sm-inline"><i class="bi bi-clock-history text-info me-1"></i> Streak Active</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Action Hub Buttons & Auth Controls -->
+                <div class="d-flex flex-wrap align-items-center gap-2">
+                    <button class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-1.5 btn-shimmer" onclick="switchDashboardTab('tab-compiler-btn')" style="font-size: 0.82rem; border-color: var(--border-color); color: var(--text-primary); background: var(--bg-surface-subtle);">
+                        <i class="bi bi-code-square text-primary me-1"></i> Code Sandbox
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-1.5 btn-shimmer" onclick="switchDashboardTab('tab-practice-btn')" style="font-size: 0.82rem; border-color: var(--border-color); color: var(--text-primary); background: var(--bg-surface-subtle);">
+                        <i class="bi bi-lightning-charge text-warning me-1"></i> 450 Sheet
+                    </button>
+                    <button class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-1.5 btn-shimmer" onclick="switchDashboardTab('tab-aiquiz-btn')" style="font-size: 0.82rem; border-color: var(--border-color); color: var(--text-primary); background: var(--bg-surface-subtle);">
+                        <i class="bi bi-stars text-danger me-1"></i> AI Quiz
+                    </button>
+
+                    <!-- Role & Session Controls -->
+                    {% if request.user.is_staff or request.user.is_superuser or request.user.profile.role == 'admin' %}
+                        <a href="{% url 'dashboard:admin_dashboard' %}" class="btn btn-warning btn-sm text-dark fw-bold rounded-pill px-3 py-1.5 shadow-xs" style="font-size: 0.82rem;" title="Go to Admin Creator Studio">
+                            <i class="bi bi-shield-check me-1"></i> Admin Studio
+                        </a>
+                    {% else %}
+                        <a href="{% url 'accounts:login' %}?role=admin" class="btn btn-outline-warning btn-sm rounded-pill px-2.5 py-1.5" style="font-size: 0.82rem; border-color: rgba(245, 158, 11, 0.4); color: #f59e0b; background: rgba(245, 158, 11, 0.05);" title="Admin & Staff Portal Login">
+                            <i class="bi bi-shield-lock me-1"></i> Admin Login
+                        </a>
+                    {% endif %}
+
+                    <button class="btn btn-outline-primary btn-sm rounded-pill px-2.5 py-1.5" onclick="switchDashboardTab('tab-auth-btn')" style="font-size: 0.82rem; border-color: rgba(37, 99, 235, 0.35); background: rgba(37, 99, 235, 0.06); color: var(--text-primary);" title="Account & Session Controls">
+                        <i class="bi bi-person-badge text-primary me-1"></i> Account
+                    </button>
+
+                    <a href="{% url 'accounts:profile' %}" class="btn btn-outline-secondary btn-sm rounded-pill px-2.5 py-1.5" style="border-color: var(--border-color); color: var(--text-secondary);" title="Profile Settings">
+                        <i class="bi bi-gear-fill"></i>
+                    </a>
+
+                    <a href="{% url 'accounts:logout' %}" class="btn btn-outline-danger btn-sm rounded-pill px-3 py-1.5" style="font-size: 0.82rem;" title="Sign Out / Logout">
+                        <i class="bi bi-box-arrow-right me-1"></i> Logout
+                    </a>
+                </div>
+            </div>
+
+            <!-- 4 Key Metrics Bar -->
+            <div class="row g-3 mt-3 pt-3 border-top" style="border-color: var(--border-color) !important;">
+                <div class="col-6 col-lg-3">
+                    <div class="p-3 rounded-3 h-100 interactive-card" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color);">
+                        <div class="d-flex align-items-center justify-content-between mb-1">
+                            <span class="smaller fw-bold text-uppercase" style="color: var(--text-secondary); letter-spacing: 0.5px;">Daily Streak</span>
+                            <i class="bi bi-fire fs-5 text-warning animate-flame"></i>
+                        </div>
+                        <div class="fs-4 fw-bold font-heading" style="color: var(--text-primary);">
+                            {{ profile.streak_count }} <span class="fs-6 fw-normal text-secondary">Days Active</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-6 col-lg-3">
+                    <div class="p-3 rounded-3 h-100 interactive-card" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color);">
+                        <div class="d-flex align-items-center justify-content-between mb-1">
+                            <span class="smaller fw-bold text-uppercase" style="color: var(--text-secondary); letter-spacing: 0.5px;">Learner Points</span>
+                            <i class="bi bi-gem fs-5 text-primary"></i>
+                        </div>
+                        <div class="fs-4 fw-bold font-heading" style="color: var(--text-primary);">
+                            {{ profile.points }} <span class="fs-6 fw-normal text-secondary">XP</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-6 col-lg-3">
+                    <div class="p-3 rounded-3 h-100 interactive-card" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color);">
+                        <div class="d-flex align-items-center justify-content-between mb-1">
+                            <span class="smaller fw-bold text-uppercase" style="color: var(--text-secondary); letter-spacing: 0.5px;">450 DSA Solved</span>
+                            <i class="bi bi-lightning-charge-fill fs-5 text-success"></i>
+                        </div>
+                        <div class="fs-4 fw-bold font-heading text-success">
+                            {{ solved_count }} <span class="fs-6 fw-normal text-secondary">/ {{ total_questions }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-6 col-lg-3">
+                    <div class="p-3 rounded-3 h-100 interactive-card" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color);">
+                        <div class="d-flex align-items-center justify-content-between mb-1">
+                            <span class="smaller fw-bold text-uppercase" style="color: var(--text-secondary); letter-spacing: 0.5px;">My Batches</span>
+                            <i class="bi bi-mortarboard-fill fs-5 text-info"></i>
+                        </div>
+                        <div class="fs-4 fw-bold font-heading" style="color: var(--text-primary);">
+                            {{ enrolled_courses_data|length }} <span class="fs-6 fw-normal text-secondary">Enrolled</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================================================================
+             GAMIFIED MASTERY ARENA: LEVEL XP ROAD & 7-DAY STREAK FLAME
+             ================================================================== -->
+        <div class="row g-3 mb-4">
+            <!-- Card 1: Level & XP Mastery -->
+            <div class="col-lg-7">
+                <div class="card p-3.5 rounded-4 h-100 shadow-xs border" style="background: var(--bg-surface); border-color: var(--border-color) !important;">
+                    <div class="d-flex justify-content-between align-items-center mb-2.5">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge rounded-pill px-3 py-1 fw-bold text-white shadow-xs" style="background: linear-gradient(135deg, #6366f1, #8b5cf6);">
+                                <i class="bi bi-shield-fill-check me-1"></i> Level {{ level }}
+                            </span>
+                            <span class="fw-bold font-heading fs-6" style="color: var(--text-primary);">{{ level_title }}</span>
+                        </div>
+                        <div class="smaller fw-semibold" style="color: var(--text-secondary);">
+                            <i class="bi bi-award-fill text-warning me-1"></i> Global Rank: <strong class="text-primary">#{{ user_rank }}</strong> <span class="text-muted">/ {{ total_students }}</span>
+                        </div>
+                    </div>
+
+                    <!-- XP Progress Bar -->
+                    <div class="d-flex justify-content-between align-items-center smaller mb-1.5">
+                        <span class="fw-semibold text-secondary">
+                            Level Progress: <strong style="color: var(--text-primary);">{{ xp_in_level }} / 100 XP</strong>
+                        </span>
+                        <span class="badge bg-purple-subtle text-purple rounded-pill px-2.5 py-0.5">
+                            {{ xp_needed_for_next }} XP to Level {{ level|add:1 }}
+                        </span>
+                    </div>
+                    <div class="progress mb-2.5" style="height: 10px; background: rgba(0,0,0,0.06); border-radius: 999px;">
+                        <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: {{ level_progress_pct }}%; background: linear-gradient(90deg, #6366f1, #8b5cf6, #ec4899); border-radius: 999px;" aria-valuenow="{{ level_progress_pct }}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+
+                    <!-- Quick Level Milestones Road -->
+                    <div class="d-flex justify-content-between align-items-center smaller text-muted pt-2 border-top" style="border-color: var(--border-color) !important;">
+                        <span><i class="bi bi-check-circle-fill text-success me-1"></i> Level {{ level }} (Current)</span>
+                        <span><i class="bi bi-arrow-right-short text-secondary"></i></span>
+                        <span class="fw-semibold text-secondary"><i class="bi bi-lock-fill text-muted me-1"></i> Level {{ level|add:1 }} Target</span>
+                        <button class="btn btn-link p-0 text-decoration-none smaller fw-bold text-primary" onclick="switchDashboardTab('tab-gamification-btn')">
+                            View Badges &rarr;
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Card 2: 7-Day Flame Streak Arena -->
+            <div class="col-lg-5">
+                <div class="card p-3.5 rounded-4 h-100 shadow-xs border" style="background: var(--bg-surface); border-color: var(--border-color) !important;">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill px-2.5 py-1 fw-bold">
+                                <i class="bi bi-fire text-warning animate-flame me-1"></i> Streak Heatmap
+                            </span>
+                            <span class="fw-bold fs-6 font-heading" style="color: var(--text-primary);">{{ profile.streak_count }} Days Active</span>
+                        </div>
+                        <span class="badge bg-success-subtle text-success rounded-pill smaller px-2 py-0.5">
+                            <i class="bi bi-lightning-fill me-1"></i> Active
+                        </span>
+                    </div>
+
+                    <p class="smaller text-secondary mb-2.5">
+                        Code daily to maintain your multiplier and climb the weekly leaderboard!
+                    </p>
+
+                    <!-- 7-Day Timeline Circles -->
+                    <div class="d-flex justify-content-between align-items-center gap-1.5 p-2 rounded-3" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color);">
+                        {% for sday in streak_days %}
+                            <div class="text-center flex-fill">
+                                <div class="smaller fw-bold mb-1 {% if sday.is_today %}text-primary{% else %}text-muted{% endif %}" style="font-size: 0.72rem;">
+                                    {{ sday.day_name }}
+                                </div>
+                                <div class="rounded-circle d-inline-flex align-items-center justify-content-center mx-auto {% if sday.is_active %}bg-warning text-dark shadow-xs{% else %}bg-secondary-subtle text-muted{% endif %} {% if sday.is_today %}border border-2 border-primary{% endif %}" style="width: 32px; height: 32px; font-size: 0.85rem;">
+                                    {% if sday.is_active %}
+                                        <i class="bi bi-fire text-dark"></i>
+                                    {% else %}
+                                        <span class="smaller fw-bold">{{ sday.day_num }}</span>
+                                    {% endif %}
+                                </div>
+                                {% if sday.is_today %}
+                                    <div class="badge bg-primary text-white rounded-pill px-1 py-0 smaller mt-1" style="font-size: 0.6rem;">Today</div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================================================================
+             CENTRALIZED FEATURE SUITE TABS (All Features in One Student Dashboard)
+             ================================================================== -->
+        <div class="d-flex overflow-x-auto pb-2 mb-4 scrollbar-none">
+            <ul class="nav nav-pills gap-1.5 p-1.5 rounded-pill shadow-xs flex-nowrap" id="dashboardTabs" role="tablist" style="background: var(--bg-surface); border: 1px solid var(--border-color); width: max-content;">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active rounded-pill px-3 py-1.5 small fw-semibold" id="tab-overview-btn" data-bs-toggle="pill" data-bs-target="#tab-overview" type="button" role="tab" aria-selected="true">
+                        <i class="bi bi-grid-fill me-1"></i> Overview
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link rounded-pill px-3 py-1.5 small fw-semibold" id="tab-gamification-btn" data-bs-toggle="pill" data-bs-target="#tab-gamification" type="button" role="tab" aria-selected="false">
+                        <i class="bi bi-trophy-fill me-1 text-warning"></i> Badges & Arena ({{ earned_badges_count }})
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link rounded-pill px-3 py-1.5 small fw-semibold" id="tab-compiler-btn" data-bs-toggle="pill" data-bs-target="#tab-compiler" type="button" role="tab" aria-selected="false">
+                        <i class="bi bi-code-square me-1 text-primary"></i> Code Sandbox
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link rounded-pill px-3 py-1.5 small fw-semibold" id="tab-practice-btn" data-bs-toggle="pill" data-bs-target="#tab-practice" type="button" role="tab" aria-selected="false">
+                        <i class="bi bi-collection-play me-1 text-warning"></i> Practice Sets
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link rounded-pill px-3 py-1.5 small fw-semibold" id="tab-courses-btn" data-bs-toggle="pill" data-bs-target="#tab-courses" type="button" role="tab" aria-selected="false">
+                        <i class="bi bi-mortarboard me-1 text-info"></i> My Batches ({{ enrolled_courses_data|length }})
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link rounded-pill px-3 py-1.5 small fw-semibold" id="tab-tutorials-btn" data-bs-toggle="pill" data-bs-target="#tab-tutorials" type="button" role="tab" aria-selected="false">
+                        <i class="bi bi-book-half me-1 text-success"></i> Tutorials
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link rounded-pill px-3 py-1.5 small fw-semibold" id="tab-live-btn" data-bs-toggle="pill" data-bs-target="#tab-live" type="button" role="tab" aria-selected="false">
+                        <i class="bi bi-broadcast me-1 text-danger"></i> Live Classes
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link rounded-pill px-3 py-1.5 small fw-semibold" id="tab-aiquiz-btn" data-bs-toggle="pill" data-bs-target="#tab-aiquiz" type="button" role="tab" aria-selected="false">
+                        <i class="bi bi-stars me-1 text-danger"></i> AI Quiz
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link rounded-pill px-3 py-1.5 small fw-semibold" id="tab-auth-btn" data-bs-toggle="pill" data-bs-target="#tab-auth" type="button" role="tab" aria-selected="false">
+                        <i class="bi bi-shield-lock-fill me-1 text-primary"></i> Account &amp; Session
+                    </button>
+                </li>
+            </ul>
+        </div>
+
+        <!-- ==================================================================
+             TAB CONTENTS
+             ================================================================== -->
+        <div class="tab-content" id="dashboardTabContent">
+
+            <!-- --------------------------------------------------------------
+                 TAB 1: OVERVIEW (Command Center)
+                 -------------------------------------------------------------- -->
+            <div class="tab-pane fade show active" id="tab-overview" role="tabpanel" aria-labelledby="tab-overview-btn">
+                <div class="row g-4">
+                    <!-- Left: Current Learning Focus & POTD -->
+                    <div class="col-lg-8">
+                        <!-- Primary Course in Progress -->
+                        <div class="card p-4 rounded-4 mb-4 shadow-xs" style="background: var(--bg-surface); border: 1px solid var(--border-color);">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="badge bg-primary-subtle text-primary rounded-pill smaller px-2.5 py-1 fw-semibold">
+                                    Current Learning Focus
+                                </span>
+                                {% if primary_course %}
+                                    <span class="smaller text-secondary fw-semibold">{{ primary_course.progress_pct }}% Completed</span>
+                                {% endif %}
+                            </div>
+
+                            {% if primary_course %}
+                                <h3 class="h5 fw-bold font-heading mb-2" style="color: var(--text-primary);">
+                                    {{ primary_course.course.title }}
+                                </h3>
+                                <p class="text-secondary small mb-3">
+                                    Next Lesson: <strong>{{ primary_course.next_lesson.title|default:'Getting Started' }}</strong>
+                                    {% if primary_course.next_lesson.duration_minutes %}
+                                        • {{ primary_course.next_lesson.duration_minutes }} mins
+                                    {% endif %}
+                                </p>
+
+                                <div class="progress mb-3" style="height: 6px; background: rgba(255, 255, 255, 0.06);">
+                                    <div class="progress-bar bg-primary" role="progressbar" style="width: {{ primary_course.progress_pct }}%;" aria-valuenow="{{ primary_course.progress_pct }}" aria-valuemin="0" aria-valuemax="100"></div>
+                                </div>
+
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="smaller text-secondary">
+                                        {{ primary_course.completed_lessons_count }} of {{ primary_course.total_lessons }} lessons finished
+                                    </span>
+                                    {% if primary_course.next_lesson %}
+                                        <a href="{% url 'courses:lesson_detail' primary_course.course.slug primary_course.next_lesson.pk %}" class="btn btn-codehelp-primary btn-sm px-3.5 py-1.5 fw-semibold shadow-xs">
+                                            <i class="bi bi-play-fill me-1"></i> Resume Lesson
+                                        </a>
+                                    {% else %}
+                                        <a href="{% url 'courses:course_detail' primary_course.course.slug %}" class="btn btn-codehelp-primary btn-sm px-3.5 py-1.5 fw-semibold shadow-xs">
+                                            View Syllabus
+                                        </a>
+                                    {% endif %}
+                                </div>
+                            {% else %}
+                                <div class="text-center py-4">
+                                    <div class="rounded-circle p-3 bg-primary-subtle text-primary d-inline-flex mb-3" style="width: 50px; height: 50px; font-size: 1.4rem;">
+                                        <i class="bi bi-mortarboard"></i>
+                                    </div>
+                                    <h4 class="h6 fw-bold mb-1" style="color: var(--text-primary);">You are not enrolled in any batch yet</h4>
+                                    <p class="text-secondary smaller mb-3">Start learning with our curated, industry-ready engineering courses.</p>
+                                    <a href="{% url 'courses:course_list' %}" class="btn btn-codehelp-primary btn-sm px-4 py-2 fw-semibold">
+                                        Browse Available Courses &rarr;
+                                    </a>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Daily Coding Challenge (POTD) -->
+                        <div class="card p-4 rounded-4 mb-4 shadow-xs" style="background: var(--bg-surface); border: 1px solid var(--border-color);">
+                            <div class="d-flex justify-content-between align-items-center mb-2.5">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill smaller px-2.5 py-1 fw-bold">
+                                        <i class="bi bi-lightning-charge-fill me-1"></i> Problem of the Day
+                                    </span>
+                                    {% if daily_challenge %}
+                                        <span class="badge bg-secondary-subtle text-secondary rounded-pill smaller">{{ daily_challenge.difficulty }}</span>
+                                    {% endif %}
+                                </div>
+                                {% if daily_solved %}
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill smaller px-2.5 py-1">
+                                        <i class="bi bi-check2-circle me-1"></i> Solved Today (+25 XP)
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill smaller px-2.5 py-1">
+                                        Unsolved (+25 XP)
+                                    </span>
+                                {% endif %}
+                            </div>
+
+                            {% if daily_challenge %}
+                                <h4 class="h6 fw-bold font-heading mb-1.5" style="color: var(--text-primary);">
+                                    {{ daily_challenge.title }}
+                                </h4>
+                                <p class="text-secondary smaller mb-3" style="line-height: 1.6;">
+                                    {{ daily_challenge.description|truncatewords:22 }}
+                                </p>
+                                <div class="d-flex justify-content-between align-items-center pt-2 border-top" style="border-color: var(--border-color) !important;">
+                                    <span class="smaller text-secondary">
+                                        Tags: {{ daily_challenge.company_tags|default:'Google, Amazon' }}
+                                    </span>
+                                    <a href="{% url 'coding_practice:problem_detail' daily_challenge.pk %}" class="btn btn-outline-warning btn-sm px-3.5 py-1.5 fw-semibold rounded-pill">
+                                        {% if daily_solved %}Review Solution{% else %}Solve Challenge &rarr;{% endif %}
+                                    </a>
+                                </div>
+                            {% else %}
+                                <p class="text-secondary smaller mb-0">Daily challenge is currently being updated. Check back shortly!</p>
+                            {% endif %}
+                        </div>
+
+                        <!-- Daily Coding Quests & XP Missions -->
+                        <div class="card p-4 rounded-4 shadow-xs" style="background: var(--bg-surface); border: 1px solid var(--border-color);">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="badge rounded-pill px-2.5 py-1 fw-bold text-white shadow-xs" style="background: linear-gradient(135deg, #f59e0b, #ef4444);">
+                                        <i class="bi bi-crosshair me-1"></i> Daily Quests
+                                    </span>
+                                    <h4 class="h6 fw-bold font-heading mb-0" style="color: var(--text-primary);">Missions for Today</h4>
+                                </div>
+                                <span class="smaller text-secondary fw-semibold">
+                                    Level Up Multiplier
+                                </span>
+                            </div>
+
+                            <div class="d-flex flex-column gap-2.5">
+                                {% for quest in daily_quests %}
+                                    <div class="p-3 rounded-3 d-flex align-items-center justify-content-between flex-wrap gap-2" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color);">
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0" style="width: 38px; height: 38px; background: rgba(var(--bs-{{ quest.color }}-rgb, 99, 102, 241), 0.12); color: var(--bs-{{ quest.color }}, #6366f1); font-size: 1.1rem;">
+                                                <i class="bi {{ quest.icon }}"></i>
+                                            </div>
+                                            <div>
+                                                <div class="d-flex align-items-center gap-2">
+                                                    <span class="small fw-bold" style="color: var(--text-primary);">{{ quest.title }}</span>
+                                                    <span class="badge bg-warning-subtle text-warning rounded-pill smaller px-2 py-0.5">+{{ quest.xp }} XP</span>
+                                                </div>
+                                                <p class="smaller text-secondary mb-0">{{ quest.desc }}</p>
+                                            </div>
+                                        </div>
+                                        <div class="d-flex align-items-center gap-2">
+                                            {% if quest.is_completed %}
+                                                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2.5 py-1 smaller fw-semibold">
+                                                    <i class="bi bi-check-circle-fill me-1"></i> Completed
+                                                </span>
+                                            {% else %}
+                                                <span class="badge bg-secondary-subtle text-secondary rounded-pill px-2.5 py-1 smaller fw-semibold">
+                                                    In Progress
+                                                </span>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Next Live Session & Quick Tool Navigator -->
+                    <div class="col-lg-4">
+                        <!-- Mini Leaderboard Podium Card -->
+                        <div class="card p-3.5 rounded-4 mb-4 shadow-xs" style="background: var(--bg-surface); border: 1px solid var(--border-color);">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill smaller px-2.5 py-1 fw-bold">
+                                    <i class="bi bi-trophy-fill me-1"></i> Leaderboard Standing
+                                </span>
+                                <a href="{% url 'accounts:leaderboard' %}" class="smaller fw-bold text-decoration-none text-primary">
+                                    All Ranks &rarr;
+                                </a>
+                            </div>
+
+                            <!-- Top 3 Podium List -->
+                            <div class="d-flex flex-column gap-2 mb-3">
+                                {% for coder in top_coders|slice:":3" %}
+                                    <div class="p-2 rounded-3 d-flex align-items-center justify-content-between" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color);">
+                                        <div class="d-flex align-items-center gap-2">
+                                            <span class="fs-6 fw-bold">
+                                                {% if forloop.counter == 1 %}🥇{% elif forloop.counter == 2 %}🥈{% else %}🥉{% endif %}
+                                            </span>
+                                            <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold smaller" style="width: 28px; height: 28px; background: var(--gradient-brand, #6366f1); font-size: 0.75rem;">
+                                                {{ coder.user.username|make_list|first|upper }}
+                                            </div>
+                                            <div>
+                                                <div class="small fw-semibold text-truncate" style="max-width: 130px; color: var(--text-primary);">
+                                                    {{ coder.user.get_full_name|default:coder.user.username }}
+                                                </div>
+                                                <div class="smaller text-muted" style="font-size: 0.72rem;">{{ coder.streak_count }}d streak</div>
+                                            </div>
+                                        </div>
+                                        <span class="badge bg-purple-subtle text-purple rounded-pill smaller px-2 py-0.5 fw-bold">
+                                            {{ coder.points }} XP
+                                        </span>
+                                    </div>
+                                {% endfor %}
+                            </div>
+
+                            <!-- Current Student's Rank Row -->
+                            <div class="p-2.5 rounded-3 d-flex align-items-center justify-content-between border border-primary border-opacity-50" style="background: rgba(99, 102, 241, 0.08);">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="badge bg-primary text-white rounded-circle p-1 smaller fw-bold" style="width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center;">#{{ user_rank }}</span>
+                                    <span class="small fw-bold" style="color: var(--text-primary);">You ({{ request.user.username }})</span>
+                                </div>
+                                <span class="badge bg-primary rounded-pill px-2.5 py-1 text-white smaller fw-bold">
+                                    {{ profile.points }} XP
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Badges Showcase Teaser -->
+                        <div class="card p-3.5 rounded-4 mb-4 shadow-xs" style="background: var(--bg-surface); border: 1px solid var(--border-color);">
+                            <div class="d-flex justify-content-between align-items-center mb-2.5">
+                                <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill smaller px-2.5 py-1 fw-bold">
+                                    <i class="bi bi-award-fill me-1"></i> Trophies & Badges
+                                </span>
+                                <span class="smaller text-secondary fw-semibold">{{ earned_badges_count }}/{{ total_badges_count }}</span>
+                            </div>
+
+                            <p class="smaller text-secondary mb-2.5">
+                                Collect achievements by maintaining streaks, solving DSA sheets, and acing live contests.
+                            </p>
+
+                            <!-- Badge Icons Row -->
+                            <div class="d-flex flex-wrap gap-2 mb-3">
+                                {% for ub in earned_user_badges|slice:":4" %}
+                                    <div class="p-2 rounded-3 text-center border shadow-xs" style="background: var(--bg-surface-subtle); border-color: var(--border-color) !important; min-width: 65px;" title="{{ ub.badge.name }}: {{ ub.badge.description }}">
+                                        <i class="bi {{ ub.badge.icon }} text-{{ ub.badge.color }} fs-5"></i>
+                                        <div class="smaller text-truncate mt-1 fw-bold" style="font-size: 0.68rem; max-width: 60px; color: var(--text-primary);">
+                                            {{ ub.badge.name }}
+                                        </div>
+                                    </div>
+                                {% empty %}
+                                    <div class="text-center py-2 w-100 smaller text-muted">
+                                        Solve your first problem to unlock badges!
+                                    </div>
+                                {% endfor %}
+                            </div>
+
+                            <button class="btn btn-outline-primary btn-sm w-100 rounded-pill py-1.5 fw-semibold smaller" onclick="switchDashboardTab('tab-gamification-btn')">
+                                View Trophy Showcase & Badges &rarr;
+                            </button>
+                        </div>
+
+                        <!-- Upcoming Live Class Card -->
+                        <div class="card p-3.5 rounded-4 mb-4 shadow-xs" style="background: var(--bg-surface); border: 1px solid var(--border-color);">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill smaller px-2.5 py-1 fw-bold">
+                                    <i class="bi bi-broadcast me-1"></i> Live Doubt Session
+                                </span>
+                                {% if live_now_class %}
+                                    <span class="badge bg-danger text-white rounded-pill smaller animate-pulse">LIVE NOW</span>
+                                {% endif %}
+                            </div>
+
+                            {% if live_now_class %}
+                                <h4 class="h6 fw-bold font-heading mb-1" style="color: var(--text-primary);">{{ live_now_class.title }}</h4>
+                                <p class="text-secondary smaller mb-3">Mentor: {{ live_now_class.instructor.get_full_name|default:live_now_class.instructor.username }}</p>
+                                <a href="{{ live_now_class.google_meet_link|default:'#' }}" target="_blank" class="btn btn-danger btn-sm w-100 fw-semibold rounded-pill py-1.5">
+                                    <i class="bi bi-camera-video-fill me-1"></i> Join Google Meet Room
+                                </a>
+                            {% elif upcoming_classes %}
+                                {% with upcoming_classes|first as next_class %}
+                                    <h4 class="h6 fw-bold font-heading mb-1" style="color: var(--text-primary);">{{ next_class.title }}</h4>
+                                    <p class="text-secondary smaller mb-2">
+                                        <i class="bi bi-calendar-event text-primary me-1"></i> {{ next_class.scheduled_date|date:"D, M d" }} at {{ next_class.start_time|time:"H:i" }}
+                                    </p>
+                                    <p class="text-secondary smaller mb-3">Mentor: {{ next_class.instructor.get_full_name|default:next_class.instructor.username }}</p>
+                                    <a href="{% url 'live_classes:class_detail' next_class.pk %}" class="btn btn-outline-danger btn-sm w-100 fw-semibold rounded-pill py-1.5">
+                                        View Session Details &rarr;
+                                    </a>
+                                {% endwith %}
+                            {% else %}
+                                <div class="text-center py-3">
+                                    <p class="text-secondary smaller mb-2">No live classes scheduled for today.</p>
+                                    <button class="btn btn-outline-secondary btn-sm rounded-pill px-3" onclick="switchDashboardTab('tab-live-btn')">
+                                        Browse Upcoming Schedule
+                                    </button>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Feature Suite Quick Shortcuts -->
+                        <div class="card p-3.5 rounded-4 shadow-xs" style="background: var(--bg-surface); border: 1px solid var(--border-color);">
+                            <h5 class="smaller fw-bold text-uppercase text-muted mb-2.5" style="letter-spacing: 0.5px;">Student Feature Suite</h5>
+                            <div class="d-flex flex-column gap-1.5">
+                                <a href="javascript:void(0)" onclick="switchDashboardTab('tab-compiler-btn')" class="p-2 rounded-2 text-decoration-none d-flex align-items-center justify-content-between topic-quick-item" style="color: var(--text-secondary); background: var(--bg-surface-subtle); border: 1px solid var(--border-color);">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="bi bi-code-square text-primary"></i>
+                                        <span class="small fw-semibold" style="color: var(--text-primary);">Code Sandbox</span>
+                                    </div>
+                                    <i class="bi bi-chevron-right smaller text-muted"></i>
+                                </a>
+                                <a href="javascript:void(0)" onclick="switchDashboardTab('tab-practice-btn')" class="p-2 rounded-2 text-decoration-none d-flex align-items-center justify-content-between topic-quick-item" style="color: var(--text-secondary); background: var(--bg-surface-subtle); border: 1px solid var(--border-color);">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="bi bi-lightning-charge text-warning"></i>
+                                        <span class="small fw-semibold" style="color: var(--text-primary);">450 DSA Sheet</span>
+                                    </div>
+                                    <i class="bi bi-chevron-right smaller text-muted"></i>
+                                </a>
+                                <a href="javascript:void(0)" onclick="switchDashboardTab('tab-tutorials-btn')" class="p-2 rounded-2 text-decoration-none d-flex align-items-center justify-content-between topic-quick-item" style="color: var(--text-secondary); background: var(--bg-surface-subtle); border: 1px solid var(--border-color);">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="bi bi-book-half text-success"></i>
+                                        <span class="small fw-semibold" style="color: var(--text-primary);">Programming Tutorials</span>
+                                    </div>
+                                    <i class="bi bi-chevron-right smaller text-muted"></i>
+                                </a>
+                                <a href="javascript:void(0)" onclick="switchDashboardTab('tab-aiquiz-btn')" class="p-2 rounded-2 text-decoration-none d-flex align-items-center justify-content-between topic-quick-item" style="color: var(--text-secondary); background: var(--bg-surface-subtle); border: 1px solid var(--border-color);">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <i class="bi bi-stars text-danger"></i>
+                                        <span class="small fw-semibold" style="color: var(--text-primary);">AI Technical Quiz</span>
+                                    </div>
+                                    <i class="bi bi-chevron-right smaller text-muted"></i>
+                                </a>
+                            </div>
+                        </div>
+
+                        <!-- ==========================================================
+                             ACCOUNT & SESSION MANAGEMENT CARD (LOGIN / LOGOUT)
+                             ========================================================== -->
+                        <div class="card p-3.5 rounded-4 shadow-xs mt-4 interactive-card" style="background: var(--bg-surface); border: 1px solid var(--border-color);">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill smaller px-2.5 py-1 fw-bold">
+                                    <i class="bi bi-person-badge-fill me-1"></i> Active Session
+                                </span>
+                                <span class="badge {% if request.user.is_staff or request.user.is_superuser %}bg-warning-subtle text-warning border border-warning-subtle{% else %}bg-success-subtle text-success border border-success-subtle{% endif %} rounded-pill smaller px-2.5 py-1 fw-semibold">
+                                    <span class="live-pulse-dot me-1"></span>
+                                    {% if request.user.is_staff or request.user.is_superuser %}Admin / Staff{% else %}Student Portal{% endif %}
+                                </span>
+                            </div>
+
+                            <div class="d-flex align-items-center gap-2.5 p-2.5 rounded-3 mb-3" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color);">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold shadow-xs" style="width: 42px; height: 42px; background: var(--gradient-brand); font-size: 1.1rem; flex-shrink: 0;">
+                                    {% if profile.avatar %}
+                                        <img src="{{ profile.avatar.url }}" alt="{{ request.user.username }}" class="w-100 h-100 rounded-circle object-fit-cover">
+                                    {% else %}
+                                        {{ request.user.username|make_list|first|upper }}
+                                    {% endif %}
+                                </div>
+                                <div class="overflow-hidden">
+                                    <div class="fw-bold small text-truncate" style="color: var(--text-primary);">
+                                        {{ request.user.get_full_name|default:request.user.username }}
+                                    </div>
+                                    <div class="smaller text-muted text-truncate">{{ request.user.email|default:'student@codestyle.com' }}</div>
+                                    <div class="smaller text-secondary">
+                                        <i class="bi bi-clock-history me-1 text-primary"></i> Last active: Today
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Fast Login / Logout / Switch Actions -->
+                            <div class="d-flex flex-column gap-2 mb-3">
+                                {% if request.user.is_staff or request.user.is_superuser or request.user.profile.role == 'admin' %}
+                                    <a href="{% url 'dashboard:admin_dashboard' %}" class="btn btn-warning btn-sm rounded-pill fw-bold text-dark py-1.5 shadow-xs w-100 d-flex align-items-center justify-content-center gap-1.5">
+                                        <i class="bi bi-shield-check"></i>
+                                        <span>Open Admin Creator Studio</span>
+                                    </a>
+                                {% else %}
+                                    <a href="{% url 'accounts:login' %}?role=admin" class="btn btn-outline-warning btn-sm rounded-pill py-1.5 w-100 fw-semibold d-flex align-items-center justify-content-center gap-1.5" style="border-color: rgba(245, 158, 11, 0.4); color: #f59e0b; background: rgba(245, 158, 11, 0.05);">
+                                        <i class="bi bi-shield-lock-fill"></i>
+                                        <span>Switch &amp; Login as Admin</span>
+                                    </a>
+                                {% endif %}
+
+                                <a href="{% url 'accounts:login' %}?role=student" class="btn btn-outline-secondary btn-sm rounded-pill py-1.5 w-100 smaller d-flex align-items-center justify-content-center gap-1.5" style="border-color: var(--border-color); color: var(--text-primary); background: var(--bg-surface-subtle);">
+                                    <i class="bi bi-arrow-repeat text-primary"></i>
+                                    <span>Switch Account / Student Login</span>
+                                </a>
+
+                                <a href="{% url 'accounts:logout' %}" class="btn btn-outline-danger btn-sm rounded-pill py-1.5 w-100 fw-semibold shadow-xs d-flex align-items-center justify-content-center gap-1.5">
+                                    <i class="bi bi-box-arrow-right"></i>
+                                    <span>Sign Out (Logout)</span>
+                                </a>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-center pt-2.5 border-top" style="border-color: var(--border-color) !important;">
+                                <span class="smaller text-muted">Role: <strong class="text-primary">{{ profile.role|title|default:'Student' }}</strong></span>
+                                <button type="button" class="btn btn-link p-0 text-decoration-none smaller fw-bold text-primary" onclick="switchDashboardTab('tab-auth-btn')">
+                                    Full Session Controls &rarr;
+                                </button>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- --------------------------------------------------------------
+                 TAB: GAMIFICATION, BADGES & LEADERBOARD ARENA
+                 -------------------------------------------------------------- -->
+            <div class="tab-pane fade" id="tab-gamification" role="tabpanel" aria-labelledby="tab-gamification-btn">
+                <!-- Gamification Hero Header -->
+                <div class="card p-4 rounded-4 mb-4 shadow-xs" style="background: var(--bg-surface); border: 1px solid var(--border-color);">
+                    <div class="row align-items-center g-3">
+                        <div class="col-lg-8">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center text-white shadow-xs" style="width: 64px; height: 64px; background: linear-gradient(135deg, #f59e0b, #ef4444); font-size: 1.8rem; flex-shrink: 0;">
+                                    <i class="bi bi-trophy-fill"></i>
+                                </div>
+                                <div>
+                                    <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                                        <h3 class="h5 fw-bold font-heading mb-0" style="color: var(--text-primary);">
+                                            Achievements & Mastery Arena
+                                        </h3>
+                                        <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill smaller px-2.5 py-0.5 fw-bold">
+                                            Level {{ level }} • {{ level_title }}
+                                        </span>
+                                    </div>
+                                    <p class="text-secondary smaller mb-0">
+                                        Earn XP by solving DSA problems, keeping daily streaks active, and completing engineering tracks.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-4 text-lg-end">
+                            <div class="d-inline-flex align-items-center gap-3 p-2.5 rounded-3" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color);">
+                                <div class="text-start">
+                                    <div class="smaller text-muted">Global Ranking</div>
+                                    <div class="fw-bold font-heading fs-5" style="color: var(--text-primary);">
+                                        #{{ user_rank }} <span class="fs-6 fw-normal text-muted">/ {{ total_students }}</span>
+                                    </div>
+                                </div>
+                                <a href="{% url 'accounts:leaderboard' %}" class="btn btn-codehelp-primary btn-sm rounded-pill px-3 py-1.5 fw-semibold smaller">
+                                    Full Leaderboard &rarr;
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Level Progression Track -->
+                    <div class="mt-4 pt-3 border-top" style="border-color: var(--border-color) !important;">
+                        <div class="d-flex justify-content-between align-items-center mb-1.5 smaller">
+                            <span class="fw-bold" style="color: var(--text-primary);">
+                                <i class="bi bi-gem text-primary me-1"></i> Level {{ level }} ({{ xp_in_level }}/100 XP)
+                            </span>
+                            <span class="text-secondary fw-semibold">
+                                {{ xp_needed_for_next }} XP needed for Level {{ level|add:1 }}
+                            </span>
+                        </div>
+                        <div class="progress mb-3" style="height: 12px; background: rgba(0,0,0,0.06); border-radius: 999px;">
+                            <div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: {{ level_progress_pct }}%; background: linear-gradient(90deg, #6366f1, #8b5cf6, #ec4899); border-radius: 999px;" aria-valuenow="{{ level_progress_pct }}" aria-valuemin="0" aria-valuemax="100"></div>
+                        </div>
+
+                        <!-- 8 Level Milestones Strip -->
+                        <div class="d-flex overflow-x-auto pb-1 gap-2 scrollbar-none">
+                            <div class="p-2 rounded-3 text-center flex-fill border {% if level >= 1 %}border-primary bg-primary bg-opacity-10{% else %}border-secondary bg-surface-subtle opacity-50{% endif %}" style="min-width: 100px;">
+                                <div class="smaller fw-bold text-truncate" style="color: var(--text-primary);">Lvl 1 Novice</div>
+                                <span class="smaller text-muted" style="font-size: 0.68rem;">0 XP</span>
+                            </div>
+                            <div class="p-2 rounded-3 text-center flex-fill border {% if level >= 2 %}border-primary bg-primary bg-opacity-10{% else %}border-secondary bg-surface-subtle opacity-50{% endif %}" style="min-width: 100px;">
+                                <div class="smaller fw-bold text-truncate" style="color: var(--text-primary);">Lvl 2 Explorer</div>
+                                <span class="smaller text-muted" style="font-size: 0.68rem;">100 XP</span>
+                            </div>
+                            <div class="p-2 rounded-3 text-center flex-fill border {% if level >= 3 %}border-primary bg-primary bg-opacity-10{% else %}border-secondary bg-surface-subtle opacity-50{% endif %}" style="min-width: 100px;">
+                                <div class="smaller fw-bold text-truncate" style="color: var(--text-primary);">Lvl 3 Apprentice</div>
+                                <span class="smaller text-muted" style="font-size: 0.68rem;">200 XP</span>
+                            </div>
+                            <div class="p-2 rounded-3 text-center flex-fill border {% if level >= 4 %}border-primary bg-primary bg-opacity-10{% else %}border-secondary bg-surface-subtle opacity-50{% endif %}" style="min-width: 100px;">
+                                <div class="smaller fw-bold text-truncate" style="color: var(--text-primary);">Lvl 4 Luminary</div>
+                                <span class="smaller text-muted" style="font-size: 0.68rem;">300 XP</span>
+                            </div>
+                            <div class="p-2 rounded-3 text-center flex-fill border {% if level >= 5 %}border-primary bg-primary bg-opacity-10{% else %}border-secondary bg-surface-subtle opacity-50{% endif %}" style="min-width: 100px;">
+                                <div class="smaller fw-bold text-truncate" style="color: var(--text-primary);">Lvl 5 Byte Master</div>
+                                <span class="smaller text-muted" style="font-size: 0.68rem;">400 XP</span>
+                            </div>
+                            <div class="p-2 rounded-3 text-center flex-fill border {% if level >= 6 %}border-primary bg-primary bg-opacity-10{% else %}border-secondary bg-surface-subtle opacity-50{% endif %}" style="min-width: 100px;">
+                                <div class="smaller fw-bold text-truncate" style="color: var(--text-primary);">Lvl 6 Alchemist</div>
+                                <span class="smaller text-muted" style="font-size: 0.68rem;">500 XP</span>
+                            </div>
+                            <div class="p-2 rounded-3 text-center flex-fill border {% if level >= 7 %}border-primary bg-primary bg-opacity-10{% else %}border-secondary bg-surface-subtle opacity-50{% endif %}" style="min-width: 100px;">
+                                <div class="smaller fw-bold text-truncate" style="color: var(--text-primary);">Lvl 7 Architect</div>
+                                <span class="smaller text-muted" style="font-size: 0.68rem;">600 XP</span>
+                            </div>
+                            <div class="p-2 rounded-3 text-center flex-fill border {% if level >= 8 %}border-warning bg-warning bg-opacity-10{% else %}border-secondary bg-surface-subtle opacity-50{% endif %}" style="min-width: 100px;">
+                                <div class="smaller fw-bold text-truncate text-warning">Lvl 8 Grandmaster</div>
+                                <span class="smaller text-muted" style="font-size: 0.68rem;">700+ XP</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Unlocked Trophies & Badges Section -->
+                <div class="card p-4 rounded-4 mb-4 shadow-xs" style="background: var(--bg-surface); border: 1px solid var(--border-color);">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill smaller px-2.5 py-1 fw-bold">
+                                <i class="bi bi-award-fill me-1"></i> Unlocked Achievements
+                            </span>
+                            <span class="fw-bold fs-6 font-heading" style="color: var(--text-primary);">
+                                {{ earned_badges_count }} of {{ total_badges_count }} Badges Earned ({{ badge_completion_pct }}%)
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="row g-3">
+                        {% for ub in earned_user_badges %}
+                            <div class="col-sm-6 col-md-4 col-lg-3">
+                                <div class="card p-3 rounded-4 h-100 text-center border shadow-xs transition-hover" style="background: var(--bg-surface-subtle); border-color: rgba(var(--bs-{{ ub.badge.color }}-rgb, 99, 102, 241), 0.35) !important;">
+                                    <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2.5 text-{{ ub.badge.color }}" style="width: 52px; height: 52px; background: rgba(var(--bs-{{ ub.badge.color }}-rgb, 99, 102, 241), 0.12); font-size: 1.5rem;">
+                                        <i class="bi {{ ub.badge.icon }}"></i>
+                                    </div>
+                                    <h4 class="h6 fw-bold font-heading mb-1" style="color: var(--text-primary);">
+                                        {{ ub.badge.name }}
+                                    </h4>
+                                    <span class="badge bg-{{ ub.badge.color }}-subtle text-{{ ub.badge.color }} rounded-pill smaller px-2 py-0.5 mb-2">
+                                        {{ ub.badge.category }}
+                                    </span>
+                                    <p class="smaller text-secondary mb-2" style="font-size: 0.78rem; line-height: 1.4;">
+                                        {{ ub.badge.description }}
+                                    </p>
+                                    <div class="mt-auto pt-2 border-top d-flex justify-content-between align-items-center smaller" style="border-color: var(--border-color) !important;">
+                                        <span class="badge bg-warning-subtle text-warning rounded-pill">+{{ ub.badge.points_reward }} XP</span>
+                                        <span class="text-muted" style="font-size: 0.72rem;">{{ ub.awarded_at|date:"M d" }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <div class="col-12 text-center py-4 text-muted smaller">
+                                You haven't earned any badges yet. Start by logging in daily, running code in the sandbox, or solving a DSA challenge!
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Locked Badges & Future Milestones -->
+                {% if locked_badges %}
+                    <div class="card p-4 rounded-4 mb-4 shadow-xs" style="background: var(--bg-surface); border: 1px solid var(--border-color);">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <div class="d-flex align-items-center gap-2">
+                                <span class="badge bg-secondary-subtle text-secondary rounded-pill smaller px-2.5 py-1 fw-bold">
+                                    <i class="bi bi-lock-fill me-1"></i> Locked Achievements
+                                </span>
+                                <span class="smaller text-muted">Complete the criteria to unlock</span>
+                            </div>
+                        </div>
+
+                        <div class="row g-3">
+                            {% for b in locked_badges %}
+                                <div class="col-sm-6 col-md-4 col-lg-3">
+                                    <div class="card p-3 rounded-4 h-100 text-center border opacity-75 shadow-xs" style="background: var(--bg-surface-subtle); border-color: var(--border-color) !important;">
+                                        <div class="rounded-circle d-flex align-items-center justify-content-center mx-auto mb-2.5 text-muted" style="width: 48px; height: 48px; background: rgba(0,0,0,0.06); font-size: 1.3rem;">
+                                            <i class="bi bi-lock-fill"></i>
+                                        </div>
+                                        <h4 class="h6 fw-bold font-heading mb-1 text-muted">
+                                            {{ b.name }}
+                                        </h4>
+                                        <span class="badge bg-secondary-subtle text-secondary rounded-pill smaller px-2 py-0.5 mb-2">
+                                            {{ b.category }}
+                                        </span>
+                                        <p class="smaller text-muted mb-2" style="font-size: 0.78rem; line-height: 1.4;">
+                                            {{ b.description }}
+                                        </p>
+                                        <div class="mt-auto pt-2 border-top d-flex justify-content-between align-items-center smaller" style="border-color: var(--border-color) !important;">
+                                            <span class="badge bg-secondary-subtle text-muted rounded-pill">+{{ b.points_reward }} XP</span>
+                                            <span class="text-muted smaller">Locked</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- Mini Leaderboard Arena Table -->
+                <div class="card p-4 rounded-4 shadow-xs" style="background: var(--bg-surface); border: 1px solid var(--border-color);">
+                    <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom" style="border-color: var(--border-color) !important;">
+                        <div>
+                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill smaller px-2.5 py-0.5 fw-bold mb-1">
+                                Hall of Fame
+                            </span>
+                            <h3 class="h5 fw-bold font-heading mb-0" style="color: var(--text-primary);">Top Platform Coders</h3>
+                        </div>
+                        <a href="{% url 'accounts:leaderboard' %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-1.5 fw-semibold smaller">
+                            Open Full Leaderboard Table <i class="bi bi-box-arrow-up-right ms-1"></i>
+                        </a>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0">
+                            <thead>
+                                <tr class="smaller text-muted text-uppercase" style="border-color: var(--border-color);">
+                                    <th style="width: 70px;">Rank</th>
+                                    <th>Coder</th>
+                                    <th>Level & Title</th>
+                                    <th>Streak</th>
+                                    <th class="text-end">Learner Points</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for tc in top_coders %}
+                                    <tr {% if tc.user == request.user %}class="table-primary border-primary"{% endif %}>
+                                        <td class="fw-bold">
+                                            {% if forloop.counter == 1 %}🥇 1st
+                                            {% elif forloop.counter == 2 %}🥈 2nd
+                                            {% elif forloop.counter == 3 %}🥉 3rd
+                                            {% else %}#{{ forloop.counter }}
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center gap-2">
+                                                <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold smaller" style="width: 32px; height: 32px; background: var(--gradient-brand, #6366f1); font-size: 0.8rem;">
+                                                    {{ tc.user.username|make_list|first|upper }}
+                                                </div>
+                                                <div>
+                                                    <div class="fw-semibold small" style="color: var(--text-primary);">
+                                                        {{ tc.user.get_full_name|default:tc.user.username }}
+                                                        {% if tc.user == request.user %}<span class="badge bg-primary text-white rounded-pill ms-1 smaller">You</span>{% endif %}
+                                                    </div>
+                                                    <div class="smaller text-muted" style="font-size: 0.72rem;">@{{ tc.user.username }}</div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-purple-subtle text-purple rounded-pill smaller px-2.5 py-0.5">
+                                                Lvl {{ tc.points|divisibleby:100|default:1 }} Student
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-warning-subtle text-warning rounded-pill smaller px-2 py-0.5">
+                                                <i class="bi bi-fire me-1"></i> {{ tc.streak_count }} Days
+                                            </span>
+                                        </td>
+                                        <td class="text-end fw-bold font-heading fs-6" style="color: var(--text-primary);">
+                                            {{ tc.points }} <span class="fs-6 fw-normal text-muted">XP</span>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- --------------------------------------------------------------
+                 TAB 2: IN-DASHBOARD CODE SANDBOX / COMPILER ARENA
+                 -------------------------------------------------------------- -->
+            <div class="tab-pane fade" id="tab-compiler" role="tabpanel" aria-labelledby="tab-compiler-btn">
+                <div class="card p-4 rounded-4 shadow-xs" style="background: var(--bg-surface); border: 1px solid var(--border-color);">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-3 pb-3 border-bottom" style="border-color: var(--border-color) !important;">
+                        <div>
+                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill smaller px-2.5 py-0.5 fw-bold mb-1">
+                                <i class="bi bi-cpu-fill me-1"></i> In-Dashboard Code Sandbox
+                            </span>
+                            <h3 class="h5 fw-bold font-heading mb-0" style="color: var(--text-primary);">Interactive Multi-Language Compiler</h3>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <!-- Language Tabs -->
+                            <div class="btn-group btn-group-sm" role="group">
+                                <button type="button" class="btn btn-primary btn-sm py-1 px-3 active" onclick="setDashboardCompilerLang('python', this)">Python 3</button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm py-1 px-3" onclick="setDashboardCompilerLang('cpp', this)">C++</button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm py-1 px-3" onclick="setDashboardCompilerLang('java', this)">Java</button>
+                                <button type="button" class="btn btn-outline-secondary btn-sm py-1 px-3" onclick="setDashboardCompilerLang('javascript', this)">JavaScript</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Code Editor Box -->
+                    <div class="rounded-3 overflow-hidden mb-3" style="background: var(--bg-surface-elevated); border: 1px solid var(--border-color);">
+                        <div class="p-2.5 d-flex justify-content-between align-items-center border-bottom" style="background: var(--bg-surface-subtle); border-color: var(--border-color) !important;">
+                            <span class="smaller text-muted" id="compilerFilename"><i class="bi bi-file-earmark-code me-1"></i> solution.py</span>
+                            <button class="btn btn-sm btn-outline-secondary py-0.5 px-2 smaller" onclick="copyCompilerCode()">
+                                <i class="bi bi-clipboard me-1"></i> Copy
+                            </button>
+                        </div>
+                        <textarea class="form-control bg-transparent border-0 font-monospace p-3" id="dashboardCodeInput" rows="10" style="color: var(--text-primary); font-family: var(--font-code); font-size: 0.9rem; resize: vertical;"># Two Sum Problem (Hash Map Solution)
+def two_sum(nums, target):
+    seen = {}
+    for i, num in enumerate(nums):
+        complement = target - num
+        if complement in seen:
+            return [seen[complement], i]
+        seen[num] = i
+    return []
+
+# Test execution
+nums = [2, 7, 11, 15]
+target = 9
+result = two_sum(nums, target)
+print(f"Input: nums={nums}, target={target}")
+print(f"Indices Output: {result}")
+</textarea>
+                    </div>
+
+                    <!-- Action Bar & Run Button -->
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="smaller text-secondary">
+                            <span class="text-success"><i class="bi bi-check2 me-1"></i> Compiler ready</span>
+                            <span class="mx-1">&bull;</span>
+                            <span>Memory: <strong>14.2 MB</strong></span>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-codehelp-fire btn-sm py-1.5 px-4 fw-semibold shadow-xs" id="dashboardRunBtn" onclick="runDashboardCompiler()">
+                                <i class="bi bi-play-fill"></i> Execute Code
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Execution Output Terminal Console -->
+                    <div class="rounded-3 p-3 font-monospace smaller" id="dashboardCompilerOutput" style="background: #080a12; border: 1px solid rgba(255, 255, 255, 0.08); color: #a5b4fc; min-height: 80px;">
+                        <span class="text-muted">// Output terminal ready. Click "Execute Code" to evaluate solution...</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- --------------------------------------------------------------
+                 TAB 3: 450 DSA SHEET ARENA
+                 -------------------------------------------------------------- -->
+            <div class="tab-pane fade" id="tab-practice" role="tabpanel" aria-labelledby="tab-practice-btn">
+                <!-- Practice Stats Header -->
+                <div class="card p-4 rounded-4 mb-4 shadow-xs" style="background: var(--bg-surface); border: 1px solid var(--border-color);">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-3">
+                        <div>
+                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill smaller px-2.5 py-0.5 fw-bold mb-1">
+                                Interview Prep Sets
+                            </span>
+                            <h3 class="h5 fw-bold font-heading mb-0" style="color: var(--text-primary);">Curated Practice Sets</h3>
+                        </div>
+                        <a href="{% url 'coding_practice:problem_list' %}" class="btn btn-outline-warning btn-sm rounded-pill px-3.5 py-1.5 fw-semibold">
+                            Browse Practice Sets <i class="bi bi-box-arrow-up-right ms-1"></i>
+                        </a>
+                    </div>
+
+                    <!-- Difficulty Bars -->
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <div class="p-3 rounded-3" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color);">
+                                <div class="d-flex justify-content-between smaller mb-1">
+                                    <span class="text-success fw-bold">Easy</span>
+                                    <span class="text-secondary">{{ easy_solved }} / {{ easy_total }}</span>
+                                </div>
+                                <div class="progress" style="height: 6px; background: rgba(255, 255, 255, 0.06);">
+                                    <div class="progress-bar bg-success" style="width: {{ easy_pct }}%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-3 rounded-3" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color);">
+                                <div class="d-flex justify-content-between smaller mb-1">
+                                    <span class="text-warning fw-bold">Medium</span>
+                                    <span class="text-secondary">{{ medium_solved }} / {{ medium_total }}</span>
+                                </div>
+                                <div class="progress" style="height: 6px; background: rgba(255, 255, 255, 0.06);">
+                                    <div class="progress-bar bg-warning" style="width: {{ medium_pct }}%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-3 rounded-3" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color);">
+                                <div class="d-flex justify-content-between smaller mb-1">
+                                    <span class="text-danger fw-bold">Hard</span>
+                                    <span class="text-secondary">{{ hard_solved }} / {{ hard_total }}</span>
+                                </div>
+                                <div class="progress" style="height: 6px; background: rgba(255, 255, 255, 0.06);">
+                                    <div class="progress-bar bg-danger" style="width: {{ hard_pct }}%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Instant Filterable Problems Table -->
+                <div class="card rounded-4 shadow-xs overflow-hidden" style="background: var(--bg-surface); border: 1px solid var(--border-color);">
+                    <!-- Filter Controls -->
+                    <div class="p-3 border-bottom" style="background: var(--bg-surface-subtle); border-color: var(--border-color) !important;">
+                        <div class="row g-2 align-items-center">
+                            <div class="col-md-6">
+                                <div class="input-group input-group-sm">
+                                    <span class="input-group-text bg-transparent border-secondary text-muted">
+                                        <i class="bi bi-search text-primary"></i>
+                                    </span>
+                                    <input type="text" id="dashDsaSearch" class="form-control bg-transparent border-secondary py-1.5" placeholder="Search problems (e.g. Two Sum, Reverse List)..." oninput="applyDashDsaFilter()" style="color: var(--text-primary); font-size: 0.85rem;">
+                                </div>
+                            </div>
+                            <div class="col-md-6 text-md-end">
+                                <div class="btn-group btn-group-sm" role="group">
+                                    <button type="button" class="btn btn-primary btn-sm active dash-diff-pill" onclick="setDashDiff('all', this)">All</button>
+                                    <button type="button" class="btn btn-outline-success btn-sm dash-diff-pill" onclick="setDashDiff('easy', this)">Easy</button>
+                                    <button type="button" class="btn btn-outline-warning btn-sm dash-diff-pill" onclick="setDashDiff('medium', this)">Medium</button>
+                                    <button type="button" class="btn btn-outline-danger btn-sm dash-diff-pill" onclick="setDashDiff('hard', this)">Hard</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Problems Table Body -->
+                    <div class="table-responsive">
+                        <table class="table m-0 align-middle">
+                            <thead style="background: var(--bg-surface-subtle);">
+                                <tr>
+                                    <th style="width: 45px;" class="text-center">#</th>
+                                    <th>Title</th>
+                                    <th>Topic</th>
+                                    <th>Difficulty</th>
+                                    <th>Company Tags</th>
+                                    <th class="text-end" style="width: 120px;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dashDsaTableBody">
+                                {% for q in dsa_questions %}
+                                    <tr class="dash-dsa-row" data-title="{{ q.title|lower }}" data-diff="{{ q.difficulty|lower }}" data-topic="{{ q.category.name|default:'dsa'|lower }}">
+                                        <td class="text-center text-muted smaller">{{ forloop.counter }}</td>
+                                        <td>
+                                            <a href="{% url 'coding_practice:problem_detail' q.pk %}" class="fw-bold text-decoration-none" style="color: var(--text-primary);">
+                                                {{ q.title }}
+                                            </a>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-secondary-subtle text-secondary rounded-pill smaller">
+                                                {{ q.category.name|default:'DSA' }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {% if q.difficulty == 'Easy' or q.difficulty == 'easy' %}
+                                                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill smaller px-2 py-0.5">Easy</span>
+                                            {% elif q.difficulty == 'Medium' or q.difficulty == 'medium' %}
+                                                <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill smaller px-2 py-0.5">Medium</span>
+                                            {% else %}
+                                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill smaller px-2 py-0.5">Hard</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <span class="smaller text-secondary">{{ q.company_tags|default:'Google, Amazon' }}</span>
+                                        </td>
+                                        <td class="text-end">
+                                            <a href="{% url 'coding_practice:problem_detail' q.pk %}" class="btn btn-outline-primary btn-sm py-1 px-3 rounded-pill smaller fw-semibold">
+                                                Solve &rarr;
+                                            </a>
+                                        </td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="6" class="text-center text-muted py-4 small">No problems loaded.</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- --------------------------------------------------------------
+                 TAB 4: MY BATCHES & COURSES
+                 -------------------------------------------------------------- -->
+            <div class="tab-pane fade" id="tab-courses" role="tabpanel" aria-labelledby="tab-courses-btn">
+                <div class="card p-4 rounded-4 mb-4 shadow-xs" style="background: var(--bg-surface); border: 1px solid var(--border-color);">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h3 class="h5 fw-bold font-heading mb-0" style="color: var(--text-primary);">Enrolled Engineering Batches</h3>
+                        <a href="{% url 'courses:course_list' %}" class="btn btn-outline-primary btn-sm rounded-pill px-3 py-1.5 fw-semibold">
+                            Explore New Batches &rarr;
+                        </a>
+                    </div>
+
+                    {% if enrolled_courses_data %}
+                        <div class="row g-4">
+                            {% for item in enrolled_courses_data %}
+                                <div class="col-md-6">
+                                    <div class="card p-4 rounded-4 h-100 shadow-xs" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color);">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="badge bg-primary-subtle text-primary rounded-pill smaller px-2.5 py-1">
+                                                {{ item.course.category.name|default:'Engineering' }}
+                                            </span>
+                                            <span class="smaller fw-bold text-success">{{ item.progress_pct }}%</span>
+                                        </div>
+
+                                        <h4 class="h6 fw-bold font-heading mb-2" style="color: var(--text-primary);">
+                                            {{ item.course.title }}
+                                        </h4>
+
+                                        <div class="progress mb-3" style="height: 6px; background: rgba(255, 255, 255, 0.06);">
+                                            <div class="progress-bar bg-primary" style="width: {{ item.progress_pct }}%;"></div>
+                                        </div>
+
+                                        <div class="d-flex justify-content-between align-items-center smaller text-secondary mb-3">
+                                            <span><i class="bi bi-collection-play me-1 text-primary"></i> {{ item.completed_lessons_count }} of {{ item.total_lessons }} Lessons</span>
+                                            <span><i class="bi bi-clock me-1 text-info"></i> {{ item.course.estimated_hours }} Hours</span>
+                                        </div>
+
+                                        {% if item.next_lesson %}
+                                            <a href="{% url 'courses:lesson_detail' item.course.slug item.next_lesson.pk %}" class="btn btn-codehelp-primary btn-sm w-100 rounded-pill py-1.5 fw-semibold">
+                                                Resume: {{ item.next_lesson.title|truncatewords:4 }} &rarr;
+                                            </a>
+                                        {% else %}
+                                            <a href="{% url 'courses:course_detail' item.course.slug %}" class="btn btn-outline-secondary btn-sm w-100 rounded-pill py-1.5">
+                                                View Course Syllabus
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <p class="text-secondary small mb-3">You haven't enrolled in any batch yet.</p>
+                            <a href="{% url 'courses:course_list' %}" class="btn btn-codehelp-primary btn-sm px-4 py-2 fw-semibold">
+                                Browse Catalog &rarr;
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- --------------------------------------------------------------
+                 TAB 5: PROGRAMMING & CS TUTORIALS
+                 -------------------------------------------------------------- -->
+            <div class="tab-pane fade" id="tab-tutorials" role="tabpanel" aria-labelledby="tab-tutorials-btn">
+                <div class="card p-4 rounded-4 mb-4 shadow-xs" style="background: var(--bg-surface); border: 1px solid var(--border-color);">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill smaller px-2.5 py-0.5 fw-bold mb-1">
+                                Written Guides
+                            </span>
+                            <h3 class="h5 fw-bold font-heading mb-0" style="color: var(--text-primary);">Structured Technical Tutorials</h3>
+                        </div>
+                        <a href="{% url 'tutorials:tutorial_list' %}" class="btn btn-outline-success btn-sm rounded-pill px-3 py-1.5 fw-semibold">
+                            Tutorial Library <i class="bi bi-box-arrow-up-right ms-1"></i>
+                        </a>
+                    </div>
+
+                    <div class="row g-4">
+                        {% for track in tutorial_tracks %}
+                            <div class="col-md-6 col-lg-3">
+                                <div class="card p-3 rounded-4 h-100 d-flex flex-column" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color);">
+                                    <div class="d-flex justify-content-between align-items-center mb-2.5">
+                                        <div class="rounded-3 p-2 bg-primary-subtle text-primary d-inline-flex align-items-center justify-content-center" style="width: 38px; height: 38px;">
+                                            <i class="bi {{ track.icon|default:'bi-journal-code' }}"></i>
+                                        </div>
+                                        <span class="badge bg-secondary-subtle text-secondary rounded-pill smaller">{{ track.total_topics }} Topics</span>
+                                    </div>
+                                    <h4 class="h6 fw-bold font-heading mb-2" style="color: var(--text-primary);">{{ track.name }}</h4>
+                                    <div class="d-flex flex-column gap-1 mb-3 flex-grow-1">
+                                        {% for t in track.topics.all|slice:":3" %}
+                                            <a href="{% url 'tutorials:tutorial_detail' track.slug t.slug %}" class="smaller text-decoration-none text-truncate py-0.5" style="color: var(--text-secondary);">
+                                                <i class="bi bi-chevron-right smaller text-muted me-1"></i>{{ t.title }}
+                                            </a>
+                                        {% endfor %}
+                                    </div>
+                                    <a href="{% url 'tutorials:category_root' track.slug %}" class="btn btn-outline-secondary btn-sm rounded-pill py-1 w-100 smaller fw-semibold" style="border-color: var(--border-color); color: var(--text-primary);">
+                                        Open Track &rarr;
+                                    </a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- --------------------------------------------------------------
+                 TAB 7: LIVE DOUBT CLASSES (Google Meet)
+                 -------------------------------------------------------------- -->
+            <div class="tab-pane fade" id="tab-live" role="tabpanel" aria-labelledby="tab-live-btn">
+                <div class="card p-4 rounded-4 shadow-xs" style="background: var(--bg-surface); border: 1px solid var(--border-color);">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill smaller px-2.5 py-0.5 fw-bold mb-1">
+                                Google Meet Schedule
+                            </span>
+                            <h3 class="h5 fw-bold font-heading mb-0" style="color: var(--text-primary);">Interactive Live Masterclasses</h3>
+                        </div>
+                        <a href="{% url 'live_classes:class_list' %}" class="btn btn-outline-danger btn-sm rounded-pill px-3 py-1.5 fw-semibold">
+                            Full Calendar <i class="bi bi-calendar3 ms-1"></i>
+                        </a>
+                    </div>
+
+                    <div class="row g-3">
+                        {% for cls in all_upcoming_classes %}
+                            <div class="col-md-6">
+                                <div class="card p-3.5 rounded-4 h-100" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color);">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="smaller fw-bold text-primary">
+                                            <i class="bi bi-calendar-event me-1"></i> {{ cls.scheduled_date|date:"D, M d" }} • {{ cls.start_time|time:"H:i" }}
+                                        </span>
+                                        {% if cls.status == 'live' %}
+                                            <span class="badge bg-danger text-white rounded-pill smaller">LIVE NOW</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary-subtle text-secondary rounded-pill smaller">Upcoming</span>
+                                        {% endif %}
+                                    </div>
+                                    <h4 class="h6 fw-bold font-heading mb-1.5" style="color: var(--text-primary);">{{ cls.title }}</h4>
+                                    <p class="smaller text-secondary mb-3">{{ cls.description|truncatewords:14 }}</p>
+                                    <div class="d-flex justify-content-between align-items-center pt-2 border-top" style="border-color: var(--border-color) !important;">
+                                        <span class="smaller text-secondary">Mentor: {{ cls.instructor.get_full_name|default:cls.instructor.username }}</span>
+                                        {% if cls.google_meet_link %}
+                                            <a href="{{ cls.google_meet_link }}" target="_blank" class="btn btn-codehelp-fire btn-sm rounded-pill px-3 py-1 smaller fw-semibold">
+                                                <i class="bi bi-camera-video me-1"></i> Join Meet
+                                            </a>
+                                        {% else %}
+                                            <a href="{% url 'live_classes:class_detail' cls.pk %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-1 smaller">
+                                                Details
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <div class="col-12 text-center py-4 text-secondary small">No upcoming live classes right now. Check back shortly.</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- --------------------------------------------------------------
+                 TAB 8: AI TECHNICAL QUIZ GENERATOR
+                 -------------------------------------------------------------- -->
+            <div class="tab-pane fade" id="tab-aiquiz" role="tabpanel" aria-labelledby="tab-aiquiz-btn">
+                <div class="card p-4 rounded-4 shadow-xs" style="background: var(--bg-surface); border: 1px solid var(--border-color);">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 pb-3 border-bottom" style="border-color: var(--border-color) !important;">
+                        <div>
+                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill smaller px-2.5 py-0.5 fw-bold mb-1">
+                                AI Powered Assessment
+                            </span>
+                            <h3 class="h5 fw-bold font-heading mb-0" style="color: var(--text-primary);">Test Your Technical Depth</h3>
+                        </div>
+                        <a href="{% url 'courses:ai_quiz_generator' %}" class="btn btn-codehelp-primary btn-sm rounded-pill px-3.5 py-1.5 fw-semibold shadow-xs">
+                            <i class="bi bi-stars me-1"></i> Custom AI Quiz Generator
+                        </a>
+                    </div>
+
+                    <div class="row g-4">
+                        <div class="col-md-6 col-lg-3">
+                            <div class="card p-3.5 rounded-4 h-100 text-center" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color);">
+                                <i class="bi bi-filetype-py fs-2 text-primary mb-2"></i>
+                                <h4 class="h6 fw-bold mb-1" style="color: var(--text-primary);">Python Mastery</h4>
+                                <p class="smaller text-secondary mb-3">Syntax, OOP, Lambda, Decorators</p>
+                                <a href="{% url 'courses:ai_quiz_generator' %}?topic=Python" class="btn btn-outline-primary btn-sm rounded-pill w-100 py-1.5 smaller fw-semibold">
+                                    Start 5-Min Test &rarr;
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 col-lg-3">
+                            <div class="card p-3.5 rounded-4 h-100 text-center" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color);">
+                                <i class="bi bi-diagram-3-fill fs-2 text-warning mb-2"></i>
+                                <h4 class="h6 fw-bold mb-1" style="color: var(--text-primary);">Data Structures</h4>
+                                <p class="smaller text-secondary mb-3">Arrays, Linked Lists, Trees, DP</p>
+                                <a href="{% url 'courses:ai_quiz_generator' %}?topic=DSA" class="btn btn-outline-warning btn-sm rounded-pill w-100 py-1.5 smaller fw-semibold">
+                                    Start 5-Min Test &rarr;
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 col-lg-3">
+                            <div class="card p-3.5 rounded-4 h-100 text-center" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color);">
+                                <i class="bi bi-database-fill fs-2 text-info mb-2"></i>
+                                <h4 class="h6 fw-bold mb-1" style="color: var(--text-primary);">DBMS & SQL</h4>
+                                <p class="smaller text-secondary mb-3">Joins, Normalization, ACID</p>
+                                <a href="{% url 'courses:ai_quiz_generator' %}?topic=DBMS" class="btn btn-outline-info btn-sm rounded-pill w-100 py-1.5 smaller fw-semibold">
+                                    Start 5-Min Test &rarr;
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6 col-lg-3">
+                            <div class="card p-3.5 rounded-4 h-100 text-center" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color);">
+                                <i class="bi bi-cpu-fill fs-2 text-success mb-2"></i>
+                                <h4 class="h6 fw-bold mb-1" style="color: var(--text-primary);">Operating Systems</h4>
+                                <p class="smaller text-secondary mb-3">Scheduling, Threads, Virtual Memory</p>
+                                <a href="{% url 'courses:ai_quiz_generator' %}?topic=OS" class="btn btn-outline-success btn-sm rounded-pill w-100 py-1.5 smaller fw-semibold">
+                                    Start 5-Min Test &rarr;
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- --------------------------------------------------------------
+                 TAB: ACCOUNT, AUTHENTICATION & SESSION CONTROL (LOGIN / LOGOUT)
+                 -------------------------------------------------------------- -->
+            <div class="tab-pane fade" id="tab-auth" role="tabpanel" aria-labelledby="tab-auth-btn">
+                
+                <!-- Account Header Banner -->
+                <div class="card p-4 rounded-4 mb-4 shadow-xs" style="background: var(--bg-surface); border: 1px solid var(--border-color);">
+                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3">
+                        <div class="d-flex align-items-center gap-3">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center text-white shadow-xs" style="width: 56px; height: 56px; background: linear-gradient(135deg, #3b82f6, #6366f1); font-size: 1.6rem; flex-shrink: 0;">
+                                <i class="bi bi-shield-lock-fill"></i>
+                            </div>
+                            <div>
+                                <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                                    <h3 class="h5 fw-bold font-heading mb-0" style="color: var(--text-primary);">
+                                        Account, Authentication &amp; Session Hub
+                                    </h3>
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill smaller px-2.5 py-0.5 fw-semibold">
+                                        <span class="live-pulse-dot me-1"></span> Session Active
+                                    </span>
+                                </div>
+                                <p class="smaller text-secondary mb-0">
+                                    Manage your login status, toggle between Student and Admin portals, or terminate your active session safely.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <a href="{% url 'accounts:logout' %}" class="btn btn-outline-danger btn-sm rounded-pill px-3.5 py-2 fw-semibold shadow-xs">
+                                <i class="bi bi-box-arrow-right me-1"></i> Sign Out (Logout)
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-4">
+                    <!-- Column 1: Current Session & Security Details -->
+                    <div class="col-lg-6">
+                        <div class="card p-4 rounded-4 h-100 shadow-xs" style="background: var(--bg-surface); border: 1px solid var(--border-color);">
+                            <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom" style="border-color: var(--border-color) !important;">
+                                <h4 class="h6 fw-bold font-heading mb-0" style="color: var(--text-primary);">
+                                    <i class="bi bi-person-badge text-primary me-2"></i> Active Credentials &amp; Role
+                                </h4>
+                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill smaller">
+                                    Logged In
+                                </span>
+                            </div>
+
+                            <div class="d-flex align-items-center gap-3 p-3 rounded-3 mb-3" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color);">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold shadow-xs" style="width: 50px; height: 50px; background: var(--gradient-brand); font-size: 1.35rem; flex-shrink: 0;">
+                                    {% if profile.avatar %}
+                                        <img src="{{ profile.avatar.url }}" alt="{{ request.user.username }}" class="w-100 h-100 rounded-circle object-fit-cover">
+                                    {% else %}
+                                        {{ request.user.username|make_list|first|upper }}
+                                    {% endif %}
+                                </div>
+                                <div class="overflow-hidden">
+                                    <div class="fw-bold font-heading fs-6 text-truncate" style="color: var(--text-primary);">
+                                        {{ request.user.get_full_name|default:request.user.username }}
+                                    </div>
+                                    <div class="smaller text-muted text-truncate">@{{ request.user.username }} &bull; {{ request.user.email|default:'student@codestyle.com' }}</div>
+                                    <div class="d-flex align-items-center gap-2 mt-1">
+                                        <span class="badge bg-purple-subtle text-purple rounded-pill smaller px-2 py-0.5">
+                                            {{ profile.role|title|default:'Student' }}
+                                        </span>
+                                        {% if request.user.is_staff or request.user.is_superuser %}
+                                            <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill smaller px-2 py-0.5">
+                                                <i class="bi bi-shield-check me-1"></i> Admin Privileges
+                                            </span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex flex-column gap-2.5 mb-4">
+                                <div class="d-flex justify-content-between align-items-center p-2.5 rounded-2" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color);">
+                                    <span class="smaller text-secondary"><i class="bi bi-calendar3 me-2 text-primary"></i> Account Created</span>
+                                    <span class="smaller fw-semibold" style="color: var(--text-primary);">{{ request.user.date_joined|date:"M d, Y" }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center p-2.5 rounded-2" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color);">
+                                    <span class="smaller text-secondary"><i class="bi bi-clock-history me-2 text-info"></i> Last Active Session</span>
+                                    <span class="smaller fw-semibold" style="color: var(--text-primary);">{{ request.user.last_login|date:"M d, Y H:i"|default:'Just now' }}</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center p-2.5 rounded-2" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color);">
+                                    <span class="smaller text-secondary"><i class="bi bi-fire me-2 text-warning"></i> Learning Streak</span>
+                                    <span class="smaller fw-bold text-warning">{{ profile.streak_count }} Days Active</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center p-2.5 rounded-2" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color);">
+                                    <span class="smaller text-secondary"><i class="bi bi-gem me-2 text-primary"></i> Total XP Points</span>
+                                    <span class="smaller fw-bold text-primary">{{ profile.points }} XP</span>
+                                </div>
+                            </div>
+
+                            <!-- Logout Action Panel -->
+                            <div class="p-3 rounded-3 mt-auto" style="background: rgba(239, 68, 68, 0.05); border: 1px solid rgba(239, 68, 68, 0.2);">
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <i class="bi bi-box-arrow-right text-danger fs-5"></i>
+                                    <h6 class="fw-bold mb-0 text-danger">Logout of Active Session</h6>
+                                </div>
+                                <p class="smaller text-secondary mb-3">
+                                    Signing out will terminate this browser session. Your solved questions, streaks, and enrolled course progress are securely saved.
+                                </p>
+                                <a href="{% url 'accounts:logout' %}" class="btn btn-danger btn-sm rounded-pill px-4 py-2 fw-semibold shadow-xs d-inline-flex align-items-center gap-2">
+                                    <i class="bi bi-box-arrow-right"></i>
+                                    <span>Confirm Sign Out</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Column 2: Dual-Portal Switcher & Multi-Role Login -->
+                    <div class="col-lg-6">
+                        <div class="card p-4 rounded-4 h-100 shadow-xs" style="background: var(--bg-surface); border: 1px solid var(--border-color);">
+                            <div class="d-flex align-items-center justify-content-between mb-3 pb-2 border-bottom" style="border-color: var(--border-color) !important;">
+                                <h4 class="h6 fw-bold font-heading mb-0" style="color: var(--text-primary);">
+                                    <i class="bi bi-arrow-left-right text-warning me-2"></i> Portal Switcher &amp; Login
+                                </h4>
+                                <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill smaller">
+                                    Multi-Role Access
+                                </span>
+                            </div>
+
+                            <p class="smaller text-secondary mb-3">
+                                Need to test platform features with another account or access administrative tools? Select one of the portals below to switch.
+                            </p>
+
+                            <!-- Option 1: Admin & Staff Portal -->
+                            <div class="p-3.5 rounded-3 mb-3 interactive-card" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color);">
+                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="rounded-2 p-1.5 d-flex align-items-center justify-content-center" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b; width: 34px; height: 34px;">
+                                            <i class="bi bi-shield-lock-fill"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold small" style="color: var(--text-primary);">Administrator &amp; Creator Studio</div>
+                                            <div class="smaller text-muted">Add courses, live classes, challenges, &amp; notes</div>
+                                        </div>
+                                    </div>
+                                    <span class="badge bg-warning text-dark smaller px-2 py-0.5 fw-bold">Admin</span>
+                                </div>
+
+                                <div class="d-flex justify-content-between align-items-center mb-3 p-2 rounded-2" style="background: rgba(255, 255, 255, 0.04); border: 1px dashed var(--border-color);">
+                                    <span class="smaller text-secondary">Demo Admin:</span>
+                                    <span class="smaller font-monospace text-primary fw-bold">admin / admin123</span>
+                                </div>
+
+                                {% if request.user.is_staff or request.user.is_superuser or request.user.profile.role == 'admin' %}
+                                    <a href="{% url 'dashboard:admin_dashboard' %}" class="btn btn-warning btn-sm rounded-pill fw-bold text-dark w-100 py-2 shadow-xs d-flex align-items-center justify-content-center gap-2">
+                                        <i class="bi bi-shield-check"></i>
+                                        <span>Open Admin Creator Studio Now</span>
+                                    </a>
+                                {% else %}
+                                    <a href="{% url 'accounts:login' %}?role=admin" class="btn btn-outline-warning btn-sm rounded-pill fw-semibold w-100 py-2 d-flex align-items-center justify-content-center gap-2">
+                                        <i class="bi bi-box-arrow-in-right"></i>
+                                        <span>Sign in to Admin Portal</span>
+                                    </a>
+                                {% endif %}
+                            </div>
+
+                            <!-- Option 2: Student Portal Account Switcher -->
+                            <div class="p-3.5 rounded-3 mb-3 interactive-card" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color);">
+                                <div class="d-flex align-items-center justify-content-between mb-2">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="rounded-2 p-1.5 d-flex align-items-center justify-content-center" style="background: rgba(37, 99, 235, 0.15); color: #3b82f6; width: 34px; height: 34px;">
+                                            <i class="bi bi-mortarboard-fill"></i>
+                                        </div>
+                                        <div>
+                                            <div class="fw-bold small" style="color: var(--text-primary);">Student Learner Account</div>
+                                            <div class="smaller text-muted">Courses, 450 Sheet, AI quizzes, &amp; live streams</div>
+                                        </div>
+                                    </div>
+                                    <span class="badge bg-primary text-white smaller px-2 py-0.5 fw-bold">Student</span>
+                                </div>
+
+                                <div class="d-flex justify-content-between align-items-center mb-3 p-2 rounded-2" style="background: rgba(255, 255, 255, 0.04); border: 1px dashed var(--border-color);">
+                                    <span class="smaller text-secondary">Demo Student:</span>
+                                    <span class="smaller font-monospace text-primary fw-bold">student / student123</span>
+                                </div>
+
+                                <a href="{% url 'accounts:login' %}?role=student" class="btn btn-outline-primary btn-sm rounded-pill fw-semibold w-100 py-2 d-flex align-items-center justify-content-center gap-2">
+                                    <i class="bi bi-arrow-repeat"></i>
+                                    <span>Switch Account or Re-login</span>
+                                </a>
+                            </div>
+
+                            <!-- Option 3: Register New Account -->
+                            <div class="text-center pt-2">
+                                <span class="smaller text-muted">Don't have another account? </span>
+                                <a href="{% url 'accounts:register' %}" class="smaller fw-bold text-primary text-decoration-none">
+                                    Create New Account &rarr;
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Tab switcher helper function
+    function switchDashboardTab(tabBtnId) {
+        var triggerEl = document.getElementById(tabBtnId);
+        if (triggerEl) {
+            var tab = new bootstrap.Tab(triggerEl);
+            tab.show();
+            triggerEl.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        }
+    }
+
+    // In-Dashboard Code Sandbox Presets & Execution
+    const compilerSnippets = {
+        python: `# Two Sum Problem (Hash Map Solution)
+def two_sum(nums, target):
+    seen = {}
+    for i, num in enumerate(nums):
+        complement = target - num
+        if complement in seen:
+            return [seen[complement], i]
+        seen[num] = i
+    return []
+
+# Test execution
+nums = [2, 7, 11, 15]
+target = 9
+result = two_sum(nums, target)
+print(f"Input: nums={nums}, target={target}")
+print(f"Indices Output: {result}")
+`,
+        cpp: `// Two Sum Problem (C++ STL Unordered Map)
+#include <iostream>
+#include <vector>
+#include <unordered_map>
+
+std::vector<int> twoSum(std::vector<int>& nums, int target) {
+    std::unordered_map<int, int> seen;
+    for (int i = 0; i < nums.size(); ++i) {
+        int diff = target - nums[i];
+        if (seen.count(diff)) {
+            return {seen[diff], i};
+        }
+        seen[nums[i]] = i;
+    }
+    return {};
+}
+
+int main() {
+    std::vector<int> nums = {2, 7, 11, 15};
+    auto ans = twoSum(nums, 9);
+    std::cout << "Indices: [" << ans[0] << ", " << ans[1] << "]" << std::endl;
+    return 0;
+}`,
+        java: `// Two Sum Problem (Java HashMap)
+import java.util.*;
+
+public class Solution {
+    public static int[] twoSum(int[] nums, int target) {
+        Map<Integer, Integer> map = new HashMap<>();
+        for (int i = 0; i < nums.length; i++) {
+            int complement = target - nums[i];
+            if (map.containsKey(complement)) {
+                return new int[] { map.get(complement), i };
+            }
+            map.put(nums[i], i);
+        }
+        return new int[0];
+    }
+
+    public static void main(String[] args) {
+        int[] nums = {2, 7, 11, 15};
+        int[] res = twoSum(nums, 9);
+        System.out.println("Output: " + Arrays.toString(res));
+    }
+}`,
+        javascript: `// Two Sum (JavaScript Map)
+function twoSum(nums, target) {
+    const map = new Map();
+    for (let i = 0; i < nums.length; i++) {
+        const diff = target - nums[i];
+        if (map.has(diff)) {
+            return [map.get(diff), i];
+        }
+        map.set(nums[i], i);
+    }
+    return [];
+}
+
+const res = twoSum([2, 7, 11, 15], 9);
+console.log("Indices:", res);
+`
+    };
+
+    let currentDashCompilerLang = 'python';
+
+    function setDashboardCompilerLang(lang, btn) {
+        currentDashCompilerLang = lang;
+        const textarea = document.getElementById('dashboardCodeInput');
+        const filename = document.getElementById('compilerFilename');
+        
+        if (compilerSnippets[lang]) {
+            textarea.value = compilerSnippets[lang];
+        }
+        
+        const extMap = { python: 'solution.py', cpp: 'solution.cpp', java: 'Solution.java', javascript: 'solution.js' };
+        if (filename && extMap[lang]) {
+            filename.innerHTML = '<i class="bi bi-file-earmark-code me-1"></i> ' + extMap[lang];
+        }
+
+        const buttons = btn.parentElement.querySelectorAll('button');
+        buttons.forEach(b => {
+            b.classList.remove('active', 'btn-primary');
+            b.classList.add('btn-outline-secondary');
+        });
+        btn.classList.remove('btn-outline-secondary');
+        btn.classList.add('active', 'btn-primary');
+    }
+
+    function escapeDashHtml(str) {
+        if (!str) return '';
+        const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+        return String(str).replace(/[&<>"']/g, function(m) { return map[m]; });
+    }
+
+    async function runDashboardCompiler() {
+        const btn = document.getElementById('dashboardRunBtn');
+        const output = document.getElementById('dashboardCompilerOutput');
+        const code = document.getElementById('dashboardCodeInput').value;
+        const lang = currentDashCompilerLang || 'python';
+        
+        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Compiling...';
+        btn.disabled = true;
+        output.innerHTML = '<span class="text-muted"><i class="bi bi-hourglass-split me-1"></i> Submitting to sandbox runner...</span>';
+
+        try {
+            const res = await fetch('/practice/sandbox/run/', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ language: lang, code: code, stdin: '' })
+            });
+            const data = await res.json();
+            btn.innerHTML = '<i class="bi bi-play-fill"></i> Execute Code';
+            btn.disabled = false;
+
+            const isSuccess = data.success !== false && (data.exit_code === 0 || data.exit_code === null || data.exit_code === undefined);
+            const statusBadge = isSuccess
+                ? '<span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill smaller px-2 py-0.5"><i class="bi bi-check-circle-fill me-1"></i> Execution Successful • Exit ' + (data.exit_code !== undefined ? data.exit_code : 0) + '</span>'
+                : '<span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill smaller px-2 py-0.5"><i class="bi bi-exclamation-triangle-fill me-1"></i> Exit Code ' + (data.exit_code || 1) + '</span>';
+
+            const runTime = data.runtime_ms ? data.runtime_ms + ' ms' : '< 50 ms';
+            const stdout = data.stdout || data.output || 'Code executed with no output.';
+            const stderr = data.stderr ? '<div class="text-danger mt-2"><strong>Error Output:</strong><pre class="m-0 text-danger-emphasis">' + escapeDashHtml(data.stderr) + '</pre></div>' : '';
+
+            output.innerHTML = `
+                <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom border-secondary border-opacity-25">
+                    <div>${statusBadge}</div>
+                    <div class="text-muted smaller">Time: <strong>${runTime}</strong> | Memory: <strong>14.2 MB</strong></div>
+                </div>
+                <pre class="m-0 font-monospace text-light" style="white-space: pre-wrap; font-size: 0.88rem;">${escapeDashHtml(stdout)}</pre>
+                ${stderr}
+            `;
+        } catch (err) {
+            btn.innerHTML = '<i class="bi bi-play-fill"></i> Execute Code';
+            btn.disabled = false;
+            output.innerHTML = '<span class="text-danger"><i class="bi bi-x-circle me-1"></i> Error: ' + escapeDashHtml(err.message) + '</span>';
+        }
+    }
+
+    function copyCompilerCode() {
+        const text = document.getElementById('dashboardCodeInput').value;
+        navigator.clipboard.writeText(text).then(() => {
+            alert('Code copied to clipboard!');
+        });
+    }
+
+    // 450 DSA Sheet Instant Filter on Dashboard
+    let currentDashDiff = 'all';
+
+    function setDashDiff(diff, btn) {
+        currentDashDiff = diff;
+        document.querySelectorAll('.dash-diff-pill').forEach(b => {
+            b.classList.remove('active', 'btn-primary', 'btn-success', 'btn-warning', 'btn-danger');
+            b.classList.add('btn-outline-secondary');
+        });
+        btn.classList.remove('btn-outline-secondary');
+        if (diff === 'easy') btn.classList.add('btn-success', 'active');
+        else if (diff === 'medium') btn.classList.add('btn-warning', 'active');
+        else if (diff === 'hard') btn.classList.add('btn-danger', 'active');
+        else btn.classList.add('btn-primary', 'active');
+
+        applyDashDsaFilter();
+    }
+
+    function applyDashDsaFilter() {
+        const query = (document.getElementById('dashDsaSearch')?.value || '').toLowerCase().trim();
+        const rows = document.querySelectorAll('.dash-dsa-row');
+
+        rows.forEach(row => {
+            const title = row.getAttribute('data-title') || '';
+            const diff = row.getAttribute('data-diff') || '';
+            const topic = row.getAttribute('data-topic') || '';
+
+            const matchesQuery = !query || title.includes(query) || topic.includes(query);
+            const matchesDiff = (currentDashDiff === 'all') || (diff === currentDashDiff);
+
+            if (matchesQuery && matchesDiff) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+    }
+</script>
+{% endblock %}

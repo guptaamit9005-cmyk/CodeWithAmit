@@ -1,0 +1,125 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ live_class.title }} — Live Class Details | CodeWithAmit{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb smaller mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'live_classes:class_list' %}" class="text-decoration-none">Live Classes</a></li>
+            <li class="breadcrumb-item active text-dark fw-semibold" aria-current="page">{{ live_class.title }}</li>
+        </ol>
+    </nav>
+
+    <div class="row g-4">
+        <div class="col-lg-8">
+            <!-- Header Card -->
+            <div class="card p-4 p-md-5 rounded-4 shadow-sm mb-4">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <span class="badge {% if live_class.status == 'live' %}bg-danger text-white{% elif live_class.status == 'upcoming' %}bg-primary-subtle text-primary border border-primary-subtle{% else %}bg-secondary-subtle text-secondary{% endif %} rounded-pill px-3 py-1 fw-semibold">
+                        {{ live_class.get_status_display|upper }}
+                    </span>
+                    <span class="smaller text-secondary"><i class="bi bi-people-fill text-primary me-1"></i> {{ live_class.attendee_count }} Students Registered</span>
+                </div>
+
+                <h1 class="h2 fw-bold text-dark font-heading mb-3">{{ live_class.title }}</h1>
+                
+                <div class="d-flex flex-wrap gap-4 text-secondary smaller mb-4">
+                    <span><i class="bi bi-person-fill text-primary me-1"></i> Instructor: <strong class="text-dark">{{ live_class.instructor.get_full_name|default:live_class.instructor.username }}</strong></span>
+                    <span><i class="bi bi-calendar-event text-primary me-1"></i> {{ live_class.scheduled_date|date:"l, F d, Y" }}</span>
+                    <span><i class="bi bi-clock text-primary me-1"></i> {{ live_class.start_time|time:"g:i A" }} ({{ live_class.duration_minutes }} Minutes)</span>
+                </div>
+
+                <div class="d-flex flex-wrap gap-3 align-items-center mb-4">
+                    <a href="{% url 'live_classes:join_class' live_class.pk %}" target="_blank" class="btn btn-danger btn-lg rounded-pill px-5 fw-bold shadow-sm d-inline-flex align-items-center gap-2">
+                        <i class="bi bi-camera-video-fill"></i>
+                        <span>Join Google Meet</span>
+                    </a>
+
+                    {% if request.user.is_authenticated and not is_registered %}
+                        <a href="{% url 'live_classes:register_class' live_class.pk %}" class="btn btn-outline-primary rounded-pill px-4 fw-semibold">
+                            <i class="bi bi-calendar-check me-1"></i> RSVP / Register
+                        </a>
+                    {% elif is_registered %}
+                        <span class="badge bg-success-subtle text-success p-2 px-3 rounded-pill border border-success-subtle fw-semibold">
+                            <i class="bi bi-check2-circle me-1"></i> You are registered for this class
+                        </span>
+                    {% endif %}
+                </div>
+
+                <hr class="my-4 border-light-subtle">
+
+                <h4 class="text-dark font-heading fw-bold mb-3">Class Description & Agenda</h4>
+                <div class="text-secondary small line-height-relaxed" style="white-space: pre-line; line-height: 1.8;">
+                    {{ live_class.description }}
+                </div>
+            </div>
+
+            <!-- Post-Class Resources & Recording (if available) -->
+            {% if live_class.recording_url or live_class.notes_attachment or live_class.additional_resources %}
+                <div class="card p-4 rounded-4 shadow-sm mb-4">
+                    <h4 class="text-dark font-heading fw-bold mb-3"><i class="bi bi-paperclip text-primary me-2"></i> Class Resources & Recording</h4>
+                    
+                    {% if live_class.recording_url %}
+                        <div class="mb-3">
+                            <h6 class="text-dark fw-bold smaller">Session Recording:</h6>
+                            <a href="{{ live_class.recording_url }}" target="_blank" class="btn btn-outline-warning btn-sm rounded-pill px-4 fw-semibold text-dark">
+                                <i class="bi bi-play-circle me-1"></i> Watch Google Meet Recording
+                            </a>
+                        </div>
+                    {% endif %}
+
+                    {% if live_class.notes_attachment %}
+                        <div class="mb-3">
+                            <h6 class="text-dark fw-bold smaller">Presentation Slides / Shared Notes:</h6>
+                            <a href="{{ live_class.notes_attachment.url }}" target="_blank" class="btn btn-outline-primary btn-sm rounded-pill px-4 fw-semibold">
+                                <i class="bi bi-download me-1"></i> Download Session Notes
+                            </a>
+                        </div>
+                    {% endif %}
+
+                    {% if live_class.additional_resources %}
+                        <div>
+                            <h6 class="text-dark fw-bold smaller">Shared Code Repos & Links:</h6>
+                            <div class="text-secondary smaller bg-light p-3 rounded-3 border" style="white-space: pre-line;">
+                                {{ live_class.additional_resources }}
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Right Column: Attendees & Guidelines -->
+        <div class="col-lg-4">
+            <div class="card p-4 rounded-4 shadow-sm mb-4">
+                <h5 class="text-dark font-heading fw-bold mb-3">Class Attendees ({{ live_class.attendee_count }})</h5>
+                <div class="d-flex flex-column gap-2 overflow-auto" style="max-height: 250px;">
+                    {% for att in attendees %}
+                        <div class="d-flex align-items-center gap-2 smaller text-secondary p-2 rounded-2 bg-light">
+                            <i class="bi bi-person-circle text-primary fs-6"></i>
+                            <span class="text-dark fw-semibold">{{ att.user.username }}</span>
+                            {% if att.has_joined %}
+                                <span class="badge bg-success-subtle text-success smaller ms-auto">Joined</span>
+                            {% endif %}
+                        </div>
+                    {% empty %}
+                        <div class="text-muted smaller">Be the first to register for this live session!</div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="card p-4 rounded-4 shadow-sm">
+                <h5 class="text-dark font-heading fw-bold mb-3"><i class="bi bi-info-circle text-primary me-2"></i> Join Guidelines</h5>
+                <ul class="list-unstyled smaller text-secondary d-flex flex-column gap-2 mb-0">
+                    <li><i class="bi bi-check2 text-success me-1"></i> Keep your microphone muted when entering.</li>
+                    <li><i class="bi bi-check2 text-success me-1"></i> Use the Google Meet chatbox for questions.</li>
+                    <li><i class="bi bi-check2 text-success me-1"></i> Video recording will be available post-class.</li>
+                    <li><i class="bi bi-check2 text-success me-1"></i> Code snippets will be shared in real time.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

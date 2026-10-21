@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+
+{% block title %}Computer Science Tutorials & Tracks — Learn DSA, Python, Java, C++, Web Dev | CodeWithAmit{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header Section with High Contrast Visual Hierarchy -->
+    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-1">
+                <span class="badge bg-success-subtle text-success border border-success-subtle px-2.5 py-1 rounded-pill small fw-semibold">
+                    <i class="bi bi-book-half me-1"></i> GFG-Style Interactive Tutorials
+                </span>
+                <span class="text-muted small">• 100% Free Structured Tracks</span>
+            </div>
+            <h1 class="h2 fw-bold mb-1 text-body font-heading">Computer Science & Programming Tutorials</h1>
+            <p class="text-secondary small mb-0" style="max-width: 680px;">
+                Learn concepts step-by-step with interactive flowcharts, complexity benchmark graphs, multi-language solutions, and direct LeetCode practice links.
+            </p>
+        </div>
+
+        {% if is_admin %}
+            <div class="d-flex align-items-center gap-2">
+                <a href="{% url 'tutorials:add_topic' %}" class="btn btn-primary rounded-pill px-3.5 py-2 fw-semibold shadow-sm d-flex align-items-center gap-2">
+                    <i class="bi bi-plus-circle-fill"></i>
+                    <span>Add New Topic</span>
+                </a>
+                <a href="{% url 'tutorials:add_category' %}" class="btn btn-outline-secondary rounded-pill px-3 py-2 btn-sm" title="Add Track">
+                    <i class="bi bi-folder-plus me-1"></i> New Track
+                </a>
+            </div>
+        {% endif %}
+    </div>
+
+    <!-- Filter & Search Bar -->
+    <div class="card border-0 shadow-sm rounded-4 p-3 mb-4 bg-white" style="border: 1px solid #e2e8f0 !important;">
+        <form method="GET" class="d-flex flex-column flex-md-row gap-2">
+            <div class="input-group flex-grow-1">
+                <span class="input-group-text bg-transparent border-end-0 text-muted ps-3">
+                    <i class="bi bi-search"></i>
+                </span>
+                <input type="text" name="q" class="form-control border-start-0 text-dark" placeholder="Search tutorials e.g. Arrays, Hash Map, Binary Search, Python, SQL Joins..." value="{{ query }}">
+            </div>
+            
+            <div class="d-flex gap-2">
+                <select name="difficulty" class="form-select text-dark bg-white" style="min-width: 150px; border-color: #cbd5e1;" onchange="this.form.submit()">
+                    <option value="">All Difficulties</option>
+                    <option value="Beginner" {% if selected_difficulty == 'Beginner' %}selected{% endif %}>🟢 Beginner</option>
+                    <option value="Intermediate" {% if selected_difficulty == 'Intermediate' %}selected{% endif %}>🟡 Intermediate</option>
+                    <option value="Advanced" {% if selected_difficulty == 'Advanced' %}selected{% endif %}>🔴 Advanced</option>
+                </select>
+                <button type="submit" class="btn btn-primary px-4 rounded-3 fw-semibold">Search</button>
+                {% if query or selected_difficulty %}
+                    <a href="{% url 'tutorials:tutorial_list' %}" class="btn btn-outline-secondary rounded-3" title="Clear Filters">
+                        <i class="bi bi-x-lg"></i>
+                    </a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
+
+    <!-- Tracks Grid -->
+    <div class="row g-4 mb-5">
+        {% for item in tracks %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card border-0 shadow-sm rounded-4 h-100 p-4 bg-white hover-lift transition-all d-flex flex-column" style="border: 1px solid #e2e8f0 !important;">
+                    <!-- Track Top Header -->
+                    <div class="d-flex align-items-start justify-content-between mb-3">
+                        <div class="p-3 bg-primary-subtle text-primary rounded-3 d-flex align-items-center justify-content-center shadow-xs" style="width: 52px; height: 52px;">
+                            <i class="bi {{ item.category.icon|default:'bi-code-slash' }} fs-4"></i>
+                        </div>
+                        <span class="badge bg-secondary-subtle text-dark border border-secondary-subtle rounded-pill px-2.5 py-1 small fw-semibold">
+                            {{ item.topics_count }} Topics
+                        </span>
+                    </div>
+
+                    <!-- Title & Description -->
+                    <h3 class="h5 fw-bold mb-2 text-dark font-heading">
+                        {{ item.category.name }}
+                    </h3>
+                    <p class="small mb-3 flex-grow-1" style="min-height: 44px; line-height: 1.6; color: #475569;">
+                        {{ item.category.description|default:"Master key concepts, algorithms, real-world syntax, and step-by-step code demonstrations." }}
+                    </p>
+
+                    <!-- Preview of Topics in this Track -->
+                    {% if item.recent_topics %}
+                        <div class="mb-3 p-2.5 rounded-3 border" style="background: #f8fafc; border-color: #e2e8f0 !important;">
+                            <span class="smaller text-muted fw-bold d-block mb-1.5 text-uppercase" style="font-size: 0.72rem;">Track Highlights:</span>
+                            <div class="d-flex flex-column gap-1">
+                                {% for top in item.recent_topics %}
+                                    <a href="{% url 'tutorials:tutorial_detail' item.category.slug top.slug %}" class="smaller text-decoration-none text-dark d-flex align-items-center gap-1.5 text-truncate" style="transition: color 0.2s ease;">
+                                        <i class="bi bi-play-circle-fill text-primary" style="font-size: 0.75rem;"></i>
+                                        <span class="text-truncate fw-medium">{{ top.title }}</span>
+                                    </a>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <!-- Footer Action -->
+                    <div class="pt-3 border-top border-secondary-subtle d-flex align-items-center justify-content-between mt-auto">
+                        <span class="badge bg-light text-secondary border small">{{ item.category.badge_text|default:'Tutorial Series' }}</span>
+                        {% if item.first_topic %}
+                            <a href="{% url 'tutorials:tutorial_detail' item.category.slug item.first_topic.slug %}" class="btn btn-outline-primary btn-sm rounded-pill px-3.5 fw-semibold d-inline-flex align-items-center gap-1.5 shadow-xs">
+                                <span>Start Reading</span>
+                                <i class="bi bi-arrow-right"></i>
+                            </a>
+                        {% else %}
+                            <a href="{% url 'tutorials:category_root' item.category.slug %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                                Explore Track
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12 text-center py-5">
+                <i class="bi bi-journal-x fs-1 text-muted d-block mb-3"></i>
+                <h5 class="fw-bold text-body">No tutorials found</h5>
+                <p class="text-secondary small">Try searching for a different keyword or check back soon.</p>
+                {% if is_admin %}
+                    <a href="{% url 'tutorials:add_topic' %}" class="btn btn-primary rounded-pill px-4 mt-2">
+                        <i class="bi bi-plus-lg me-1"></i> Add First Tutorial Topic
+                    </a>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+
+    <!-- Quick Practice Connect Banner -->
+    <div class="card border-0 shadow-lg rounded-4 p-4 p-md-5 bg-primary text-white position-relative overflow-hidden">
+        <div class="row align-items-center g-4 position-relative z-1">
+            <div class="col-lg-8">
+                <span class="badge bg-white text-primary px-3 py-1 rounded-pill small fw-bold mb-2">
+                    <i class="bi bi-lightning-charge-fill text-warning me-1"></i> Connect Theory to Practice
+                </span>
+                <h2 class="h3 fw-bold mb-2 text-white font-heading">Ready to test what you've learned?</h2>
+                <p class="text-white-50 mb-0">
+                    Jump into our curated 450 Sheet and LeetCode problems section. Filter by topic (Arrays, Linked Lists, Trees, DP) and solve challenges directly with 1-click progress tracking.
+                </p>
+            </div>
+            <div class="col-lg-4 text-lg-end">
+                <a href="{% url 'coding_practice:problem_list' %}" class="btn btn-warning text-dark px-4 py-2.5 rounded-pill fw-bold shadow-sm d-inline-flex align-items-center gap-2">
+                    <span>Solve 450 DSA Sheet</span>
+                    <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

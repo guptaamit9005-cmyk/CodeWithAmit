@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if is_edit %}Edit Practice Set: {{ practice_set.title }}{% else %}Create New Practice Set{% endif %} — CodeWithAmit{% endblock %}
+
+{% block content %}
+<div class="container py-4 py-md-5" style="max-width: 820px;">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb smaller mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'coding_practice:problem_list' %}" class="text-decoration-none">Practice Sets</a></li>
+            <li class="breadcrumb-item active text-muted" aria-current="page">{% if is_edit %}Edit Set{% else %}Create Set{% endif %}</li>
+        </ol>
+    </nav>
+
+    <div class="card border-0 shadow-sm rounded-4 p-4 p-md-5" style="background: var(--cwa-bg-card, #ffffff); border: 1px solid var(--cwa-border, #e2e8f0) !important;">
+        <div class="d-flex align-items-center justify-content-between pb-3 mb-4 border-bottom" style="border-color: var(--cwa-border, #e2e8f0) !important;">
+            <div>
+                <span class="badge bg-warning-subtle text-warning-emphasis border border-warning-subtle px-3 py-1 rounded-pill mb-2 fw-semibold smaller">
+                    <i class="bi bi-collection-play-fill me-1"></i> Course Track Creator
+                </span>
+                <h1 class="h3 fw-bold mb-1" style="color: var(--cwa-text-heading, #0f172a);">
+                    {% if is_edit %}Edit Practice Set: {{ practice_set.title }}{% else %}Create New Practice Set{% endif %}
+                </h1>
+                <p class="text-secondary small mb-0">
+                    Create course-like practice sets for any subject (e.g. Python, DSA, SQL, Web Dev, Java, C++). Students can access and practice questions topic by topic.
+                </p>
+            </div>
+            <a href="{% url 'coding_practice:problem_list' %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                <i class="bi bi-arrow-left me-1"></i> Back to Sets
+            </a>
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger py-2 small rounded-3">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <!-- Title -->
+            <div class="mb-3">
+                <label class="form-label fw-semibold small">Practice Set Title <span class="text-danger">*</span></label>
+                {{ form.title }}
+                <div class="form-text smaller text-muted">e.g. "Python Programming Practice Set", "450 DSA Sheet", "SQL & Database Queries Track"</div>
+                {% if form.title.errors %}<div class="text-danger smaller mt-1">{{ form.title.errors }}</div>{% endif %}
+            </div>
+
+            <!-- Description -->
+            <div class="mb-3">
+                <label class="form-label fw-semibold small">Description</label>
+                {{ form.description }}
+                <div class="form-text smaller text-muted">What will students master by solving questions in this practice set?</div>
+                {% if form.description.errors %}<div class="text-danger smaller mt-1">{{ form.description.errors }}</div>{% endif %}
+            </div>
+
+            <!-- Badge & Difficulty -->
+            <div class="row g-3 mb-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold small">Badge Label</label>
+                    {{ form.badge }}
+                    <div class="form-text smaller text-muted">e.g. "Top Tech 450", "Python Mastery", "Placement Special"</div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold small">Difficulty Level</label>
+                    {{ form.difficulty }}
+                    <div class="form-text smaller text-muted">e.g. "All Levels", "Beginner to Advanced", "Intermediate"</div>
+                </div>
+            </div>
+
+            <!-- Icon & Banner Gradient -->
+            <div class="row g-3 mb-3">
+                <div class="col-md-5">
+                    <label class="form-label fw-semibold small">Bootstrap Icon Class</label>
+                    {{ form.icon }}
+                    <div class="form-text smaller text-muted">e.g. <code>bi-lightning-charge-fill</code>, <code>bi-filetype-py</code>, <code>bi-database-fill</code>, <code>bi-code-slash</code></div>
+                </div>
+                <div class="col-md-7">
+                    <label class="form-label fw-semibold small">Banner Gradient CSS</label>
+                    {{ form.banner_gradient }}
+                    <div class="form-text smaller text-muted">e.g. <code>linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%)</code></div>
+                </div>
+            </div>
+
+            <!-- Presets buttons for Gradient -->
+            <div class="mb-3">
+                <label class="form-label smaller fw-semibold text-muted d-block mb-1.5">Quick Palette Presets:</label>
+                <div class="d-flex flex-wrap gap-2">
+                    <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill smaller py-1" onclick="applyPreset('linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)', 'bi-lightning-charge-fill')">
+                        <span class="d-inline-block rounded-circle me-1" style="width: 10px; height: 10px; background: linear-gradient(135deg, #4f46e5, #7c3aed);"></span> Indigo Purple (DSA)
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill smaller py-1" onclick="applyPreset('linear-gradient(135deg, #0284c7 0%, #0369a1 100%)', 'bi-filetype-py')">
+                        <span class="d-inline-block rounded-circle me-1" style="width: 10px; height: 10px; background: linear-gradient(135deg, #0284c7, #0369a1);"></span> Ocean Blue (Python)
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill smaller py-1" onclick="applyPreset('linear-gradient(135deg, #d97706 0%, #b45309 100%)', 'bi-database-fill')">
+                        <span class="d-inline-block rounded-circle me-1" style="width: 10px; height: 10px; background: linear-gradient(135deg, #d97706, #b45309);"></span> Amber Flame (SQL)
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill smaller py-1" onclick="applyPreset('linear-gradient(135deg, #059669 0%, #047857 100%)', 'bi-code-slash')">
+                        <span class="d-inline-block rounded-circle me-1" style="width: 10px; height: 10px; background: linear-gradient(135deg, #059669, #047857);"></span> Emerald Green (Web Dev)
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill smaller py-1" onclick="applyPreset('linear-gradient(135deg, #e11d48 0%, #be123c 100%)', 'bi-cup-hot-fill')">
+                        <span class="d-inline-block rounded-circle me-1" style="width: 10px; height: 10px; background: linear-gradient(135deg, #e11d48, #be123c);"></span> Rose Red (Java)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Order & Featured -->
+            <div class="row g-3 mb-4">
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold small">Display Order</label>
+                    {{ form.order }}
+                </div>
+                <div class="col-md-8 d-flex align-items-center pt-4">
+                    <div class="form-check">
+                        {{ form.is_featured }}
+                        <label class="form-check-label small fw-semibold" for="{{ form.is_featured.id_for_label }}">
+                            Featured Practice Set (show prominently on portal)
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit -->
+            <div class="d-flex align-items-center justify-content-end gap-3 pt-3 border-top" style="border-color: var(--cwa-border, #e2e8f0) !important;">
+                <a href="{% url 'coding_practice:problem_list' %}" class="btn btn-outline-secondary px-4 rounded-pill">Cancel</a>
+                <button type="submit" class="btn btn-primary px-4 py-2 rounded-pill fw-semibold shadow-sm">
+                    <i class="bi bi-check-lg me-1"></i> {% if is_edit %}Save Changes{% else %}Create Practice Set{% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+function applyPreset(gradient, icon) {
+    const gradInput = document.getElementById('id_banner_gradient');
+    const iconInput = document.getElementById('id_icon');
+    if (gradInput) gradInput.value = gradient;
+    if (iconInput) iconInput.value = icon;
+}
+</script>
+{% endblock %}

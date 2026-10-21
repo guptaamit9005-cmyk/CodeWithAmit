@@ -1,0 +1,376 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}CodeWithAmit — Build Skills. Write Code. Shape Your Future.{% endblock %}</title>
+    
+    <!-- Meta SEO -->
+    <meta name="description" content="{% block meta_description %}CodeWithAmit is a premier coding education platform. Learn programming, master Data Structures and Algorithms, explore AI/ML, build real projects, and prepare for top tech interviews.{% endblock %}">
+    <meta name="keywords" content="CodeWithAmit, coding, DSA, algorithms, web development, AI, ML, Python, interview preparation, computer science">
+    <meta name="theme-color" content="#2563eb">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{% block og_title %}CodeWithAmit — Build Skills. Write Code.{% endblock %}">
+    <meta property="og:description" content="{% block og_desc %}Learn programming, master DSA, explore AI/ML and build real projects.{% endblock %}">
+
+    <!-- Bootstrap 5.3.3 CSS & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <!-- Google Fonts: Plus Jakarta Sans, Outfit, Fira Code -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- CodeWithAmit Core & Custom CSS -->
+    <link rel="stylesheet" href="{% static 'css/codewithamit.css' %}?v=2.0">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=4.4">
+    {% block extra_css %}{% endblock %}
+</head>
+<body class="cwa-theme d-flex flex-column min-vh-100">
+
+    <!-- ==================================================================
+         MOBILE OFFCANVAS DRAWER
+         ================================================================== -->
+    <div class="offcanvas offcanvas-start cwa-offcanvas" tabindex="-1" id="mobileDrawer" aria-labelledby="mobileDrawerLabel">
+        <div class="offcanvas-header border-bottom py-3 px-4">
+            <a class="cwa-brand text-decoration-none" href="{% url 'core:home' %}" id="mobileDrawerLabel">
+                <span class="cwa-brand-icon"><i class="bi bi-code-slash"></i></span>
+                <span class="cwa-brand-name">Code<span class="cwa-brand-accent">With</span>Amit</span>
+            </a>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
+        </div>
+        <div class="offcanvas-body p-0 d-flex flex-column">
+            <!-- Mobile Search -->
+            <div class="px-4 py-3 border-bottom">
+                <form action="{% url 'core:search' %}" method="GET">
+                    <div class="input-group rounded-pill overflow-hidden" style="border: 1.5px solid var(--cwa-border); background: var(--cwa-bg-subtle);">
+                        <span class="input-group-text bg-transparent border-0 text-muted ps-3 pe-1"><i class="bi bi-search" style="font-size: 0.85rem;"></i></span>
+                        <input type="text" name="q" class="form-control bg-transparent border-0 py-2" placeholder="Search courses, practice sets, topics..." value="{{ request.GET.q|default:'' }}" style="font-size: 0.9rem;">
+                    </div>
+                </form>
+            </div>
+            <!-- Mobile Nav Links -->
+            <nav class="px-3 py-2 flex-grow-1 overflow-auto">
+                <div class="cwa-drawer-section-label">Main</div>
+                <a class="cwa-drawer-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'core:home' %}"><i class="bi bi-house-door-fill"></i> Home</a>
+                <a class="cwa-drawer-link {% if request.resolver_match.app_name == 'courses' %}active{% endif %}" href="{% url 'courses:course_list' %}"><i class="bi bi-play-circle-fill text-primary"></i> Courses</a>
+                <a class="cwa-drawer-link {% if request.resolver_match.app_name == 'coding_practice' %}active{% endif %}" href="{% url 'coding_practice:problem_list' %}"><i class="bi bi-collection-play-fill text-warning"></i> Practice Sets</a>
+                <a class="cwa-drawer-link" href="{% url 'courses:course_list' %}?category=ai-ml"><i class="bi bi-cpu-fill" style="color:#7c3aed;"></i> AI / ML</a>
+                <a class="cwa-drawer-link {% if request.resolver_match.url_name == 'code_editor' %}active{% endif %}" href="{% url 'coding_practice:code_editor' %}"><i class="bi bi-terminal-fill text-success"></i> Online Compiler <span class="badge bg-success-subtle text-success rounded-pill ms-auto" style="font-size:0.65rem;">Live</span></a>
+                <div class="cwa-drawer-section-label mt-3">Resources</div>
+                <a class="cwa-drawer-link" href="{% url 'roadmaps:roadmap_list' %}"><i class="bi bi-signpost-split-fill" style="color:var(--cwa-indigo);"></i> Career Roadmaps</a>
+                <a class="cwa-drawer-link" href="{% url 'tutorials:tutorial_list' %}"><i class="bi bi-book-half text-success"></i> Tutorials & Guides</a>
+                <a class="cwa-drawer-link" href="{% url 'live_classes:class_list' %}"><i class="bi bi-broadcast text-danger"></i> Live Sessions</a>
+                <a class="cwa-drawer-link {% if request.resolver_match.url_name == 'features' %}active{% endif %}" href="{% url 'core:features' %}"><i class="bi bi-stars text-warning"></i> Platform Features</a>
+                <div class="cwa-drawer-section-label mt-3">Portals</div>
+                <a class="cwa-drawer-link" href="{% url 'dashboard:student_dashboard' %}"><i class="bi bi-mortarboard-fill text-primary"></i> Student Dashboard</a>
+                <a class="cwa-drawer-link" href="{% url 'dashboard:admin_dashboard' %}"><i class="bi bi-speedometer2 text-warning"></i> Admin Dashboard</a>
+            </nav>
+            <!-- Mobile Auth -->
+            <div class="px-4 py-4 border-top">
+                {% if request.user.is_authenticated %}
+                    <div class="d-flex align-items-center gap-2 mb-3 p-2 rounded-3" style="background:var(--cwa-bg-subtle);border:1px solid var(--cwa-border);">
+                        <div class="rounded-circle bg-primary text-white fw-bold d-flex align-items-center justify-content-center" style="width:36px;height:36px;font-size:1rem;">{{ request.user.username|first|upper }}</div>
+                        <div>
+                            <div class="fw-bold small" style="color:var(--cwa-text-heading);">{{ request.user.username }}</div>
+                            <div class="text-muted" style="font-size:0.75rem;">{{ request.user.email }}</div>
+                        </div>
+                    </div>
+                    <a href="{% url 'accounts:logout' %}" class="btn btn-sm btn-outline-danger w-100 rounded-pill fw-semibold"><i class="bi bi-box-arrow-right me-1"></i> Sign Out</a>
+                {% else %}
+                    <a href="{% url 'accounts:student_login' %}" class="btn btn-outline-primary w-100 rounded-pill fw-semibold mb-2"><i class="bi bi-mortarboard-fill me-1"></i> Student Login</a>
+                    <a href="{% url 'accounts:register' %}?role=student" class="cwa-btn-primary w-100 justify-content-center"><i class="bi bi-person-plus-fill"></i> Register Free</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================================================================
+         TOP ANNOUNCEMENT BAR (desktop only)
+         ================================================================== -->
+    <div class="cwa-announcement-bar d-none d-lg-block">
+        <div class="container-fluid px-3 px-xl-5">
+            <div class="d-flex justify-content-between align-items-center">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="badge bg-warning text-dark rounded-pill px-2 py-1 fw-bold" style="font-size:0.68rem;"><i class="bi bi-shield-lock-fill me-1"></i>Quick Access</span>
+                    <span class="d-none d-xl-inline" style="font-size:0.78rem;opacity:0.6;">CodeWithAmit Learning &amp; Administration Ecosystem</span>
+                </div>
+                <div class="d-flex align-items-center gap-3">
+                    <a href="{% url 'accounts:student_login' %}" class="cwa-topbar-link"><i class="bi bi-mortarboard-fill text-primary"></i> Student Login</a>
+                    <span class="opacity-25">|</span>
+                    <a href="{% url 'accounts:admin_login' %}" class="cwa-topbar-link text-warning"><i class="bi bi-shield-lock-fill"></i> Admin Login</a>
+                    <span class="opacity-25">|</span>
+                    <a href="{% url 'dashboard:admin_dashboard' %}" class="cwa-topbar-link" style="color:#38bdf8;"><i class="bi bi-speedometer2"></i> Admin Dashboard</a>
+                    {% if request.user.is_staff or request.user.is_superuser %}
+                    <span class="opacity-25">|</span>
+                    <a href="/admin/" target="_blank" class="cwa-topbar-link opacity-60"><i class="bi bi-database"></i> Django Admin</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================================================================
+         STICKY TOP NAVIGATION BAR
+         ================================================================== -->
+    <header class="cwa-navbar" id="main-nav">
+        <div class="container-fluid px-3 px-xl-5 d-flex align-items-center justify-content-between" style="height:62px;">
+            
+            <!-- Mobile: Hamburger -->
+            <button class="btn d-xl-none border-0 shadow-none p-2 me-1" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileDrawer" aria-controls="mobileDrawer" aria-label="Open menu">
+                <i class="bi bi-list" style="font-size: 1.55rem; color: var(--cwa-text-heading);"></i>
+            </button>
+
+            <!-- Brand Wordmark -->
+            <a class="cwa-brand me-auto me-xl-0" href="{% url 'core:home' %}">
+                <span class="cwa-brand-icon"><i class="bi bi-code-slash"></i></span>
+                <span class="cwa-brand-name">Code<span class="cwa-brand-accent">With</span>Amit</span>
+            </a>
+
+            <!-- Search Bar (Desktop only) -->
+            <form class="d-none d-xl-flex mx-4" action="{% url 'core:search' %}" method="GET" style="max-width: 300px; width: 100%;">
+                <div class="input-group input-group-sm rounded-pill overflow-hidden" style="border: 1.5px solid var(--cwa-border); background: var(--cwa-bg-subtle);">
+                    <span class="input-group-text bg-transparent border-0 text-muted ps-3 pe-1"><i class="bi bi-search" style="font-size: 0.8rem;"></i></span>
+                    <input type="text" name="q" class="form-control bg-transparent border-0 py-1" placeholder="Search courses, practice sets..." value="{{ request.GET.q|default:'' }}" style="font-size: 0.84rem;">
+                </div>
+            </form>
+
+            <!-- Desktop Nav Links -->
+            <nav class="d-none d-xl-flex align-items-center gap-1 me-3">
+
+                <a class="cwa-nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'core:home' %}">Home</a>
+                <a class="cwa-nav-link {% if request.resolver_match.app_name == 'courses' %}active{% endif %}" href="{% url 'courses:course_list' %}">Courses</a>
+                <a class="cwa-nav-link {% if request.resolver_match.app_name == 'coding_practice' %}active{% endif %}" href="{% url 'coding_practice:problem_list' %}">Practice Sets</a>
+                <a class="cwa-nav-link" href="{% url 'courses:course_list' %}?category=ai-ml">AI/ML</a>
+                <a class="cwa-nav-link {% if request.resolver_match.url_name == 'code_editor' %}active{% endif %}" href="{% url 'coding_practice:code_editor' %}">
+                    <i class="bi bi-terminal-fill me-1 text-primary" style="font-size:0.8rem;"></i>Compiler
+                    <span class="badge rounded-pill ms-1" style="background:#dcfce7;color:#16a34a;font-size:0.65rem;padding:2px 7px;">Live</span>
+                </a>
+
+
+                <!-- Resources Dropdown -->
+                <div class="position-relative">
+                    <a class="cwa-nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Resources</a>
+                    <ul class="dropdown-menu cwa-mega-dropdown shadow-lg border p-2" style="min-width:260px;">
+                        <li><a class="cwa-dropdown-item" href="{% url 'coding_practice:code_editor' %}"><span class="cwa-dropdown-icon" style="background:#eff6ff;color:#2563eb;"><i class="bi bi-code-slash"></i></span><div><div class="fw-semibold small">Online Compiler</div><div class="text-muted" style="font-size:0.75rem;">Python, C, C++, HTML, JS</div></div></a></li>
+                        <li><a class="cwa-dropdown-item" href="{% url 'tutorials:tutorial_list' %}"><span class="cwa-dropdown-icon" style="background:#ecfdf5;color:#059669;"><i class="bi bi-book-half"></i></span><div><div class="fw-semibold small">Tutorials &amp; Guides</div><div class="text-muted" style="font-size:0.75rem;">Core CS, Web Dev, Python</div></div></a></li>
+                        <li><a class="cwa-dropdown-item" href="{% url 'roadmaps:roadmap_list' %}"><span class="cwa-dropdown-icon" style="background:#eef2ff;color:#4f46e5;"><i class="bi bi-signpost-split-fill"></i></span><div><div class="fw-semibold small">Career Roadmaps</div><div class="text-muted" style="font-size:0.75rem;">Step-by-step career milestones</div></div></a></li>
+                        <li><a class="cwa-dropdown-item" href="{% url 'live_classes:class_list' %}"><span class="cwa-dropdown-icon" style="background:#fff1f2;color:#e11d48;"><i class="bi bi-broadcast"></i></span><div><div class="fw-semibold small">Live Sessions</div><div class="text-muted" style="font-size:0.75rem;">Interactive mentor video calls</div></div></a></li>
+                        <li><hr class="dropdown-divider my-1"></li>
+                        <li class="px-3 py-1 text-uppercase fw-bold" style="font-size:0.68rem;letter-spacing:0.07em;color:var(--cwa-text-muted);">Portals</li>
+                        <li><a class="cwa-dropdown-item" href="{% url 'dashboard:student_dashboard' %}"><span class="cwa-dropdown-icon" style="background:#eff6ff;color:#2563eb;width:28px;height:28px;"><i class="bi bi-mortarboard-fill"></i></span><div><div class="fw-semibold small">Student Dashboard</div><div class="text-muted" style="font-size:0.75rem;">DSA progress &amp; streaks</div></div></a></li>
+                        <li><a class="cwa-dropdown-item" href="{% url 'dashboard:admin_dashboard' %}"><span class="cwa-dropdown-icon" style="background:#fffbeb;color:#d97706;width:28px;height:28px;"><i class="bi bi-shield-lock-fill"></i></span><div><div class="fw-semibold small">Admin Dashboard</div><div class="text-muted" style="font-size:0.75rem;">Creator studio &amp; management hub</div></div></a></li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Desktop Auth Buttons -->
+            <div class="d-none d-xl-flex align-items-center gap-2 ms-2">
+                {% if request.user.is_authenticated %}
+                    {% if request.user.is_staff or request.user.is_superuser or request.user.profile.role == 'admin' %}
+                        <a href="{% url 'dashboard:admin_dashboard' %}" class="btn btn-sm fw-bold rounded-pill px-3 d-inline-flex align-items-center gap-1" style="background:#fffbeb;border:1.5px solid #f59e0b;color:#92400e;">
+                            <i class="bi bi-speedometer2"></i> Admin
+                        </a>
+                    {% endif %}
+                    <a href="{% url 'dashboard:student_dashboard' %}" class="cwa-btn-secondary py-1 px-3" style="font-size:0.88rem;">
+                        <i class="bi bi-mortarboard-fill text-primary"></i> Dashboard
+                    </a>
+                    <div class="dropdown">
+                        <button class="btn btn-sm rounded-pill border dropdown-toggle d-inline-flex align-items-center gap-2 px-3 py-1" type="button" data-bs-toggle="dropdown" style="border-color:var(--cwa-border);background:var(--cwa-bg-subtle);">
+                            <span class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center fw-bold" style="width:22px;height:22px;font-size:0.75rem;">{{ request.user.username|first|upper }}</span>
+                            <span class="fw-semibold" style="font-size:0.87rem;color:var(--cwa-text-heading);">{{ request.user.username }}</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end shadow border p-2" style="border-radius:var(--cwa-radius-md);min-width:215px;border-color:var(--cwa-border);">
+                            {% if request.user.is_staff or request.user.is_superuser or request.user.profile.role == 'admin' %}
+                                <li><a class="dropdown-item py-2 px-3 rounded-2 fw-bold small" href="{% url 'dashboard:admin_dashboard' %}" style="color:#92400e;"><i class="bi bi-speedometer2 me-2 text-warning"></i> Admin Dashboard</a></li>
+                                <li><a class="dropdown-item py-2 px-3 rounded-2 fw-semibold small text-primary" href="{% url 'core:add_feature' %}"><i class="bi bi-plus-circle-fill me-2"></i> Add Platform Feature</a></li>
+                                <li><a class="dropdown-item py-2 px-3 rounded-2 small" href="/admin/" target="_blank"><i class="bi bi-database me-2 text-secondary"></i> Django Backend Admin</a></li>
+                                <li><hr class="dropdown-divider my-1"></li>
+                            {% else %}
+                                <li><a class="dropdown-item py-2 px-3 rounded-2 small fw-semibold" href="{% url 'accounts:admin_login' %}?switch=true" style="color:#92400e;"><i class="bi bi-shield-lock-fill me-2 text-warning"></i> Switch to Admin</a></li>
+                                <li><hr class="dropdown-divider my-1"></li>
+                            {% endif %}
+                            <li><a class="dropdown-item py-2 px-3 rounded-2 small fw-semibold" href="{% url 'dashboard:student_dashboard' %}"><i class="bi bi-mortarboard-fill me-2 text-primary"></i> Student Dashboard</a></li>
+                            <li><a class="dropdown-item py-2 px-3 rounded-2 small" href="{% url 'accounts:profile' %}"><i class="bi bi-person me-2 text-secondary"></i> My Profile</a></li>
+                            <li><hr class="dropdown-divider my-1"></li>
+                            <li><a class="dropdown-item py-2 px-3 rounded-2 small text-danger" href="{% url 'accounts:logout' %}"><i class="bi bi-box-arrow-right me-2"></i> Sign Out</a></li>
+                        </ul>
+                    </div>
+                {% else %}
+                    <a href="{% url 'accounts:admin_login' %}" class="btn btn-sm rounded-pill px-3 fw-semibold d-inline-flex align-items-center gap-1" style="border:1.5px solid #f59e0b;background:rgba(245,158,11,0.08);color:#92400e;">
+                        <i class="bi bi-shield-lock-fill text-warning"></i> Admin
+                    </a>
+                    <a href="{% url 'accounts:student_login' %}" class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-semibold d-inline-flex align-items-center gap-1" style="border:1.5px solid var(--cwa-primary);">
+                        <i class="bi bi-mortarboard-fill"></i> Login
+                    </a>
+                    <a href="{% url 'accounts:register' %}?role=student" class="cwa-btn-primary py-1 px-4">
+                        Register <i class="bi bi-arrow-right"></i>
+                    </a>
+                {% endif %}
+            </div>
+
+            <!-- Mobile Icons (search + avatar) -->
+            <div class="d-flex d-xl-none align-items-center gap-1 ms-auto">
+                <a href="{% url 'core:search' %}" class="btn border-0 p-2" title="Search">
+                    <i class="bi bi-search" style="font-size:1.1rem;color:var(--cwa-text-body);"></i>
+                </a>
+                {% if request.user.is_authenticated %}
+                    <a href="{% url 'dashboard:student_dashboard' %}" class="btn border-0 p-1" title="Dashboard">
+                        <span class="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center fw-bold" style="width:30px;height:30px;font-size:0.8rem;">{{ request.user.username|first|upper }}</span>
+                    </a>
+                {% else %}
+                    <a href="{% url 'accounts:student_login' %}" class="cwa-btn-primary py-1 px-3 ms-1" style="font-size:0.82rem;">Login</a>
+                {% endif %}
+            </div>
+        </div>
+    </header>
+
+    <!-- Global Alert / Messages Container -->
+    <div class="container-fluid px-3 px-xl-5 mt-2">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show border-0 shadow-sm d-flex align-items-center gap-2 mb-2" role="alert" style="border-radius: var(--cwa-radius-md);">
+                    {% if message.tags == 'success' %}
+                        <i class="bi bi-check-circle-fill fs-5 text-success flex-shrink-0"></i>
+                    {% elif message.tags == 'danger' or message.tags == 'error' %}
+                        <i class="bi bi-exclamation-triangle-fill fs-5 text-danger flex-shrink-0"></i>
+                    {% elif message.tags == 'warning' %}
+                        <i class="bi bi-exclamation-circle-fill fs-5 text-warning flex-shrink-0"></i>
+                    {% else %}
+                        <i class="bi bi-info-circle-fill fs-5 text-primary flex-shrink-0"></i>
+                    {% endif %}
+                    <div class="flex-grow-1">{{ message }}</div>
+                    <button type="button" class="btn-close flex-shrink-0" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+
+    <!-- Main Content Block -->
+    <main class="flex-grow-1">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- ==================================================================
+         FOOTER
+         ================================================================== -->
+    <footer class="cwa-footer">
+        <div class="container px-3 px-xl-5">
+            <div class="row g-4 g-lg-5">
+                
+                <!-- Brand Info & Mission -->
+                <div class="col-lg-4 col-md-6">
+                    <a class="cwa-brand mb-3 d-inline-flex" href="{% url 'core:home' %}">
+                        <span class="cwa-brand-icon"><i class="bi bi-code-slash"></i></span>
+                        <span class="cwa-brand-name">Code<span class="cwa-brand-accent">With</span>Amit</span>
+                    </a>
+                    <p class="small mb-4" style="line-height: 1.7; max-width: 320px; color: var(--cwa-text-muted);">
+                        Learn programming, master problem-solving, explore AI, and turn your ideas into real-world projects with CodeWithAmit.
+                    </p>
+                    <div class="d-flex gap-2 flex-wrap">
+                        <a href="https://github.com" target="_blank" rel="noopener noreferrer" class="cwa-social-btn" title="GitHub"><i class="bi bi-github"></i></a>
+                        <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" class="cwa-social-btn" style="color:#0077b5;" title="LinkedIn"><i class="bi bi-linkedin"></i></a>
+                        <a href="https://youtube.com" target="_blank" rel="noopener noreferrer" class="cwa-social-btn" style="color:#ff0000;" title="YouTube"><i class="bi bi-youtube"></i></a>
+                        <a href="https://discord.com" target="_blank" rel="noopener noreferrer" class="cwa-social-btn" style="color:#5865f2;" title="Discord"><i class="bi bi-discord"></i></a>
+                        <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" class="cwa-social-btn" title="Twitter / X"><i class="bi bi-twitter-x"></i></a>
+                    </div>
+                </div>
+
+                <!-- Learning Paths -->
+                <div class="col-lg-2 col-md-3 col-6">
+                    <h6 class="cwa-footer-heading">Learning</h6>
+                    <ul class="cwa-footer-links">
+                        <li><a href="{% url 'coding_practice:problem_list' %}">DSA 450 Sheet</a></li>
+                        <li><a href="{% url 'courses:course_list' %}">Featured Courses</a></li>
+                        <li><a href="{% url 'courses:course_list' %}?category=ai-ml">AI & Machine Learning</a></li>
+                        <li><a href="{% url 'roadmaps:roadmap_list' %}">Career Roadmaps</a></li>
+                        <li><a href="{% url 'core:home' %}#projects">Project Showcase</a></li>
+                    </ul>
+                </div>
+
+                <!-- Programming Resources -->
+                <div class="col-lg-2 col-md-3 col-6">
+                    <h6 class="cwa-footer-heading">Resources</h6>
+                    <ul class="cwa-footer-links">
+                        <li><a href="{% url 'tutorials:tutorial_list' %}">Tutorials & Guides</a></li>
+                        <li><a href="{% url 'live_classes:class_list' %}">Live Doubt Sessions</a></li>
+                        <li><a href="{% url 'coding_practice:contest_list' %}">Coding Contests</a></li>
+                        <li><a href="{% url 'global_leaderboard' %}">Learner Leaderboard</a></li>
+                    </ul>
+                </div>
+
+                <!-- Portals -->
+                <div class="col-lg-2 col-md-3 col-6">
+                    <h6 class="cwa-footer-heading">Portals</h6>
+                    <ul class="cwa-footer-links">
+                        <li><a href="{% url 'accounts:student_login' %}" class="fw-semibold"><i class="bi bi-mortarboard-fill text-primary me-1"></i>Student Login</a></li>
+                        <li><a href="{% url 'dashboard:student_dashboard' %}">Student Dashboard</a></li>
+                        <li><a href="{% url 'accounts:admin_login' %}" class="fw-bold" style="color:#d97706;"><i class="bi bi-shield-lock-fill me-1"></i>Admin Login</a></li>
+                        <li><a href="{% url 'dashboard:admin_dashboard' %}">Admin Dashboard</a></li>
+                        <li><a href="/admin/" target="_blank">Django Admin</a></li>
+                    </ul>
+                </div>
+
+                <!-- Company & Legal -->
+                <div class="col-lg-2 col-md-3 col-6">
+                    <h6 class="cwa-footer-heading">Company</h6>
+                    <ul class="cwa-footer-links">
+                        <li><a href="{% url 'core:about' %}">About Us</a></li>
+                        <li><a href="{% url 'core:contact' %}">Contact Support</a></li>
+                        <li><a href="{% url 'core:privacy_policy' %}">Privacy Policy</a></li>
+                        <li><a href="{% url 'core:terms_of_service' %}">Terms of Service</a></li>
+                        <li><a href="{% url 'core:features' %}">Platform Features</a></li>
+                    </ul>
+                </div>
+
+            </div>
+
+            <hr class="my-4" style="border-color: rgba(255,255,255,0.08);">
+
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-2 small" style="color: rgba(255,255,255,0.4);">
+                <p class="mb-0">© 2026 CodeWithAmit. All rights reserved. Built with ❤️ for learners.</p>
+                <div class="d-flex gap-3 flex-wrap">
+                    <a href="{% url 'core:privacy_policy' %}" style="color:rgba(255,255,255,0.5);" class="text-decoration-none">Privacy</a>
+                    <a href="{% url 'core:terms_of_service' %}" style="color:rgba(255,255,255,0.5);" class="text-decoration-none">Terms</a>
+                    <a href="{% url 'core:contact' %}" style="color:rgba(255,255,255,0.5);" class="text-decoration-none">Contact</a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ==================================================================
+         MOBILE BOTTOM APP BAR
+         ================================================================== -->
+    <nav class="cwa-bottom-bar d-xl-none" aria-label="Mobile navigation">
+        <a href="{% url 'core:home' %}" class="cwa-bottom-bar-item {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+            <i class="bi bi-house-door{% if request.resolver_match.url_name == 'home' %}-fill{% endif %}"></i>
+            <span>Home</span>
+        </a>
+        <a href="{% url 'courses:course_list' %}" class="cwa-bottom-bar-item {% if request.resolver_match.app_name == 'courses' %}active{% endif %}">
+            <i class="bi bi-play-circle{% if request.resolver_match.app_name == 'courses' %}-fill{% endif %}"></i>
+            <span>Courses</span>
+        </a>
+        <a href="{% url 'coding_practice:problem_list' %}" class="cwa-bottom-bar-item {% if request.resolver_match.app_name == 'coding_practice' %}active{% endif %}">
+            <i class="bi bi-list-check"></i>
+            <span>DSA</span>
+        </a>
+        <a href="{% url 'coding_practice:code_editor' %}" class="cwa-bottom-bar-item cwa-bottom-bar-fab" title="Online Compiler">
+            <i class="bi bi-terminal-fill"></i>
+            <span>Compile</span>
+        </a>
+        <a href="{% url 'dashboard:student_dashboard' %}" class="cwa-bottom-bar-item">
+            <i class="bi bi-person"></i>
+            <span>Profile</span>
+        </a>
+    </nav>
+
+    <!-- Bootstrap 5.3.3 JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Custom Application JS -->
+    <script src="{% static 'js/main.js' %}"></script>
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

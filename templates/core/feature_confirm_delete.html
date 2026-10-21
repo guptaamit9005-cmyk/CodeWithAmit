@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Delete Feature — CodeWithAmit Admin Studio{% endblock %}
+
+{% block content %}
+<div class="py-5" style="background: var(--cwa-bg);">
+    <div class="container" style="max-width: 620px;">
+
+        <div class="cwa-card p-4 p-md-5 shadow-sm text-center">
+            <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-danger-subtle text-danger mb-3" style="width: 64px; height: 64px;">
+                <i class="bi bi-trash3-fill fs-2"></i>
+            </div>
+
+            <h2 class="h4 fw-bold cwa-heading mb-2">Delete Platform Feature?</h2>
+            <p class="text-secondary small mb-4">
+                Are you sure you want to permanently delete the feature <strong class="text-dark">"{{ feature.title }}"</strong>?
+                Once deleted, users will no longer see or access this feature from the Features directory.
+            </p>
+
+            <div class="p-3 rounded-3 text-start bg-light border mb-4">
+                <div class="d-flex align-items-center gap-2 mb-1">
+                    <i class="bi {{ feature.icon }} text-primary"></i>
+                    <span class="fw-bold small">{{ feature.title }}</span>
+                    <span class="badge bg-secondary-subtle text-secondary ms-auto smaller">{{ feature.get_category_display }}</span>
+                </div>
+                <div class="smaller text-muted">{{ feature.short_description }}</div>
+                <div class="smaller text-muted mt-1"><i class="bi bi-link-45deg"></i> Target: <code>{{ feature.action_url }}</code></div>
+            </div>
+
+            <form method="post">
+                {% csrf_token %}
+                <div class="d-flex justify-content-center gap-3">
+                    <a href="{% url 'core:features' %}" class="cwa-btn-secondary py-2 px-4">
+                        Cancel & Keep Feature
+                    </a>
+                    <button type="submit" class="btn btn-danger py-2 px-4 fw-semibold rounded-pill shadow-sm">
+                        <i class="bi bi-trash3 me-1"></i> Confirm Delete
+                    </button>
+                </div>
+            </form>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

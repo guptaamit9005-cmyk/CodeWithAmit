@@ -1,0 +1,1194 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}CodeWithAmit — Build Skills. Write Code. Shape Your Future.{% endblock %}
+{% block meta_description %}Learn programming, master problem-solving, explore AI, and turn your ideas into real-world projects with CodeWithAmit.{% endblock %}
+
+{% block content %}
+<div class="cwa-home-wrapper">
+
+    <!-- ==================================================================
+         B. HERO SECTION: Confident Typography, Generous Whitespace, Code Preview
+         ================================================================== -->
+    <section class="cwa-section py-5 py-lg-6" style="background: radial-gradient(circle at 50% 0%, #f1f5f9 0%, #ffffff 75%);">
+        <div class="container px-3 px-xl-5">
+            <div class="row align-items-center g-5">
+                
+                <!-- Hero Left: Typography & CTAs -->
+                <div class="col-lg-6">
+                    <div class="d-inline-flex align-items-center gap-2 mb-3">
+                        <span class="cwa-badge cwa-badge-primary">
+                            <i class="bi bi-mortarboard-fill"></i> Modern Coding Education
+                        </span>
+                        <span class="cwa-badge cwa-badge-emerald">
+                            <i class="bi bi-check-circle-fill"></i> 100% Student-Friendly
+                        </span>
+                    </div>
+
+                    <h1 class="display-4 fw-bold cwa-heading mb-3" style="line-height: 1.15; letter-spacing: -0.04em;">
+                        Build Skills.<br>
+                        Write Code.<br>
+                        <span style="color: var(--cwa-primary);">Shape Your Future.</span>
+                    </h1>
+
+                    <p class="lead mb-4" style="color: var(--cwa-text-body); font-size: 1.15rem; line-height: 1.65; max-width: 530px;">
+                        Learn programming, master problem-solving, explore AI, and turn your ideas into real-world projects with CodeWithAmit.
+                    </p>
+
+                    <div class="d-flex flex-wrap gap-3 mb-4 pb-2">
+                        <a href="{% url 'roadmaps:roadmap_list' %}" class="cwa-btn-primary py-2.5 px-4 shadow-sm">
+                            <span>Explore Learning Paths</span>
+                            <i class="bi bi-arrow-right"></i>
+                        </a>
+                        <a href="{% url 'coding_practice:code_editor' %}" class="cwa-btn-secondary py-2.5 px-4 shadow-xs">
+                            <i class="bi bi-terminal-fill text-primary"></i>
+                            <span>Online Compiler</span>
+                            <span class="badge bg-success-subtle text-success py-0.5 px-1.5 rounded-pill smaller ms-1">New</span>
+                        </a>
+                    </div>
+
+                    <!-- Instant Portal Access Dock (Student & Admin Portals) -->
+                    <div class="p-2.5 rounded-3 mb-4 d-flex align-items-center justify-content-between flex-wrap gap-2" style="background: rgba(15, 23, 42, 0.04); border: 1px solid var(--cwa-border); max-width: 530px;">
+                        <div class="d-flex align-items-center gap-2">
+                            <span class="badge bg-dark text-white rounded-pill px-2.5 py-1 smaller fw-bold">
+                                <i class="bi bi-door-open-fill me-1 text-warning"></i> Portals
+                            </span>
+                            <span class="smaller text-muted d-none d-sm-inline">Quick Access:</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <a href="{% url 'accounts:student_login' %}" class="btn btn-sm btn-outline-primary rounded-pill px-2.5 py-1 smaller fw-semibold d-inline-flex align-items-center gap-1 shadow-xs">
+                                <i class="bi bi-mortarboard-fill"></i> Student Portal
+                            </a>
+                            <a href="{% url 'accounts:admin_login' %}" class="btn btn-sm btn-outline-warning text-dark rounded-pill px-2.5 py-1 smaller fw-bold d-inline-flex align-items-center gap-1 shadow-xs" style="background: rgba(245, 158, 11, 0.15); border-color: #f59e0b;">
+                                <i class="bi bi-shield-lock-fill text-warning"></i> Admin &amp; Dashboard
+                            </a>
+                        </div>
+                    </div>
+
+                    <!-- Trust Stats Bar -->
+                    <div class="row g-3 pt-3 border-top border-light-subtle" style="max-width: 520px;">
+                        <div class="col-4">
+                            <div class="fw-bold cwa-heading fs-4 mb-0">450+</div>
+                            <div class="smaller text-muted">DSA Problems</div>
+                        </div>
+                        <div class="col-4">
+                            <div class="fw-bold cwa-heading fs-4 mb-0">6+</div>
+                            <div class="smaller text-muted">Curated Tracks</div>
+                        </div>
+                        <div class="col-4">
+                            <div class="fw-bold cwa-heading fs-4 mb-0">Free</div>
+                            <div class="smaller text-muted">Academic Notes</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Hero Right: Original Visual Code Editor & Terminal Composition -->
+                <div class="col-lg-6">
+                    <div class="cwa-hero-preview shadow-lg">
+                        <!-- Window Chrome & Language Switcher Tabs -->
+                        <div class="cwa-preview-header flex-wrap gap-2">
+                            <div class="cwa-window-dots">
+                                <span class="cwa-dot cwa-dot-red"></span>
+                                <span class="cwa-dot cwa-dot-yellow"></span>
+                                <span class="cwa-dot cwa-dot-green"></span>
+                            </div>
+                            <!-- Language Tabs -->
+                            <div class="d-flex align-items-center gap-1">
+                                <button type="button" class="cwa-code-tab active" onclick="switchHeroCodeTab('python', this)">
+                                    Python
+                                </button>
+                                <button type="button" class="cwa-code-tab" onclick="switchHeroCodeTab('cpp', this)">
+                                    C++
+                                </button>
+                                <button type="button" class="cwa-code-tab" onclick="switchHeroCodeTab('java', this)">
+                                    Java
+                                </button>
+                                <button type="button" class="cwa-code-tab" onclick="switchHeroCodeTab('javascript', this)">
+                                    JavaScript
+                                </button>
+                            </div>
+                            <!-- Actions: Copy & Run -->
+                            <div class="d-flex align-items-center gap-2 ms-auto">
+                                <button type="button" class="btn btn-sm text-secondary p-1" onclick="copyHeroCode()" title="Copy snippet" style="font-size: 0.8rem;">
+                                    <i class="bi bi-clipboard" id="hero-copy-icon"></i>
+                                </button>
+                                <button type="button" id="hero-run-btn" class="btn btn-sm btn-primary rounded-pill px-2.5 py-0.5 fw-semibold smaller d-inline-flex align-items-center gap-1 shadow-sm" onclick="runHeroCode()">
+                                    <i class="bi bi-play-fill"></i> Run Code
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Code Body (Dynamic Tab Panes) -->
+                        <div id="hero-code-wrapper">
+                            <!-- Python Snippet -->
+                            <pre class="cwa-preview-code active" id="code-snippet-python"><code><span style="color: #64748b;"># CodeWithAmit — DSA &amp; AI Foundations</span>
+<span style="color: #f472b6;">def</span> <span style="color: #60a5fa;">build_future</span>(learner):
+    skills = [<span style="color: #a7f3d0;">"DSA"</span>, <span style="color: #a7f3d0;">"Web Development"</span>, <span style="color: #a7f3d0;">"AI/ML"</span>]
+    portfolio = []
+    
+    <span style="color: #f472b6;">for</span> topic <span style="color: #f472b6;">in</span> skills:
+        code = learner.solve_daily(topic)
+        portfolio.append(learner.ship_project(code))
+        
+    <span style="color: #f472b6;">return</span> {
+        <span style="color: #cbd5e1;">"status"</span>: <span style="color: #34d399;">"Interview Ready"</span>,
+        <span style="color: #cbd5e1;">"projects_built"</span>: len(portfolio),
+        <span style="color: #cbd5e1;">"confidence"</span>: <span style="color: #fbbf24;">100</span>
+    }
+
+<span style="color: #38bdf8;">print</span>(build_future(student))</code></pre>
+
+                            <!-- C++ Snippet -->
+                            <pre class="cwa-preview-code d-none" id="code-snippet-cpp"><code><span style="color: #64748b;">// CodeWithAmit — High-Performance C++</span>
+<span style="color: #38bdf8;">#include</span> <span style="color: #a7f3d0;">&lt;iostream&gt;</span>
+<span style="color: #38bdf8;">#include</span> <span style="color: #a7f3d0;">&lt;vector&gt;</span>
+
+<span style="color: #f472b6;">struct</span> <span style="color: #fbbf24;">Result</span> {
+    std::string status = <span style="color: #a7f3d0;">"Interview Ready"</span>;
+    <span style="color: #f472b6;">int</span> problems_solved = <span style="color: #fbbf24;">450</span>;
+};
+
+<span style="color: #f472b6;">int</span> <span style="color: #60a5fa;">main</span>() {
+    Result student;
+    std::cout &lt;&lt; <span style="color: #a7f3d0;">"&gt; Status: "</span> &lt;&lt; student.status 
+              &lt;&lt; <span style="color: #a7f3d0;">" | Sheet: "</span> &lt;&lt; student.problems_solved 
+              &lt;&lt; <span style="color: #a7f3d0;">" Completed\n"</span>;
+    <span style="color: #f472b6;">return</span> <span style="color: #fbbf24;">0</span>;
+}</code></pre>
+
+                            <!-- Java Snippet -->
+                            <pre class="cwa-preview-code d-none" id="code-snippet-java"><code><span style="color: #64748b;">// CodeWithAmit — Enterprise Java &amp; DSA</span>
+<span style="color: #f472b6;">public class</span> <span style="color: #fbbf24;">Solution</span> {
+    <span style="color: #f472b6;">public static void</span> <span style="color: #60a5fa;">main</span>(String[] args) {
+        String track = <span style="color: #a7f3d0;">"Full-Stack &amp; DSA"</span>;
+        <span style="color: #f472b6;">int</span> streakDays = <span style="color: #fbbf24;">45</span>;
+        
+        System.out.println(<span style="color: #a7f3d0;">"&gt; Track: "</span> + track);
+        System.out.println(<span style="color: #a7f3d0;">"&gt; Streak: "</span> + streakDays + <span style="color: #a7f3d0;">" days active!"</span>);
+    }
+}</code></pre>
+
+                            <!-- JavaScript Snippet -->
+                            <pre class="cwa-preview-code d-none" id="code-snippet-javascript"><code><span style="color: #64748b;">// CodeWithAmit — Modern Full-Stack JavaScript</span>
+<span style="color: #f472b6;">const</span> <span style="color: #60a5fa;">launchCareer</span> = <span style="color: #f472b6;">async</span> (developer) =&gt; {
+    <span style="color: #f472b6;">const</span> modules = [<span style="color: #a7f3d0;">"React"</span>, <span style="color: #a7f3d0;">"Node.js"</span>, <span style="color: #a7f3d0;">"SQL"</span>, <span style="color: #a7f3d0;">"AI APIs"</span>];
+    <span style="color: #f472b6;">const</span> deployedApp = <span style="color: #f472b6;">await</span> developer.buildProduction(modules);
+    
+    <span style="color: #f472b6;">return</span> {
+        liveUrl: <span style="color: #a7f3d0;">"https://my-app.codewithamit.dev"</span>,
+        performanceScore: <span style="color: #fbbf24;">100</span>
+    };
+};
+
+launchCareer(amit).then(console.log);</code></pre>
+                        </div>
+
+                        <!-- Terminal Output Bar with Status & Simulation -->
+                        <div class="p-3 border-top" style="background: #090d16; border-color: rgba(255, 255, 255, 0.08) !important;">
+                            <div class="d-flex justify-content-between align-items-center smaller text-muted mb-1.5" style="font-family: 'Fira Code', monospace;">
+                                <span>
+                                    <i class="bi bi-terminal text-primary me-1"></i>
+                                    <span id="hero-output-label">Interactive Console Output</span>
+                                </span>
+                                <span id="hero-output-meta" class="text-success">
+                                    <i class="bi bi-check2-circle me-1"></i> Latency: 1.4ms • Memory: 14MB
+                                </span>
+                            </div>
+                            <div id="hero-terminal-output" class="p-2.5 rounded-2 smaller" style="background: rgba(255, 255, 255, 0.04); color: #a5b4fc; font-family: 'Fira Code', monospace; line-height: 1.5;">
+                                &gt; { "status": "Interview Ready", "projects_built": 3, "confidence": 100 }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ==================================================================
+         C. LEARNING CATEGORIES: 6 High-Clarity Structured Cards
+         ================================================================== -->
+    <section class="cwa-section" id="categories" style="background: var(--cwa-bg);">
+        <div class="container px-3 px-xl-5">
+            <div class="cwa-section-heading">
+                <span class="cwa-badge cwa-badge-primary mb-2">Curated Curriculums</span>
+                <h2 class="h2 cwa-heading mb-2">Explore Learning Categories</h2>
+                <p class="text-secondary small">Comprehensive tracks designed to take you from foundational syntax to industry-grade engineering.</p>
+            </div>
+
+            <div class="row g-4">
+                <!-- 1. Programming Fundamentals -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="cwa-category-card">
+                        <div class="cwa-icon-box" style="background: var(--cwa-primary-subtle); color: var(--cwa-primary);">
+                            <i class="bi bi-code-slash"></i>
+                        </div>
+                        <h3 class="h5 cwa-heading mb-2">Programming Fundamentals</h3>
+                        <p class="text-secondary small flex-grow-1 mb-3">
+                            Master syntax, logical thinking, control flow, functions, and memory basics in C++, Java, or Python.
+                        </p>
+                        <a href="{% url 'courses:course_list' %}" class="cwa-btn-secondary btn-sm rounded-pill w-100 justify-content-center">
+                            Explore Track <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 2. Data Structures & Algorithms -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="cwa-category-card">
+                        <div class="cwa-icon-box" style="background: var(--cwa-indigo-subtle); color: var(--cwa-indigo);">
+                            <i class="bi bi-diagram-3-fill"></i>
+                        </div>
+                        <h3 class="h5 cwa-heading mb-2">Data Structures & Algorithms</h3>
+                        <p class="text-secondary small flex-grow-1 mb-3">
+                            Systematically conquer Arrays, Linked Lists, Trees, Graphs, and Dynamic Programming with time-complexity analysis.
+                        </p>
+                        <a href="{% url 'coding_practice:problem_list' %}" class="cwa-btn-secondary btn-sm rounded-pill w-100 justify-content-center">
+                            Explore Track <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 3. Web Development -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="cwa-category-card">
+                        <div class="cwa-icon-box" style="background: var(--cwa-emerald-subtle); color: var(--cwa-emerald);">
+                            <i class="bi bi-globe"></i>
+                        </div>
+                        <h3 class="h5 cwa-heading mb-2">Web Development</h3>
+                        <p class="text-secondary small flex-grow-1 mb-3">
+                            Build responsive user interfaces and robust server architectures with HTML5, CSS3, modern JavaScript, and backend frameworks.
+                        </p>
+                        <a href="{% url 'courses:course_list' %}" class="cwa-btn-secondary btn-sm rounded-pill w-100 justify-content-center">
+                            Explore Track <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 4. Artificial Intelligence & Machine Learning -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="cwa-category-card">
+                        <div class="cwa-icon-box" style="background: var(--cwa-amber-subtle); color: var(--cwa-amber);">
+                            <i class="bi bi-cpu-fill"></i>
+                        </div>
+                        <h3 class="h5 cwa-heading mb-2">Artificial Intelligence & ML</h3>
+                        <p class="text-secondary small flex-grow-1 mb-3">
+                            Explore supervised learning, classification, neural models, NLP concepts, and practical LLM app integrations.
+                        </p>
+                        <a href="{% url 'courses:course_list' %}?category=ai-ml" class="cwa-btn-secondary btn-sm rounded-pill w-100 justify-content-center">
+                            Explore Track <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 5. Python Programming -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="cwa-category-card">
+                        <div class="cwa-icon-box" style="background: var(--cwa-cyan-subtle); color: var(--cwa-cyan);">
+                            <i class="bi bi-terminal-fill"></i>
+                        </div>
+                        <h3 class="h5 cwa-heading mb-2">Python Programming</h3>
+                        <p class="text-secondary small flex-grow-1 mb-3">
+                            From basic scripting to Object-Oriented design, automation, data wrangling with Pandas, and API development.
+                        </p>
+                        <a href="{% url 'courses:course_list' %}" class="cwa-btn-secondary btn-sm rounded-pill w-100 justify-content-center">
+                            Explore Track <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 6. Projects & Portfolio -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="cwa-category-card">
+                        <div class="cwa-icon-box" style="background: var(--cwa-rose-subtle); color: var(--cwa-rose);">
+                            <i class="bi bi-folder-check"></i>
+                        </div>
+                        <h3 class="h5 cwa-heading mb-2">Projects & Portfolio</h3>
+                        <p class="text-secondary small flex-grow-1 mb-3">
+                            Transform theoretical knowledge into production-ready software systems that stand out on your resume and GitHub.
+                        </p>
+                        <a href="#projects" class="cwa-btn-secondary btn-sm rounded-pill w-100 justify-content-center">
+                            Explore Track <i class="bi bi-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ==================================================================
+         D. FEATURED COURSES: Original Cards with Titles from Specification
+         ================================================================== -->
+    <section class="cwa-section py-5" style="background: var(--cwa-bg-subtle);">
+        <div class="container px-3 px-xl-5">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end mb-4 pb-2">
+                <div>
+                    <span class="cwa-badge cwa-badge-primary mb-2">Structured Cohorts</span>
+                    <h2 class="h2 cwa-heading mb-1">Featured Courses &amp; Batches</h2>
+                    <p class="text-secondary small mb-0">Original curriculums built for concept clarity and practical execution.</p>
+                </div>
+                <div class="d-flex gap-2 align-items-center mt-3 mt-md-0">
+                    {% if request.user.is_staff or request.user.is_superuser %}
+                        <a href="{% url 'courses:create_course' %}" class="btn btn-outline-success btn-sm rounded-pill px-3">
+                            <i class="bi bi-plus-lg me-1"></i> Add Course
+                        </a>
+                    {% endif %}
+                    <a href="{% url 'courses:course_list' %}" class="cwa-btn-outline">
+                        <span>View All Courses</span>
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+            </div>
+
+            {% if course_categories and flagship_batches %}
+                <!-- Course Category Filter Bar -->
+                <div class="d-flex flex-wrap gap-2 mb-4 pb-1">
+                    <a href="{% url 'courses:course_list' %}" class="cwa-filter-btn active text-decoration-none">
+                        <i class="bi bi-grid-fill"></i> All Tracks ({{ flagship_batches|length }})
+                    </a>
+                    {% for cat in course_categories %}
+                        <a href="{% url 'courses:course_list' %}?category={{ cat.slug }}" class="cwa-filter-btn text-decoration-none">
+                            <i class="bi {{ cat.icon|default:'bi-folder' }}"></i> {{ cat.name }}
+                        </a>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <div class="row g-4" id="cwa-courses-grid">
+                {% for course in flagship_batches %}
+                    <div class="col-lg-4 col-md-6">
+                        <div class="cwa-card h-100 d-flex flex-column">
+                            <div class="p-4" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: #ffffff; min-height: 140px; display: flex; flex-direction: column; justify-content: space-between;">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="cwa-badge" style="background: rgba(37, 99, 235, 0.2); color: #93c5fd; border: 1px solid rgba(147, 197, 253, 0.3);">
+                                        {{ course.category.name }}
+                                    </span>
+                                    {% if course.difficulty == 'Beginner' %}
+                                        <span class="cwa-badge cwa-badge-emerald">Beginner</span>
+                                    {% elif course.difficulty == 'Intermediate' %}
+                                        <span class="cwa-badge cwa-badge-amber">Intermediate</span>
+                                    {% else %}
+                                        <span class="cwa-badge cwa-badge-indigo">Advanced</span>
+                                    {% endif %}
+                                </div>
+                                <div class="h5 fw-bold font-heading mb-0 text-white">{{ course.title }}</div>
+                            </div>
+                            <div class="p-4 d-flex flex-column flex-grow-1">
+                                <p class="text-secondary small mb-3 flex-grow-1">
+                                    {{ course.short_description|truncatechars:120 }}
+                                </p>
+                                <div class="d-flex flex-wrap gap-1.5 mb-3">
+                                    {% if course.batch_name %}
+                                        <span class="badge bg-light text-primary border">{{ course.batch_name }}</span>
+                                    {% endif %}
+                                    <span class="badge bg-light text-secondary border">{{ course.total_lessons }} Lessons</span>
+                                    <span class="badge bg-light text-secondary border">{{ course.estimated_hours }}h Duration</span>
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center pt-3 border-top border-light-subtle">
+                                    <div>
+                                        {% if course.price == 0 %}
+                                            <span class="badge bg-success-subtle text-success fw-bold">FREE</span>
+                                        {% else %}
+                                            <span class="fw-bold" style="color: var(--cwa-text-heading);">₹{{ course.price }}</span>
+                                            {% if course.original_price and course.original_price > course.price %}
+                                                <span class="smaller text-muted text-decoration-line-through">₹{{ course.original_price }}</span>
+                                            {% endif %}
+                                        {% endif %}
+                                    </div>
+                                    <a href="{% url 'courses:course_detail' course.slug %}" class="cwa-btn-primary btn-sm py-1.5 px-3">
+                                        Explore Course
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="col-12 text-center py-5">
+                        <div class="p-5 rounded-4 mx-auto" style="max-width: 540px; background: var(--cwa-bg-card, #ffffff); border: 1px solid var(--cwa-border, #e2e8f0); box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
+                            <div class="rounded-circle d-inline-flex p-3 mb-3" style="background: rgba(99, 102, 241, 0.1); color: #6366f1;">
+                                <i class="bi bi-collection-play fs-1"></i>
+                            </div>
+                            <h4 class="fw-bold font-heading mb-2" style="color: var(--cwa-text-heading, #0f172a);">No Cohort Courses Yet</h4>
+                            <p class="text-secondary small mb-4">All dummy sample batches have been cleared. New cohorts will appear here once published.</p>
+                            <div class="d-flex justify-content-center gap-2 flex-wrap">
+                                {% if request.user.is_staff or request.user.is_superuser %}
+                                    <a href="{% url 'courses:create_course' %}" class="cwa-btn-primary btn-sm py-2 px-3">
+                                        <i class="bi bi-plus-circle me-1"></i> Create First Course
+                                    </a>
+                                {% endif %}
+                                <a href="{% url 'coding_practice:problem_list' %}" class="cwa-btn-outline btn-sm py-2 px-3">
+                                    <i class="bi bi-collection-play me-1"></i> Practice Sets
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ==================================================================
+         E. LEARNING ROADMAPS: Clear Connected Progressions
+         ================================================================== -->
+    <section class="cwa-section" id="roadmaps" style="background: var(--cwa-bg);">
+        <div class="container px-3 px-xl-5">
+            <div class="cwa-section-heading">
+                <span class="cwa-badge cwa-badge-indigo mb-2">Guided Progressions</span>
+                <h2 class="h2 cwa-heading mb-2">Structured Learning Roadmaps</h2>
+                <p class="text-secondary small">Follow clear, step-by-step tracks to achieve mastery without tutorial paralysis.</p>
+            </div>
+
+            {% if popular_roadmaps %}
+            <div class="row g-4">
+                {% for r in popular_roadmaps %}
+                <div class="col-lg-6">
+                    <div class="cwa-step-card h-100 d-flex flex-column justify-content-between">
+                        <div>
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div class="cwa-step-number d-flex align-items-center justify-content-center" style="width: 42px; height: 42px; border-radius: 12px; background: rgba(99, 102, 241, 0.1); color: var(--cwa-primary, #6366f1); font-size: 1.25rem;">
+                                    <i class="bi {{ r.icon|default:'bi-diagram-3' }}"></i>
+                                </div>
+                                <span class="cwa-badge cwa-badge-primary">{{ r.stages.count }} Stage{{ r.stages.count|pluralize }}</span>
+                            </div>
+                            <h3 class="h5 cwa-heading mb-1">{{ r.title }}</h3>
+                            <div class="d-flex align-items-center gap-2 text-secondary small mb-3">
+                                <span><i class="bi bi-briefcase me-1 text-primary"></i>{{ r.target_role }}</span>
+                                <span>&bull;</span>
+                                <span><i class="bi bi-clock me-1 text-primary"></i>{{ r.estimated_time }}</span>
+                            </div>
+                            <p class="text-secondary small mb-4">{{ r.short_description|default:r.description|truncatewords:22 }}</p>
+                            
+                            {% if r.stages.all %}
+                            <div class="d-flex flex-column gap-2 mb-4">
+                                {% for stage in r.stages.all|slice:":3" %}
+                                <div class="p-2.5 rounded-2 bg-light d-flex align-items-center gap-2 text-secondary small">
+                                    <i class="bi bi-check-circle-fill text-success"></i>
+                                    <span><strong>Stage {{ forloop.counter }}:</strong> {{ stage.title }}</span>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% endif %}
+                        </div>
+
+                        <a href="{% url 'roadmaps:roadmap_detail' r.slug %}" class="cwa-btn-secondary btn-sm rounded-pill w-100 justify-content-center mt-3">
+                            View Full Roadmap <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="text-center mt-4">
+                <a href="{% url 'roadmaps:roadmap_list' %}" class="cwa-btn-secondary btn-sm rounded-pill px-4">
+                    Explore All Roadmaps <i class="bi bi-arrow-right ms-1"></i>
+                </a>
+            </div>
+            {% else %}
+            <div class="card border-0 text-center py-5 px-4 rounded-4 shadow-sm" style="background: var(--cwa-bg-subtle, #f8fafc); border: 1px dashed var(--cwa-border, rgba(0,0,0,0.1)) !important;">
+                <div class="mb-3">
+                    <span class="d-inline-flex align-items-center justify-content-center rounded-circle" style="width: 58px; height: 58px; background: rgba(99, 102, 241, 0.12); color: #6366f1;">
+                        <i class="bi bi-compass fs-2"></i>
+                    </span>
+                </div>
+                <h4 class="fw-bold mb-2">Curated Career Tracks Coming Soon</h4>
+                <p class="text-secondary small mx-auto mb-4" style="max-width: 520px;">
+                    Our industry mentors are designing step-by-step career path roadmaps with interactive progress tracking, milestones, and hands-on projects.
+                </p>
+                <div class="d-flex justify-content-center gap-2">
+                    {% if is_admin %}
+                    <a href="{% url 'roadmaps:create_roadmap' %}" class="btn btn-primary btn-sm rounded-pill px-4">
+                        <i class="bi bi-plus-lg me-1"></i> Create Roadmap (Admin)
+                    </a>
+                    {% endif %}
+                    <a href="{% url 'roadmaps:roadmap_list' %}" class="btn btn-outline-secondary btn-sm rounded-pill px-4">
+                        View Roadmaps Directory
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+
+
+    <!-- ==================================================================
+         F. PRACTICE & CODING SECTION: Dedicated Coding Hub
+         ================================================================== -->
+    <section class="cwa-section py-5" style="background: var(--cwa-bg-subtle);">
+        <div class="container px-3 px-xl-5">
+            <div class="row align-items-center g-5">
+                
+                <div class="col-lg-6">
+                    <span class="cwa-badge cwa-badge-amber mb-2">
+                        <i class="bi bi-lightning-charge-fill"></i> Problem Solving Arena
+                    </span>
+                    <h2 class="h2 cwa-heading mb-3">Daily Coding Practice & Problem Sheets</h2>
+                    <p class="text-secondary mb-4" style="line-height: 1.65;">
+                        Consistency is the bridge between aspiring and achieving. Strengthen your logic with our handpicked problem sets, categorized from easy fundamentals to advanced graph theory.
+                    </p>
+
+                    <div class="d-flex flex-column gap-3 mb-4">
+                        <div class="d-flex align-items-start gap-3">
+                            <div class="p-2 rounded-2 bg-white border text-primary" style="border-color: var(--cwa-border);">
+                                <i class="bi bi-calendar-check-fill fs-5"></i>
+                            </div>
+                            <div>
+                                <h4 class="h6 cwa-heading mb-1">Daily Problem of the Day (POTD)</h4>
+                                <p class="smaller text-secondary mb-0">One curated challenge every morning to maintain your momentum and streak.</p>
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-start gap-3">
+                            <div class="p-2 rounded-2 bg-white border text-warning" style="border-color: var(--cwa-border);">
+                                <i class="bi bi-list-check fs-5"></i>
+                            </div>
+                            <div>
+                                <h4 class="h6 cwa-heading mb-1">Curated Practice Sets (DSA, Python, SQL &amp; More)</h4>
+                                <p class="smaller text-secondary mb-0">Topic-by-topic course-like tracks covering all coding challenges with YouTube video solutions.</p>
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-start gap-3">
+                            <div class="p-2 rounded-2 bg-white border text-success" style="border-color: var(--cwa-border);">
+                                <i class="bi bi-bar-chart-line-fill fs-5"></i>
+                            </div>
+                            <div>
+                                <h4 class="h6 cwa-heading mb-1">1-Click Progress Tracking</h4>
+                                <p class="smaller text-secondary mb-0">Monitor your completion rate across Easy, Medium, and Hard problem tiers.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <a href="{% url 'coding_practice:problem_list' %}" class="cwa-btn-primary py-2.5 px-4">
+                        <span>Start Practicing Now</span>
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
+                </div>
+
+                <!-- Problem Preview Component -->
+                <div class="col-lg-6">
+                    <div class="cwa-card p-4 shadow-sm">
+                        <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom border-light-subtle">
+                            <div>
+                                <span class="fw-bold cwa-heading small d-block">
+                                    <i class="bi bi-trophy-fill text-warning me-1"></i> Interactive 450 Sheet Tracker
+                                </span>
+                                <span class="smaller text-muted">Click any problem to test interactive tracking</span>
+                            </div>
+                            <span class="cwa-badge cwa-badge-emerald" id="sheet-badge-status">
+                                <span id="sheet-count-solved">2</span>/4 Solved
+                            </span>
+                        </div>
+
+                        <div class="d-flex flex-column gap-2 mb-3" id="interactive-problem-list">
+                            <!-- Problem 1 (Solved) -->
+                            <div class="cwa-check-item completed d-flex align-items-center justify-content-between" onclick="toggleProblemItem(this)">
+                                <div class="d-flex align-items-center gap-2.5">
+                                    <i class="bi bi-check-circle-fill text-success fs-5 check-status-icon"></i>
+                                    <div>
+                                        <div class="fw-semibold small problem-title">Two Sum</div>
+                                        <div class="smaller text-muted">Arrays • Hash Table</div>
+                                    </div>
+                                </div>
+                                <span class="cwa-badge cwa-badge-emerald py-0.5 px-2">Easy</span>
+                            </div>
+
+                            <!-- Problem 2 (Solved) -->
+                            <div class="cwa-check-item completed d-flex align-items-center justify-content-between" onclick="toggleProblemItem(this)">
+                                <div class="d-flex align-items-center gap-2.5">
+                                    <i class="bi bi-check-circle-fill text-success fs-5 check-status-icon"></i>
+                                    <div>
+                                        <div class="fw-semibold small problem-title">Longest Substring Without Repeating Characters</div>
+                                        <div class="smaller text-muted">Strings • Sliding Window</div>
+                                    </div>
+                                </div>
+                                <span class="cwa-badge cwa-badge-amber py-0.5 px-2">Medium</span>
+                            </div>
+
+                            <!-- Problem 3 (Unsolved) -->
+                            <div class="cwa-check-item d-flex align-items-center justify-content-between" onclick="toggleProblemItem(this)">
+                                <div class="d-flex align-items-center gap-2.5">
+                                    <i class="bi bi-circle text-muted fs-5 check-status-icon"></i>
+                                    <div>
+                                        <div class="fw-semibold small problem-title">Reverse Linked List</div>
+                                        <div class="smaller text-muted">Linked Lists • Pointers</div>
+                                    </div>
+                                </div>
+                                <span class="cwa-badge cwa-badge-emerald py-0.5 px-2">Easy</span>
+                            </div>
+
+                            <!-- Problem 4 (Unsolved) -->
+                            <div class="cwa-check-item d-flex align-items-center justify-content-between" onclick="toggleProblemItem(this)">
+                                <div class="d-flex align-items-center gap-2.5">
+                                    <i class="bi bi-circle text-muted fs-5 check-status-icon"></i>
+                                    <div>
+                                        <div class="fw-semibold small problem-title">Trapping Rain Water</div>
+                                        <div class="smaller text-muted">Arrays • Two Pointers • Stack</div>
+                                    </div>
+                                </div>
+                                <span class="cwa-badge cwa-badge-rose py-0.5 px-2" style="background: var(--cwa-rose-subtle); color: var(--cwa-rose);">Hard</span>
+                            </div>
+                        </div>
+
+                        <!-- Progress Bar Preview -->
+                        <div class="pt-2">
+                            <div class="d-flex justify-content-between smaller text-muted mb-1.5">
+                                <span>Curated Sheet Completion</span>
+                                <span class="fw-bold text-success" id="sheet-progress-text">50% Completed</span>
+                            </div>
+                            <div class="progress" style="height: 10px; border-radius: 9999px; background: #e2e8f0;">
+                                <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" id="sheet-progress-bar" style="width: 50%; transition: width 0.35s ease;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ==================================================================
+         G. PROJECT-BASED LEARNING: 4 Production-Grade Projects
+         ================================================================== -->
+    <section class="cwa-section" id="projects" style="background: var(--cwa-bg);">
+        <div class="container px-3 px-xl-5">
+            <div class="cwa-section-heading">
+                <span class="cwa-badge cwa-badge-primary mb-2">Applied Engineering</span>
+                <h2 class="h2 cwa-heading mb-2">Project-Based Learning</h2>
+                <p class="text-secondary small">Theoretical concepts solidify when you build working applications. Here is what you will create.</p>
+            </div>
+
+            <div class="row g-4">
+                <!-- Project 1: AI-Powered Applications -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="cwa-project-card">
+                        <div class="cwa-project-banner" style="background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);">
+                            <i class="bi bi-robot fs-1"></i>
+                        </div>
+                        <div class="p-3.5 d-flex flex-column flex-grow-1">
+                            <span class="cwa-badge cwa-badge-indigo mb-2" style="width: max-content;">AI Application</span>
+                            <h3 class="h6 cwa-heading mb-1.5">Intelligent Resume Matcher</h3>
+                            <p class="smaller text-secondary flex-grow-1 mb-3">
+                                Vector-embedding based similarity engine that scores resumes against job descriptions with Gemini AI explanations.
+                            </p>
+                            <div class="d-flex flex-wrap gap-1 mb-3">
+                                <span class="badge bg-light text-muted border smaller">Python</span>
+                                <span class="badge bg-light text-muted border smaller">Embeddings</span>
+                            </div>
+                            <a href="{% url 'courses:course_list' %}" class="cwa-btn-secondary btn-sm rounded-pill justify-content-center">
+                                Project Details <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 2: Full-Stack Web Application -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="cwa-project-card">
+                        <div class="cwa-project-banner" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);">
+                            <i class="bi bi-kanban-fill fs-1"></i>
+                        </div>
+                        <div class="p-3.5 d-flex flex-column flex-grow-1">
+                            <span class="cwa-badge cwa-badge-primary mb-2" style="width: max-content;">Full-Stack</span>
+                            <h3 class="h6 cwa-heading mb-1.5">Collaborative Task Studio</h3>
+                            <p class="smaller text-secondary flex-grow-1 mb-3">
+                                Realtime Kanban board with role-based auth, live WebSockets updates, and persistent relational database storage.
+                            </p>
+                            <div class="d-flex flex-wrap gap-1 mb-3">
+                                <span class="badge bg-light text-muted border smaller">React</span>
+                                <span class="badge bg-light text-muted border smaller">Django</span>
+                                <span class="badge bg-light text-muted border smaller">SQL</span>
+                            </div>
+                            <a href="{% url 'courses:course_list' %}" class="cwa-btn-secondary btn-sm rounded-pill justify-content-center">
+                                Project Details <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 3: Machine Learning Project -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="cwa-project-card">
+                        <div class="cwa-project-banner" style="background: linear-gradient(135deg, #059669 0%, #047857 100%);">
+                            <i class="bi bi-graph-up-arrow fs-1"></i>
+                        </div>
+                        <div class="p-3.5 d-flex flex-column flex-grow-1">
+                            <span class="cwa-badge cwa-badge-emerald mb-2" style="width: max-content;">Machine Learning</span>
+                            <h3 class="h6 cwa-heading mb-1.5">Student Success Predictor</h3>
+                            <p class="smaller text-secondary flex-grow-1 mb-3">
+                                End-to-end classification pipeline predicting student exam outcomes using feature scaling and Random Forest models.
+                            </p>
+                            <div class="d-flex flex-wrap gap-1 mb-3">
+                                <span class="badge bg-light text-muted border smaller">Scikit-Learn</span>
+                                <span class="badge bg-light text-muted border smaller">Pandas</span>
+                            </div>
+                            <a href="{% url 'courses:course_list' %}" class="cwa-btn-secondary btn-sm rounded-pill justify-content-center">
+                                Project Details <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Project 4: Student Productivity Tool -->
+                <div class="col-md-6 col-lg-3">
+                    <div class="cwa-project-card">
+                        <div class="cwa-project-banner" style="background: linear-gradient(135deg, #d97706 0%, #b45309 100%);">
+                            <i class="bi bi-code-square fs-1"></i>
+                        </div>
+                        <div class="p-3.5 d-flex flex-column flex-grow-1">
+                            <span class="cwa-badge cwa-badge-amber mb-2" style="width: max-content;">Productivity Tool</span>
+                            <h3 class="h6 cwa-heading mb-1.5">In-Browser Code Runner</h3>
+                            <p class="smaller text-secondary flex-grow-1 mb-3">
+                                Fast browser-based code execution sandbox with test-case assertions, time measurement, and syntax coloring.
+                            </p>
+                            <div class="d-flex flex-wrap gap-1 mb-3">
+                                <span class="badge bg-light text-muted border smaller">JavaScript</span>
+                                <span class="badge bg-light text-muted border smaller">Monaco</span>
+                            </div>
+                            <a href="{% url 'courses:course_list' %}" class="cwa-btn-secondary btn-sm rounded-pill justify-content-center">
+                                Project Details <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ==================================================================
+         H. WHY CODEWITHAMIT: Clean 6-Feature Grid
+         ================================================================== -->
+    <section class="cwa-section py-5" style="background: var(--cwa-bg-subtle);">
+        <div class="container px-3 px-xl-5">
+            <div class="cwa-section-heading">
+                <span class="cwa-badge cwa-badge-primary mb-2">Our Foundation</span>
+                <h2 class="h2 cwa-heading mb-2">Why Learn With CodeWithAmit?</h2>
+                <p class="text-secondary small">Honest, student-first education built around genuine skill acquisition rather than hype.</p>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-6 col-lg-4">
+                    <div class="cwa-feature-item h-100">
+                        <div class="cwa-icon-box" style="background: var(--cwa-primary-subtle); color: var(--cwa-primary);">
+                            <i class="bi bi-signpost-split"></i>
+                        </div>
+                        <h3 class="h6 cwa-heading mb-2">Structured Learning Paths</h3>
+                        <p class="text-secondary small mb-0">Every topic follows an intentional progression from core concepts to interview-level edge cases.</p>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="cwa-feature-item h-100">
+                        <div class="cwa-icon-box" style="background: var(--cwa-indigo-subtle); color: var(--cwa-indigo);">
+                            <i class="bi bi-code"></i>
+                        </div>
+                        <h3 class="h6 cwa-heading mb-2">Practical Coding Exercises</h3>
+                        <p class="text-secondary small mb-0">Learn by typing code, fixing compilation bugs, and analyzing test runner output firsthand.</p>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="cwa-feature-item h-100">
+                        <div class="cwa-icon-box" style="background: var(--cwa-emerald-subtle); color: var(--cwa-emerald);">
+                            <i class="bi bi-laptop"></i>
+                        </div>
+                        <h3 class="h6 cwa-heading mb-2">Project-Based Learning</h3>
+                        <p class="text-secondary small mb-0">Every module concludes with a portfolio project demonstrating your real-world development skill.</p>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="cwa-feature-item h-100">
+                        <div class="cwa-icon-box" style="background: var(--cwa-amber-subtle); color: var(--cwa-amber);">
+                            <i class="bi bi-lightbulb-fill"></i>
+                        </div>
+                        <h3 class="h6 cwa-heading mb-2">Beginner-Friendly Explanations</h3>
+                        <p class="text-secondary small mb-0">Complex algorithms explained with simple visual diagrams and dry-run walkthroughs.</p>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="cwa-feature-item h-100">
+                        <div class="cwa-icon-box" style="background: var(--cwa-cyan-subtle); color: var(--cwa-cyan);">
+                            <i class="bi bi-briefcase-fill"></i>
+                        </div>
+                        <h3 class="h6 cwa-heading mb-2">Career-Oriented Skills</h3>
+                        <p class="text-secondary small mb-0">Curriculums aligned directly with modern hiring benchmarks, system design, and coding rounds.</p>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-lg-4">
+                    <div class="cwa-feature-item h-100">
+                        <div class="cwa-icon-box" style="background: var(--cwa-rose-subtle); color: var(--cwa-rose);">
+                            <i class="bi bi-fire"></i>
+                        </div>
+                        <h3 class="h6 cwa-heading mb-2">Consistent Practice</h3>
+                        <p class="text-secondary small mb-0">Built-in streak counters and daily challenges that foster durable problem-solving discipline.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ==================================================================
+         I. LEARNING EXPERIENCE (Clearly Labeled Demo Placeholders)
+         ================================================================== -->
+    <section class="cwa-section" style="background: var(--cwa-bg);">
+        <div class="container px-3 px-xl-5">
+            <div class="cwa-section-heading">
+                <span class="cwa-badge cwa-badge-primary mb-2">Student Experience</span>
+                <h2 class="h2 cwa-heading mb-2">What Learners Experience</h2>
+                <p class="text-secondary small">Demo student perspectives illustrating platform workflows (sample placeholders).</p>
+            </div>
+
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="cwa-testimonial-card">
+                        <div>
+                            <div class="d-flex align-items-center gap-1 text-warning mb-2" style="font-size: 0.85rem;">
+                                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                            </div>
+                            <p class="small text-secondary mb-3" style="line-height: 1.6;">
+                                "The step-by-step breakdown of dynamic programming and recursion made topics that felt intimidating finally click."
+                            </p>
+                        </div>
+                        <div class="d-flex align-items-center gap-2.5 pt-3 border-top border-light-subtle">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold text-white small" style="width: 36px; height: 36px; background: var(--cwa-primary);">
+                                S
+                            </div>
+                            <div>
+                                <div class="fw-bold small" style="color: var(--cwa-text-heading);">Sample Learner (Demo)</div>
+                                <div class="smaller text-muted">B.Tech CS Student</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="cwa-testimonial-card">
+                        <div>
+                            <div class="d-flex align-items-center gap-1 text-warning mb-2" style="font-size: 0.85rem;">
+                                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                            </div>
+                            <p class="small text-secondary mb-3" style="line-height: 1.6;">
+                                "Having the practice sets organized by topic and company tags with YouTube solution links saved me weeks of scattered searching."
+                            </p>
+                        </div>
+                        <div class="d-flex align-items-center gap-2.5 pt-3 border-top border-light-subtle">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold text-white small" style="width: 36px; height: 36px; background: var(--cwa-indigo);">
+                                A
+                            </div>
+                            <div>
+                                <div class="fw-bold small" style="color: var(--cwa-text-heading);">Aspiring SDE (Demo)</div>
+                                <div class="smaller text-muted">DSA Prep Learner</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="cwa-testimonial-card">
+                        <div>
+                            <div class="d-flex align-items-center gap-1 text-warning mb-2" style="font-size: 0.85rem;">
+                                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
+                            </div>
+                            <p class="small text-secondary mb-3" style="line-height: 1.6;">
+                                "The full-stack projects are structured like real software products with clean architecture rather than toy examples."
+                            </p>
+                        </div>
+                        <div class="d-flex align-items-center gap-2.5 pt-3 border-top border-light-subtle">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold text-white small" style="width: 36px; height: 36px; background: var(--cwa-emerald);">
+                                R
+                            </div>
+                            <div>
+                                <div class="fw-bold small" style="color: var(--cwa-text-heading);">Web Developer (Demo)</div>
+                                <div class="smaller text-muted">Frontend & Backend Explorer</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ==================================================================
+         FAQ SECTION: Clean Accordion for Student Clarity
+         ================================================================== -->
+    <section class="cwa-section py-5" style="background: var(--cwa-bg-subtle);">
+        <div class="container px-3 px-xl-5" style="max-width: 860px;">
+            <div class="cwa-section-heading">
+                <span class="cwa-badge cwa-badge-primary mb-2">Got Questions?</span>
+                <h2 class="h2 cwa-heading mb-2">Frequently Asked Questions</h2>
+                <p class="text-secondary small">Everything you need to know about getting started, practice tracks, and building projects.</p>
+            </div>
+
+            <div class="accordion cwa-faq-accordion" id="cwaFaqAccordion">
+                <!-- FAQ 1 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingOne">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+                            <i class="bi bi-question-circle text-primary me-2.5"></i>
+                            Is CodeWithAmit suitable for absolute beginners with zero programming experience?
+                        </button>
+                    </h2>
+                    <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#cwaFaqAccordion">
+                        <div class="accordion-body">
+                            Yes, absolutely. Our <strong>Programming Fundamentals</strong> and <strong>C++ Foundations</strong> tracks start from first principles — variable declaration, memory layout, and basic arithmetic operations — without assuming any prior exposure to computer science.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 2 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingTwo">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                            <i class="bi bi-diagram-3 text-indigo me-2.5"></i>
+                            Are the learning roadmaps and practice sets free to access?
+                        </button>
+                    </h2>
+                    <div id="collapseTwo" class="accordion-collapse collapse" aria-labelledby="headingTwo" data-bs-parent="#cwaFaqAccordion">
+                        <div class="accordion-body">
+                            All curriculum roadmaps, community discussion hubs, and practice sets are 100% free for students. Our mission is to democratize high-quality computer engineering guidance without paywalls on fundamental knowledge.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 3 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingThree">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                            <i class="bi bi-lightning-charge text-warning me-2.5"></i>
+                            How does the curated 450 DSA Sheet differ from solving random LeetCode problems?
+                        </button>
+                    </h2>
+                    <div id="collapseThree" class="accordion-collapse collapse" aria-labelledby="headingThree" data-bs-parent="#cwaFaqAccordion">
+                        <div class="accordion-body">
+                            Random problem solving often causes tutorial burnout. The 450 Sheet groups problems by core algorithmic patterns (e.g. Sliding Window, Monotonic Stack, Topological Sort, 0/1 Knapsack), ensuring you build pattern recognition rather than memorizing individual solutions.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 4 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingFour">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                            <i class="bi bi-briefcase text-success me-2.5"></i>
+                            What kind of projects will I have built by the end of the full-stack and AI tracks?
+                        </button>
+                    </h2>
+                    <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#cwaFaqAccordion">
+                        <div class="accordion-body">
+                            You will build production-caliber applications like the <strong>Intelligent Resume Matcher</strong> (leveraging vector embeddings and Gemini API), a <strong>Collaborative Task Studio</strong> (with WebSockets and SQL transactions), and an <strong>In-Browser Code Runner</strong> sandbox.
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FAQ 5 -->
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingFive">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                            <i class="bi bi-mortarboard text-danger me-2.5"></i>
+                            Can I access the practice problems and code runner from my mobile device?
+                        </button>
+                    </h2>
+                    <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#cwaFaqAccordion">
+                        <div class="accordion-body">
+                            Yes. The platform is responsive across smartphones, tablets, laptops, and ultra-wide desktop monitors, allowing you to review notes, solve daily quizzes, and track problem streaks wherever you are.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ==================================================================
+         J. FINAL CALL TO ACTION: High-Impact Original Headline
+         ================================================================== -->
+    <section class="py-5 text-center" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: #ffffff;">
+        <div class="container px-3 px-xl-5 py-4" style="max-width: 760px;">
+            <span class="cwa-badge mb-3" style="background: rgba(37, 99, 235, 0.25); color: #93c5fd; border: 1px solid rgba(147, 197, 253, 0.3);">
+                Start Today
+            </span>
+            <h2 class="display-5 fw-bold mb-3 font-heading text-white" style="letter-spacing: -0.03em;">
+                Your Next Chapter Starts With One Line of Code.
+            </h2>
+            <p class="lead mb-4 text-slate-300" style="color: #cbd5e1; font-size: 1.1rem; line-height: 1.65;">
+                Join students and aspiring software engineers mastering Data Structures, modern Web Development, and AI with CodeWithAmit.
+            </p>
+            <div class="d-flex flex-wrap justify-content-center gap-3">
+                <a href="{% url 'roadmaps:roadmap_list' %}" class="cwa-btn-primary py-2.5 px-4 shadow-sm">
+                    <span>Explore Learning Paths</span>
+                    <i class="bi bi-arrow-right"></i>
+                </a>
+                <a href="{% url 'courses:course_list' %}" class="cwa-btn-secondary py-2.5 px-4" style="background: #ffffff; color: var(--cwa-text-heading) !important;">
+                    <span>Browse All Courses</span>
+                </a>
+            </div>
+        </div>
+    </section>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // =========================================================================
+    // 1. HERO CODE PLAYGROUND: Interactive Language Tabs, Copy, & Simulated Runner
+    // =========================================================================
+    const languageOutputs = {
+        python: {
+            output: '> { "status": "Interview Ready", "projects_built": 3, "confidence": 100 }',
+            latency: '1.2ms',
+            memory: '14MB'
+        },
+        cpp: {
+            output: '> Status: Interview Ready | Sheet: 450 Completed',
+            latency: '0.4ms',
+            memory: '4.2MB'
+        },
+        java: {
+            output: '> Track: Full-Stack & DSA\n> Streak: 45 days active!',
+            latency: '2.1ms',
+            memory: '22MB'
+        },
+        javascript: {
+            output: '> { liveUrl: "https://my-app.codewithamit.dev", performanceScore: 100 }',
+            latency: '1.0ms',
+            memory: '18MB'
+        }
+    };
+
+    let currentHeroLang = 'python';
+
+    function switchHeroCodeTab(lang, tabBtn) {
+        currentHeroLang = lang;
+        // Update tab buttons
+        document.querySelectorAll('.cwa-code-tab').forEach(btn => btn.classList.remove('active'));
+        if (tabBtn) tabBtn.classList.add('active');
+
+        // Hide all code snippets, show selected
+        ['python', 'cpp', 'java', 'javascript'].forEach(l => {
+            const el = document.getElementById('code-snippet-' + l);
+            if (el) {
+                if (l === lang) {
+                    el.classList.remove('d-none');
+                    el.classList.add('active');
+                } else {
+                    el.classList.add('d-none');
+                    el.classList.remove('active');
+                }
+            }
+        });
+
+        // Update output preview
+        const data = languageOutputs[lang];
+        if (data) {
+            document.getElementById('hero-terminal-output').textContent = data.output;
+            document.getElementById('hero-output-meta').innerHTML = `<i class="bi bi-check2-circle me-1"></i> Latency: ${data.latency} • Memory: ${data.memory}`;
+        }
+    }
+
+    function runHeroCode() {
+        const runBtn = document.getElementById('hero-run-btn');
+        const outputEl = document.getElementById('hero-terminal-output');
+        const metaEl = document.getElementById('hero-output-meta');
+        
+        runBtn.disabled = true;
+        runBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-1" role="status"></span> Executing...`;
+        outputEl.style.opacity = '0.5';
+
+        setTimeout(() => {
+            runBtn.disabled = false;
+            runBtn.innerHTML = `<i class="bi bi-play-fill"></i> Run Code`;
+            outputEl.style.opacity = '1';
+            
+            const data = languageOutputs[currentHeroLang];
+            outputEl.textContent = data.output;
+            metaEl.innerHTML = `<i class="bi bi-check2-circle me-1"></i> Latency: ${data.latency} • Memory: ${data.memory} • (Ran just now)`;
+        }, 500);
+    }
+
+    function copyHeroCode() {
+        const activeSnippet = document.querySelector('.cwa-preview-code.active');
+        if (activeSnippet) {
+            navigator.clipboard.writeText(activeSnippet.innerText).then(() => {
+                const icon = document.getElementById('hero-copy-icon');
+                if (icon) {
+                    icon.className = 'bi bi-check text-success';
+                    setTimeout(() => { icon.className = 'bi bi-clipboard'; }, 1800);
+                }
+            }).catch(() => {});
+        }
+    }
+
+    // =========================================================================
+    // 2. FEATURED COURSES: Instant Client-Side Category Filtering
+    // =========================================================================
+    function filterCourses(category, btn) {
+        document.querySelectorAll('.cwa-filter-btn').forEach(b => b.classList.remove('active'));
+        if (btn) btn.classList.add('active');
+
+        const courseCols = document.querySelectorAll('.cwa-course-col');
+        courseCols.forEach(col => {
+            if (category === 'all' || col.getAttribute('data-category') === category) {
+                col.style.display = 'block';
+            } else {
+                col.style.display = 'none';
+            }
+        });
+    }
+
+    // =========================================================================
+    // 3. SAMPLE PROBLEM CHECKLIST: Click to Toggle, Live Progress Calculation
+    // =========================================================================
+    function toggleProblemItem(itemEl) {
+        itemEl.classList.toggle('completed');
+        const icon = itemEl.querySelector('.check-status-icon');
+        
+        if (itemEl.classList.contains('completed')) {
+            if (icon) {
+                icon.className = 'bi bi-check-circle-fill text-success fs-5 check-status-icon';
+            }
+        } else {
+            if (icon) {
+                icon.className = 'bi bi-circle text-muted fs-5 check-status-icon';
+            }
+        }
+
+        updateProblemProgress();
+    }
+
+    function updateProblemProgress() {
+        const total = document.querySelectorAll('#interactive-problem-list .cwa-check-item').length;
+        const solved = document.querySelectorAll('#interactive-problem-list .cwa-check-item.completed').length;
+        const percent = Math.round((solved / total) * 100);
+
+        // Update badge
+        const badgeEl = document.getElementById('sheet-badge-status');
+        const countEl = document.getElementById('sheet-count-solved');
+        if (countEl) countEl.textContent = solved;
+
+        if (solved === total) {
+            badgeEl.className = 'cwa-badge cwa-badge-emerald';
+            badgeEl.innerHTML = `🎉 100% Completed!`;
+        } else {
+            badgeEl.className = 'cwa-badge cwa-badge-emerald';
+            badgeEl.innerHTML = `<span id="sheet-count-solved">${solved}</span>/${total} Solved`;
+        }
+
+        // Update progress text & bar
+        const progressText = document.getElementById('sheet-progress-text');
+        const progressBar = document.getElementById('sheet-progress-bar');
+        
+        if (progressText) progressText.textContent = `${percent}% Completed (${solved} of ${total})`;
+        if (progressBar) progressBar.style.width = `${percent}%`;
+    }
+</script>
+{% endblock %}
+

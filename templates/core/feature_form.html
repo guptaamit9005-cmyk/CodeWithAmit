@@ -1,0 +1,276 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }} — CodeWithAmit Admin Studio{% endblock %}
+
+{% block content %}
+<div class="py-5" style="background: var(--cwa-bg);">
+    <div class="container" style="max-width: 980px;">
+
+        <!-- Breadcrumb & Top Bar -->
+        <div class="d-flex flex-wrap justify-content-between align-items-center mb-4 gap-3">
+            <div>
+                <nav aria-label="breadcrumb">
+                    <ol class="breadcrumb mb-1 small">
+                        <li class="breadcrumb-item"><a href="{% url 'core:home' %}" class="text-secondary text-decoration-none">Home</a></li>
+                        <li class="breadcrumb-item"><a href="{% url 'core:features' %}" class="text-secondary text-decoration-none">Features</a></li>
+                        <li class="breadcrumb-item active fw-bold" style="color: var(--cwa-primary);" aria-current="page">{{ title }}</li>
+                    </ol>
+                </nav>
+                <h1 class="h3 fw-bold cwa-heading mb-1">{{ title }}</h1>
+                <p class="text-secondary small mb-0">{{ subtitle }}</p>
+            </div>
+            <div>
+                <a href="{% url 'core:features' %}" class="cwa-btn-secondary py-2 px-3">
+                    <i class="bi bi-arrow-left me-1"></i> Back to Features
+                </a>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Main Form Card -->
+            <div class="col-lg-8">
+                <div class="cwa-card p-4 p-md-5 shadow-sm">
+                    <form method="post" novalidate id="featureForm">
+                        {% csrf_token %}
+
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger py-2 px-3 small rounded-3 mb-4">
+                                {{ form.non_field_errors }}
+                            </div>
+                        {% endif %}
+
+                        <!-- Basic Information -->
+                        <div class="mb-4">
+                            <h5 class="fw-bold cwa-heading mb-3 pb-2 border-bottom d-flex align-items-center gap-2" style="font-size: 1.1rem;">
+                                <i class="bi bi-info-circle text-primary"></i> 1. Core Feature Details
+                            </h5>
+
+                            <div class="mb-3">
+                                <label for="{{ form.title.id_for_label }}" class="form-label fw-semibold small">Feature Title *</label>
+                                {{ form.title }}
+                                {% if form.title.errors %}<div class="text-danger small mt-1">{{ form.title.errors }}</div>{% endif %}
+                                <div class="form-text smaller">E.g., "Full-Stack Web Dev Sandbox" or "FAANG Mock Interview Prep"</div>
+                            </div>
+
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label for="{{ form.category.id_for_label }}" class="form-label fw-semibold small">Category *</label>
+                                    {{ form.category }}
+                                    {% if form.category.errors %}<div class="text-danger small mt-1">{{ form.category.errors }}</div>{% endif %}
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="{{ form.badge_text.id_for_label }}" class="form-label fw-semibold small">Badge Text (Optional)</label>
+                                    {{ form.badge_text }}
+                                    {% if form.badge_text.errors %}<div class="text-danger small mt-1">{{ form.badge_text.errors }}</div>{% endif %}
+                                    <div class="form-text smaller">E.g., "AI Powered", "Popular", "Free", "Live"</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- User Access & Launch Destination -->
+                        <div class="mb-4">
+                            <h5 class="fw-bold cwa-heading mb-3 pb-2 border-bottom d-flex align-items-center gap-2" style="font-size: 1.1rem;">
+                                <i class="bi bi-box-arrow-up-right text-success"></i> 2. User Access & Destination URL
+                            </h5>
+
+                            <div class="row g-3">
+                                <div class="col-md-7">
+                                    <label for="{{ form.action_url.id_for_label }}" class="form-label fw-semibold small">Action / Destination URL *</label>
+                                    {{ form.action_url }}
+                                    {% if form.action_url.errors %}<div class="text-danger small mt-1">{{ form.action_url.errors }}</div>{% endif %}
+                                    <div class="form-text smaller">Django URL name (e.g. <code>coding_practice:code_editor</code>) or path (<code>/practice/</code>) or external link.</div>
+                                </div>
+                                <div class="col-md-5">
+                                    <label for="{{ form.action_button_text.id_for_label }}" class="form-label fw-semibold small">Button Label *</label>
+                                    {{ form.action_button_text }}
+                                    {% if form.action_button_text.errors %}<div class="text-danger small mt-1">{{ form.action_button_text.errors }}</div>{% endif %}
+                                </div>
+                            </div>
+
+                            <div class="mt-2.5">
+                                <div class="form-check form-switch">
+                                    {{ form.is_external }}
+                                    <label class="form-check-label small fw-semibold" for="{{ form.is_external.id_for_label }}">
+                                        Open link in new browser tab (_blank)
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Descriptions & Highlights -->
+                        <div class="mb-4">
+                            <h5 class="fw-bold cwa-heading mb-3 pb-2 border-bottom d-flex align-items-center gap-2" style="font-size: 1.1rem;">
+                                <i class="bi bi-card-text text-warning"></i> 3. Explanations & Capabilities
+                            </h5>
+
+                            <div class="mb-3">
+                                <label for="{{ form.short_description.id_for_label }}" class="form-label fw-semibold small">Short Summary (for card preview) *</label>
+                                {{ form.short_description }}
+                                {% if form.short_description.errors %}<div class="text-danger small mt-1">{{ form.short_description.errors }}</div>{% endif %}
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="{{ form.detailed_description.id_for_label }}" class="form-label fw-semibold small">Detailed Highlights / Bullet Points</label>
+                                {{ form.detailed_description }}
+                                {% if form.detailed_description.errors %}<div class="text-danger small mt-1">{{ form.detailed_description.errors }}</div>{% endif %}
+                                <div class="form-text smaller">Type each highlight on a new line. They will render as a crisp checkmark list!</div>
+                            </div>
+                        </div>
+
+                        <!-- Visual Styling & Display Controls -->
+                        <div class="mb-4">
+                            <h5 class="fw-bold cwa-heading mb-3 pb-2 border-bottom d-flex align-items-center gap-2" style="font-size: 1.1rem;">
+                                <i class="bi bi-palette text-danger"></i> 4. Appearance & Ordering
+                            </h5>
+
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label for="{{ form.icon.id_for_label }}" class="form-label fw-semibold small">Bootstrap Icon Class</label>
+                                    {{ form.icon }}
+                                    {% if form.icon.errors %}<div class="text-danger small mt-1">{{ form.icon.errors }}</div>{% endif %}
+                                    <div class="form-text smaller">E.g., <code>bi-code-square</code>, <code>bi-cpu</code>, <code>bi-stars</code></div>
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="{{ form.color.id_for_label }}" class="form-label fw-semibold small">Theme Color</label>
+                                    {{ form.color }}
+                                    {% if form.color.errors %}<div class="text-danger small mt-1">{{ form.color.errors }}</div>{% endif %}
+                                </div>
+                                <div class="col-md-4">
+                                    <label for="{{ form.order.id_for_label }}" class="form-label fw-semibold small">Display Priority / Order</label>
+                                    {{ form.order }}
+                                    {% if form.order.errors %}<div class="text-danger small mt-1">{{ form.order.errors }}</div>{% endif %}
+                                    <div class="form-text smaller">0 = Highest Priority</div>
+                                </div>
+                            </div>
+
+                            <div class="d-flex flex-wrap gap-4 mt-3 pt-2">
+                                <div class="form-check form-switch">
+                                    {{ form.is_active }}
+                                    <label class="form-check-label small fw-semibold" for="{{ form.is_active.id_for_label }}">
+                                        Active & Accessible by Users
+                                    </label>
+                                </div>
+                                <div class="form-check form-switch">
+                                    {{ form.is_featured }}
+                                    <label class="form-check-label small fw-semibold" for="{{ form.is_featured.id_for_label }}">
+                                        Featured on Platform Highlights
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Action Submit Buttons -->
+                        <div class="d-flex align-items-center justify-content-between pt-4 border-top mt-4">
+                            <a href="{% url 'core:features' %}" class="cwa-btn-secondary py-2 px-3">
+                                Cancel
+                            </a>
+                            <button type="submit" class="cwa-btn-primary py-2.5 px-4 shadow-sm">
+                                <i class="bi bi-check2-circle me-1"></i> {{ action_name }}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Live Preview Sidebar -->
+            <div class="col-lg-4">
+                <div class="position-sticky" style="top: 90px;">
+                    <div class="card p-3 mb-3 border-0 shadow-sm" style="background: #f8fafc; border: 1px solid #e2e8f0 !important; border-radius: 14px;">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="badge bg-primary-subtle text-primary fw-bold px-2 py-1 smaller">
+                                <i class="bi bi-eye-fill me-1"></i> Live Card Preview
+                            </span>
+                            <span class="smaller text-muted" id="previewCategory">Coding & Sandbox</span>
+                        </div>
+                        <div class="p-3 bg-white rounded-3 shadow-xs border">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <div class="d-inline-flex align-items-center justify-content-center rounded-2 bg-primary-subtle text-primary" style="width: 36px; height: 36px;" id="previewIconBox">
+                                    <i class="bi bi-stars" id="previewIcon"></i>
+                                </div>
+                                <span class="badge bg-light text-dark border smaller" id="previewBadge">NEW</span>
+                            </div>
+                            <h6 class="fw-bold mb-1" id="previewTitle">Feature Title</h6>
+                            <p class="smaller text-secondary mb-3" id="previewSummary" style="min-height: 40px;">
+                                A concise summary of how this new tool helps students learn and practice.
+                            </p>
+                            <button type="button" class="btn btn-primary btn-sm w-100 fw-semibold" id="previewButton" disabled>
+                                Launch Feature &rarr;
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card p-3 border-0 shadow-sm" style="background: #ffffff; border: 1px solid #e2e8f0 !important; border-radius: 14px;">
+                        <h6 class="fw-bold small mb-2"><i class="bi bi-lightbulb text-warning me-1"></i> Administrator Tips</h6>
+                        <ul class="list-unstyled smaller text-secondary d-flex flex-column gap-2 mb-0">
+                            <li><i class="bi bi-check2 text-success me-1"></i><strong>Instant Access:</strong> As soon as you save with "Active" checked, all learners can see it on the Features page.</li>
+                            <li><i class="bi bi-check2 text-success me-1"></i><strong>Internal Links:</strong> Use standard paths like <code>/editor/</code>, <code>/practice/</code>, <code>/courses/</code>, or Django reverse names.</li>
+                            <li><i class="bi bi-check2 text-success me-1"></i><strong>External Tools:</strong> You can link to external tools like Discord, GitHub, or Docs using <code>https://...</code>.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+document-ready:
+document.addEventListener('DOMContentLoaded', function() {
+    const titleInput = document.getElementById('{{ form.title.id_for_label }}');
+    const summaryInput = document.getElementById('{{ form.short_description.id_for_label }}');
+    const badgeInput = document.getElementById('{{ form.badge_text.id_for_label }}');
+    const buttonTextInput = document.getElementById('{{ form.action_button_text.id_for_label }}');
+    const iconInput = document.getElementById('{{ form.icon.id_for_label }}');
+    const categoryInput = document.getElementById('{{ form.category.id_for_label }}');
+
+    const previewTitle = document.getElementById('previewTitle');
+    const previewSummary = document.getElementById('previewSummary');
+    const previewBadge = document.getElementById('previewBadge');
+    const previewButton = document.getElementById('previewButton');
+    const previewIcon = document.getElementById('previewIcon');
+    const previewCategory = document.getElementById('previewCategory');
+
+    function updatePreview() {
+        if (titleInput && previewTitle) {
+            previewTitle.textContent = titleInput.value.trim() || 'Feature Title';
+        }
+        if (summaryInput && previewSummary) {
+            previewSummary.textContent = summaryInput.value.trim() || 'A concise summary of how this new tool helps students learn and practice.';
+        }
+        if (badgeInput && previewBadge) {
+            const badgeVal = badgeInput.value.trim();
+            if (badgeVal) {
+                previewBadge.textContent = badgeVal;
+                previewBadge.style.display = 'inline-block';
+            } else {
+                previewBadge.style.display = 'none';
+            }
+        }
+        if (buttonTextInput && previewButton) {
+            previewButton.textContent = (buttonTextInput.value.trim() || 'Launch Feature') + ' →';
+        }
+        if (iconInput && previewIcon) {
+            const iconClass = iconInput.value.trim() || 'bi-stars';
+            previewIcon.className = 'bi ' + iconClass;
+        }
+        if (categoryInput && previewCategory) {
+            const selectedOpt = categoryInput.options[categoryInput.selectedIndex];
+            if (selectedOpt) {
+                previewCategory.textContent = selectedOpt.text;
+            }
+        }
+    }
+
+    [titleInput, summaryInput, badgeInput, buttonTextInput, iconInput, categoryInput].forEach(elem => {
+        if (elem) {
+            elem.addEventListener('input', updatePreview);
+            elem.addEventListener('change', updatePreview);
+        }
+    });
+
+    updatePreview();
+});
+</script>
+{% endblock %}

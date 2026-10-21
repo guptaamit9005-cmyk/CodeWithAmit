@@ -1,0 +1,422 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Platform Features & Capabilities — CodeWithAmit{% endblock %}
+{% block meta_description %}Explore all features of CodeWithAmit: in-browser code compiler, curated practice sets, step-by-step programming tutorials, video solutions, and live doubt sessions.{% endblock %}
+
+{% block content %}
+<div class="cwa-features-wrapper" style="background: var(--cwa-bg);">
+
+    <!-- ==================================================================
+         HERO SECTION: Clean Light Header with Dynamic Search & Admin Trigger
+         ================================================================== -->
+    <section class="py-5 border-bottom text-center position-relative overflow-hidden" style="border-color: var(--cwa-border) !important; background: radial-gradient(circle at 50% 0%, #f1f5f9 0%, #ffffff 80%);">
+        <div class="container py-lg-4" style="max-width: 960px;">
+            <!-- Breadcrumbs -->
+            <nav aria-label="breadcrumb" class="mb-3">
+                <ol class="breadcrumb justify-content-center smaller mb-0">
+                    <li class="breadcrumb-item"><a href="{% url 'core:home' %}" class="text-secondary text-decoration-none"><i class="bi bi-house-door-fill me-1"></i> Home</a></li>
+                    <li class="breadcrumb-item active fw-semibold" style="color: var(--cwa-primary);" aria-current="page">Features & Capabilities</li>
+                </ol>
+            </nav>
+
+            <div class="d-inline-flex flex-wrap align-items-center justify-content-center gap-2 mb-3">
+                <span class="cwa-badge cwa-badge-primary">
+                    <i class="bi bi-stars"></i> Complete Engineering Ecosystem
+                </span>
+                <span class="cwa-badge cwa-badge-emerald">
+                    <i class="bi bi-check-circle-fill"></i> Dynamic Platform Modules
+                </span>
+            </div>
+
+            <h1 class="display-4 fw-bold cwa-heading mb-3" style="line-height: 1.15; letter-spacing: -0.04em;">
+                Everything Built for Your<br>
+                <span style="color: var(--cwa-primary);">Computer Science Success</span>
+            </h1>
+
+            <p class="lead mb-4 mx-auto" style="color: var(--cwa-text-body); max-width: 740px; font-size: 1.15rem; line-height: 1.6;">
+                Explore all tools, interactive code compilers, interview tracks, and university materials. Admin can dynamically add any custom feature and users can immediately access them.
+            </p>
+
+            <!-- Admin Studio Quick Bar (Only visible to Administrators) -->
+            {% if is_admin %}
+                <div class="card p-3 mb-4 mx-auto shadow-sm border-0" style="max-width: 760px; background: linear-gradient(135deg, #eff6ff 0%, #f8fafc 100%); border: 1.5px dashed #3b82f6 !important; border-radius: 16px;">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
+                        <div class="text-start">
+                            <span class="badge bg-primary text-white rounded-pill px-2.5 py-1 smaller mb-1">
+                                <i class="bi bi-shield-lock-fill me-1"></i> Admin Creator Mode
+                            </span>
+                            <div class="fw-bold text-dark small">Admin Feature Management Active</div>
+                            <div class="smaller text-secondary">You can create new custom features, update target destinations, or remove tools.</div>
+                        </div>
+                        <div class="d-flex gap-2">
+                            <a href="{% url 'core:add_feature' %}" class="cwa-btn-primary py-2 px-3.5 shadow-sm btn-sm">
+                                <i class="bi bi-plus-circle-fill me-1"></i> + Add New Feature
+                            </a>
+                            <a href="{% url 'dashboard:admin_dashboard' %}" class="cwa-btn-secondary py-2 px-3 btn-sm">
+                                <i class="bi bi-speedometer2 me-1"></i> Admin Dashboard
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Search Bar -->
+            <form method="get" action="{% url 'core:features' %}" class="mx-auto mb-4" style="max-width: 580px;">
+                {% if current_category and current_category != 'all' %}
+                    <input type="hidden" name="category" value="{{ current_category }}">
+                {% endif %}
+                <div class="input-group shadow-sm rounded-pill overflow-hidden border" style="background: #ffffff; border-color: #cbd5e1 !important;">
+                    <span class="input-group-text bg-white border-0 ps-3.5 text-muted">
+                        <i class="bi bi-search"></i>
+                    </span>
+                    <input type="text" name="q" value="{{ search_query }}" class="form-control border-0 py-2.5 ps-1" placeholder="Search features, tools, compiler, notes, AI..." aria-label="Search features">
+                    {% if search_query %}
+                        <a href="{% url 'core:features' %}{% if current_category != 'all' %}?category={{ current_category }}{% endif %}" class="btn bg-white border-0 text-muted px-2 d-flex align-items-center">
+                            <i class="bi bi-x-circle-fill"></i>
+                        </a>
+                    {% endif %}
+                    <button class="btn btn-primary px-4 fw-semibold" type="submit">
+                        Search
+                    </button>
+                </div>
+            </form>
+
+            <!-- Category Filter Pills -->
+            <div class="d-flex flex-wrap justify-content-center gap-2 mb-2">
+                {% for cat in categories_list %}
+                    <a href="{% url 'core:features' %}?category={{ cat.key }}{% if search_query %}&q={{ search_query }}{% endif %}"
+                       class="btn btn-sm rounded-pill px-3 py-1.5 fw-semibold transition-all {% if current_category == cat.key %}btn-primary text-white shadow-sm{% else %}cwa-btn-secondary text-secondary{% endif %}"
+                       style="font-size: 0.85rem;">
+                        {{ cat.label }}
+                        {% if cat.count > 0 %}
+                            <span class="badge rounded-pill ms-1 {% if current_category == cat.key %}bg-white text-primary{% else %}bg-secondary-subtle text-secondary{% endif %}">
+                                {{ cat.count }}
+                            </span>
+                        {% endif %}
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================================================================
+         FEATURE DEEP DIVES (Dynamic Database Driven Content)
+         ================================================================== -->
+    <section class="py-5" style="background: var(--cwa-bg-subtle);">
+        <div class="container" style="max-width: 1080px;">
+
+            {% if features %}
+                <div class="d-flex flex-column gap-5">
+                    {% for feature in features %}
+                        <div class="cwa-card p-4 p-lg-5 scroll-margin-top shadow-sm position-relative {% if not feature.is_active %}border-warning{% endif %}" id="{{ feature.slug }}" style="scroll-margin-top: 90px; border-radius: 18px;">
+                            
+                            <!-- Admin Control Ribbon (Top Right) -->
+                            {% if is_admin %}
+                                <div class="position-absolute top-0 end-0 p-3 d-flex align-items-center gap-2">
+                                    {% if not feature.is_active %}
+                                        <span class="badge bg-warning-subtle text-warning border border-warning rounded-pill px-2.5 py-1 smaller">
+                                            <i class="bi bi-eye-slash-fill me-1"></i> Hidden / Inactive
+                                        </span>
+                                    {% else %}
+                                        <span class="badge bg-success-subtle text-success border border-success rounded-pill px-2.5 py-1 smaller">
+                                            <i class="bi bi-eye-fill me-1"></i> Live to Users
+                                        </span>
+                                    {% endif %}
+
+                                    {% if feature.is_featured %}
+                                        <span class="badge bg-primary-subtle text-primary rounded-pill px-2 py-1 smaller">
+                                            <i class="bi bi-star-fill me-1"></i> Featured
+                                        </span>
+                                    {% endif %}
+
+                                    <a href="{% url 'core:edit_feature' feature.pk %}" class="btn btn-sm btn-outline-primary py-1 px-2.5 rounded-pill smaller fw-semibold bg-white" title="Edit this feature">
+                                        <i class="bi bi-pencil-square me-1"></i> Edit
+                                    </a>
+                                    <a href="{% url 'core:delete_feature' feature.pk %}" class="btn btn-sm btn-outline-danger py-1 px-2 rounded-pill smaller fw-semibold bg-white" title="Delete feature">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </div>
+                            {% endif %}
+
+                            <div class="row g-4 align-items-center">
+                                <!-- Left Details -->
+                                <div class="col-lg-7">
+                                    <div class="d-flex align-items-center gap-2 mb-3">
+                                        <div class="cwa-icon-box mb-0" style="background: var(--cwa-primary-subtle); color: var(--cwa-primary);">
+                                            <i class="bi {{ feature.icon }}"></i>
+                                        </div>
+                                        <span class="cwa-badge cwa-badge-primary">
+                                            {{ feature.badge_text|default:feature.get_category_display }}
+                                        </span>
+                                        <span class="smaller text-muted">
+                                            • {{ feature.get_category_display }}
+                                        </span>
+                                    </div>
+
+                                    <h2 class="h3 fw-bold cwa-heading mb-2.5">
+                                        {{ feature.title }}
+                                    </h2>
+
+                                    <p class="mb-4 text-secondary" style="font-size: 1.02rem; line-height: 1.65;">
+                                        {{ feature.short_description }}
+                                    </p>
+
+                                    <!-- Highlights List -->
+                                    {% with highlights=feature.get_highlights_list %}
+                                        {% if highlights %}
+                                            <div class="mb-4">
+                                                <h6 class="smaller fw-bold text-uppercase mb-2.5" style="letter-spacing: 0.6px; color: var(--cwa-text-muted);">Key Capabilities</h6>
+                                                <ul class="list-unstyled d-flex flex-column gap-2 mb-0">
+                                                    {% for hl in highlights %}
+                                                        <li class="d-flex align-items-start gap-2.5 small" style="line-height: 1.5; color: var(--cwa-text-body);">
+                                                            <i class="bi bi-check-circle-fill text-success mt-0.5" style="font-size: 0.95rem; flex-shrink: 0;"></i>
+                                                            <span>{{ hl }}</span>
+                                                        </li>
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
+                                        {% endif %}
+                                    {% endwith %}
+
+                                    <!-- User Launch & Access Button -->
+                                    <div class="d-flex flex-wrap align-items-center gap-2.5">
+                                        <a href="{{ feature.get_resolved_url }}" {% if feature.is_external %}target="_blank" rel="noopener noreferrer"{% endif %} class="cwa-btn-primary py-2.5 px-4 shadow-sm">
+                                            <span>{{ feature.action_button_text|default:"Launch Feature" }}</span>
+                                            <i class="bi {% if feature.is_external %}bi-box-arrow-up-right{% else %}bi-arrow-right{% endif %} ms-1"></i>
+                                        </a>
+
+                                        {% if is_admin %}
+                                            <a href="{% url 'core:edit_feature' feature.pk %}" class="cwa-btn-secondary py-2.5 px-3.5">
+                                                <i class="bi bi-sliders me-1"></i> Configure Feature
+                                            </a>
+                                        {% else %}
+                                            <a href="{% url 'core:home' %}" class="cwa-btn-secondary py-2.5 px-3.5">
+                                                &larr; Back to Home
+                                            </a>
+                                        {% endif %}
+                                    </div>
+                                </div>
+
+                                <!-- Right Visual Demonstration Box -->
+                                <div class="col-lg-5">
+                                    <div class="cwa-hero-preview h-100 d-flex flex-column justify-content-between p-3.5">
+                                        {% if feature.category == 'coding' %}
+                                            <div class="cwa-preview-header mb-2.5 rounded-3">
+                                                <div class="cwa-window-dots">
+                                                    <span class="cwa-dot cwa-dot-red"></span>
+                                                    <span class="cwa-dot cwa-dot-yellow"></span>
+                                                    <span class="cwa-dot cwa-dot-green"></span>
+                                                </div>
+                                                <span class="badge rounded-pill px-2 py-0.5 smaller" style="background: rgba(16, 185, 129, 0.2); color: #6ee7b7;">2 ms Latency</span>
+                                            </div>
+                                            <pre class="cwa-preview-code m-0 py-2 smaller" style="max-height: 180px; overflow-y: auto;"># Optimal Solution — O(N) Complexity
+def execute_solution(data):
+    seen = set()
+    for item in data:
+        if item in seen:
+            return True
+        seen.add(item)
+    return False</pre>
+                                            <div class="pt-2.5 border-top mt-2.5 text-muted smaller d-flex justify-content-between align-items-center" style="border-color: rgba(255, 255, 255, 0.08) !important;">
+                                                <span>Test Cases: <strong class="text-white">Passed (3/3)</strong></span>
+                                                <span class="text-success fw-bold"><i class="bi bi-check2-all me-1"></i> Accepted</span>
+                                            </div>
+
+                                        {% elif feature.category == 'interview' %}
+                                            <div class="cwa-preview-header mb-2.5 rounded-3">
+                                                <span class="smaller fw-bold text-warning"><i class="bi bi-trophy-fill me-1"></i> Sheet Breakdown</span>
+                                                <span class="badge bg-warning-subtle text-warning rounded-pill px-2 py-0.5 smaller">{{ stats.problems }} Problems</span>
+                                            </div>
+                                            <div class="d-flex flex-column gap-2.5 py-1">
+                                                <div>
+                                                    <div class="d-flex justify-content-between smaller mb-1 text-light">
+                                                        <span>Easy (Arrays, Strings)</span>
+                                                        <span class="text-success fw-bold">100% Core</span>
+                                                    </div>
+                                                    <div class="progress" style="height: 7px; background: rgba(255,255,255,0.1);">
+                                                        <div class="progress-bar bg-success" style="width: 75%;"></div>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <div class="d-flex justify-content-between smaller mb-1 text-light">
+                                                        <span>Medium (Trees, Graphs)</span>
+                                                        <span class="text-warning fw-bold">Interview Focus</span>
+                                                    </div>
+                                                    <div class="progress" style="height: 7px; background: rgba(255,255,255,0.1);">
+                                                        <div class="progress-bar bg-warning" style="width: 60%;"></div>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <div class="d-flex justify-content-between smaller mb-1 text-light">
+                                                        <span>Hard (DP, Tries)</span>
+                                                        <span class="text-danger fw-bold">Top Product</span>
+                                                    </div>
+                                                    <div class="progress" style="height: 7px; background: rgba(255,255,255,0.1);">
+                                                        <div class="progress-bar bg-danger" style="width: 40%;"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="pt-2.5 border-top mt-2 text-muted smaller" style="border-color: rgba(255, 255, 255, 0.08) !important;">
+                                                <i class="bi bi-buildings me-1 text-primary"></i> Target Companies: Google, Amazon, Microsoft
+                                            </div>
+
+                                        {% elif feature.category == 'resources' %}
+                                            <div class="cwa-preview-header mb-2.5 rounded-3">
+                                                <span class="smaller fw-bold text-info"><i class="bi bi-file-earmark-pdf-fill me-1"></i> Academic Modules</span>
+                                                <span class="badge bg-info-subtle text-info rounded-pill px-2 py-0.5 smaller">{{ stats.notes }} Free Notes</span>
+                                            </div>
+                                            <div class="d-flex flex-column gap-2 py-1 smaller">
+                                                <div class="d-flex align-items-center gap-2.5 p-2 rounded-2" style="background: rgba(255, 255, 255, 0.05);">
+                                                    <i class="bi bi-cpu-fill text-primary fs-5"></i>
+                                                    <div>
+                                                        <div class="fw-bold text-white">Operating Systems</div>
+                                                        <div class="smaller text-muted">CPU Scheduling, Deadlocks, Paging</div>
+                                                    </div>
+                                                </div>
+                                                <div class="d-flex align-items-center gap-2.5 p-2 rounded-2" style="background: rgba(255, 255, 255, 0.05);">
+                                                    <i class="bi bi-database-fill text-warning fs-5"></i>
+                                                    <div>
+                                                        <div class="fw-bold text-white">DBMS & SQL</div>
+                                                        <div class="smaller text-muted">ACID, Normalization, Indexing</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="pt-2.5 border-top mt-2 text-muted smaller" style="border-color: rgba(255, 255, 255, 0.08) !important;">
+                                                <i class="bi bi-download text-info me-1"></i> Instant download with zero sign-in paywalls
+                                            </div>
+
+                                        {% else %}
+                                            <div class="cwa-preview-header mb-2.5 rounded-3">
+                                                <span class="smaller fw-bold text-primary"><i class="bi bi-shield-check me-1"></i> CodeWithAmit Core</span>
+                                                <span class="badge bg-primary-subtle text-primary rounded-pill px-2 py-0.5 smaller">Interactive</span>
+                                            </div>
+                                            <div class="p-3 rounded-3 text-center my-1" style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.08);">
+                                                <div class="d-flex justify-content-center gap-2 fs-2 mb-2 text-primary">
+                                                    <i class="bi {{ feature.icon }}"></i>
+                                                </div>
+                                                <div class="fw-bold small text-white">{{ feature.title }}</div>
+                                                <div class="smaller text-muted mt-1">{{ feature.short_description|truncatewords:15 }}</div>
+                                            </div>
+                                            <div class="pt-2.5 border-top mt-2 text-muted smaller" style="border-color: rgba(255, 255, 255, 0.08) !important;">
+                                                <i class="bi bi-check2-circle text-success me-1"></i> Available platform-wide for all learners
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <!-- Empty State -->
+                <div class="cwa-card p-5 text-center shadow-sm">
+                    <div class="d-inline-flex align-items-center justify-content-center rounded-circle bg-light text-muted mb-3" style="width: 72px; height: 72px;">
+                        <i class="bi bi-search fs-2"></i>
+                    </div>
+                    <h4 class="fw-bold cwa-heading mb-2">No Features Found</h4>
+                    <p class="text-secondary small mb-4" style="max-width: 480px; margin: 0 auto;">
+                        {% if search_query %}
+                            No features matched your search term "<strong>{{ search_query }}</strong>".
+                        {% else %}
+                            There are currently no active features under the selected category.
+                        {% endif %}
+                    </p>
+                    <div class="d-flex justify-content-center gap-2">
+                        <a href="{% url 'core:features' %}" class="cwa-btn-secondary py-2 px-3.5">
+                            Reset Filters
+                        </a>
+                        {% if is_admin %}
+                            <a href="{% url 'core:add_feature' %}" class="cwa-btn-primary py-2 px-3.5">
+                                <i class="bi bi-plus-circle me-1"></i> Add Custom Feature
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endif %}
+
+        </div>
+    </section>
+
+    <!-- ==================================================================
+         FEATURE COMPARISON MATRIX
+         ================================================================== -->
+    <section class="py-5 border-top border-bottom" style="border-color: var(--cwa-border) !important; background: var(--cwa-bg);">
+        <div class="container" style="max-width: 1040px;">
+            <div class="text-center mb-4 pb-2" style="max-width: 650px; margin: 0 auto;">
+                <span class="cwa-badge cwa-badge-primary mb-2">Platform Matrix</span>
+                <h2 class="h3 fw-bold cwa-heading mb-1">Why Learn on CodeWithAmit?</h2>
+                <p class="text-secondary small">Compare how our integrated platform provides a streamlined experience vs fragmented websites.</p>
+            </div>
+
+            <div class="cwa-card shadow-sm overflow-hidden">
+                <div class="table-responsive">
+                    <table class="table m-0 align-middle">
+                        <thead style="background: var(--cwa-bg-subtle);">
+                            <tr>
+                                <th style="width: 42%; color: var(--cwa-text-heading);" class="py-3 ps-4">Platform Feature</th>
+                                <th style="width: 29%; color: var(--cwa-primary);" class="text-center fw-bold py-3">CodeWithAmit</th>
+                                <th style="width: 29%;" class="text-center text-muted py-3 pe-4">Other Sites</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="fw-semibold ps-4" style="color: var(--cwa-text-heading);">In-Browser Multi-Language Sandbox</td>
+                                <td class="text-center text-success"><i class="bi bi-check-circle-fill me-1"></i> Included Free</td>
+                                <td class="text-center text-muted pe-4">Often Behind Paywall</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-semibold ps-4" style="color: var(--cwa-text-heading);">Curated 450 DSA Sheet with Company Tags</td>
+                                <td class="text-center text-success"><i class="bi bi-check-circle-fill me-1"></i> Fully Integrated</td>
+                                <td class="text-center text-muted pe-4">Scattered Spreadsheets</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-semibold ps-4" style="color: var(--cwa-text-heading);">Structured 3-Approach Tutorials (Optimal, Better, Brute)</td>
+                                <td class="text-center text-success"><i class="bi bi-check-circle-fill me-1"></i> Step-by-Step with Dry-Run</td>
+                                <td class="text-center text-muted pe-4">Cluttered with Popups</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-semibold ps-4" style="color: var(--cwa-text-heading);">YouTube Solution Links for Practice Problems</td>
+                                <td class="text-center text-success"><i class="bi bi-check-circle-fill me-1"></i> Direct External Links</td>
+                                <td class="text-center text-muted pe-4">Scattered / No Solutions</td>
+                            </tr>
+                            <tr>
+                                <td class="fw-semibold ps-4" style="color: var(--cwa-text-heading);">Dynamic Custom Tools Added by Admin</td>
+                                <td class="text-center text-success"><i class="bi bi-check-circle-fill me-1"></i> Real-time Creator Studio</td>
+                                <td class="text-center text-muted pe-4"><i class="bi bi-x-circle text-danger"></i> Rigid / Hardcoded</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==================================================================
+         CALL TO ACTION: Clean & Direct
+         ================================================================== -->
+    <section class="py-5 text-center" style="background: var(--cwa-bg-subtle);">
+        <div class="container" style="max-width: 680px;">
+            <h2 class="h3 fw-bold cwa-heading mb-2">Experience All Features Today</h2>
+            <p class="text-secondary small mb-4">No credit card required. Create your free student account and start mastering Computer Science.</p>
+            <div class="d-flex justify-content-center gap-3">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'dashboard:student_dashboard' %}" class="cwa-btn-primary py-2.5 px-4 shadow-sm">
+                        <span>Go to Student Dashboard</span>
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
+                {% else %}
+                    <a href="{% url 'accounts:register' %}" class="cwa-btn-primary py-2.5 px-4 shadow-sm">
+                        <span>Create Free Account</span>
+                        <i class="bi bi-arrow-right"></i>
+                    </a>
+                {% endif %}
+                <a href="{% url 'core:home' %}" class="cwa-btn-secondary py-2.5 px-4">
+                    Return to Home
+                </a>
+            </div>
+        </div>
+    </section>
+
+</div>
+{% endblock %}

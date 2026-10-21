@@ -1,0 +1,224 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Programming Courses & Batches — CodeWithAmit{% endblock %}
+{% block meta_description %}Explore live and recorded engineering courses, DSA masterclasses, full stack web development batches, and system design tracks at CodeWithAmit.{% endblock %}
+
+{% block content %}
+<div class="py-5" style="background: var(--bg-canvas); min-height: 90vh;">
+    <div class="container" style="max-width: 1200px;">
+        
+        <!-- ==================================================================
+             CATALOG HEADER & HERO
+             ================================================================== -->
+        <div class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-end mb-4 gap-3 pb-3 border-bottom" style="border-color: var(--border-color) !important;">
+            <div>
+                <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+                    <span class="badge badge-glow-purple rounded-pill px-3 py-1.5 fw-semibold smaller">
+                        <i class="bi bi-mortarboard-fill me-1"></i> Tech Education Hub
+                    </span>
+                    <span class="badge badge-glow-fire rounded-pill px-2.5 py-1 fw-semibold smaller animate-pulse-glow">
+                        <i class="bi bi-fire me-1 text-warning"></i> Placements 2026 Ready
+                    </span>
+                    <span class="text-secondary smaller">• {{ courses|length }} Batches Available</span>
+                </div>
+                <h1 class="display-5 fw-bold font-heading mb-1" style="color: var(--text-primary); letter-spacing: -0.03em;">
+                    Explore Structured <span class="gradient-text-codehelp">Courses & Batches</span>
+                </h1>
+                <p class="text-secondary mb-0" style="max-width: 650px; font-size: 1rem; line-height: 1.55;">
+                    Master Data Structures, Web Development, and Core Engineering with industry-vetted curriculums and live mentorship.
+                </p>
+            </div>
+
+            <!-- Interactive Filters Form -->
+            <form method="GET" class="d-flex flex-wrap gap-2 align-items-center">
+                <div class="input-group input-group-sm rounded-pill overflow-hidden" style="border: 1px solid var(--border-color); background: var(--bg-surface);">
+                    <label class="input-group-text bg-transparent border-0 text-secondary pe-1" for="categorySelect">
+                        <i class="bi bi-folder2-open text-primary"></i>
+                    </label>
+                    <select id="categorySelect" name="category" class="form-select form-select-sm bg-transparent border-0 text-dark pe-4" onchange="this.form.submit()" style="color: var(--text-primary); font-size: 0.85rem; cursor: pointer;">
+                        <option value="" class="bg-white text-dark">All Categories</option>
+                        {% for cat in categories %}
+                            <option value="{{ cat.slug }}" class="bg-white text-dark" {% if selected_category == cat.slug %}selected{% endif %}>{{ cat.name }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="input-group input-group-sm rounded-pill overflow-hidden" style="border: 1px solid var(--border-color); background: var(--bg-surface);">
+                    <label class="input-group-text bg-transparent border-0 text-secondary pe-1" for="difficultySelect">
+                        <i class="bi bi-speedometer text-warning"></i>
+                    </label>
+                    <select id="difficultySelect" name="difficulty" class="form-select form-select-sm bg-transparent border-0 text-dark pe-4" onchange="this.form.submit()" style="color: var(--text-primary); font-size: 0.85rem; cursor: pointer;">
+                        <option value="" class="bg-white text-dark">All Difficulties</option>
+                        <option value="Beginner" class="bg-white text-dark" {% if selected_difficulty == 'Beginner' %}selected{% endif %}>Beginner</option>
+                        <option value="Intermediate" class="bg-white text-dark" {% if selected_difficulty == 'Intermediate' %}selected{% endif %}>Intermediate</option>
+                        <option value="Advanced" class="bg-white text-dark" {% if selected_difficulty == 'Advanced' %}selected{% endif %}>Advanced</option>
+                    </select>
+                </div>
+
+                {% if selected_category or selected_difficulty %}
+                    <a href="{% url 'courses:course_list' %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-1" style="border-color: var(--border-color); color: var(--text-secondary);" title="Clear Filters">
+                        <i class="bi bi-x-lg me-1"></i> Reset
+                    </a>
+                {% endif %}
+            </form>
+        </div>
+
+        <!-- ==================================================================
+             CATEGORY QUICK-FILTER PILLS
+             ================================================================== -->
+        <div class="d-flex overflow-x-auto gap-2 pb-3 mb-4 scrollbar-none">
+            <a href="{% url 'courses:course_list' %}" class="filter-chip-link {% if not selected_category %}active{% endif %}">
+                <i class="bi bi-grid-fill"></i> All Tracks
+            </a>
+            {% for cat in categories %}
+                <a href="?category={{ cat.slug }}{% if selected_difficulty %}&difficulty={{ selected_difficulty }}{% endif %}" class="filter-chip-link {% if selected_category == cat.slug %}active{% endif %}">
+                    <i class="bi {{ cat.icon|default:'bi-code-slash' }}"></i> {{ cat.name }}
+                </a>
+            {% endfor %}
+        </div>
+
+        <!-- ==================================================================
+             COURSES GRID (Interactive Glassmorphic Cards)
+             ================================================================== -->
+        <div class="row g-4">
+            {% for course in courses %}
+                <div class="col-lg-4 col-md-6">
+                    <div class="card h-100 interactive-card d-flex flex-column" style="background: var(--bg-surface); border: 1px solid var(--border-color);">
+                        
+                        <!-- Thumbnail Header with Zoom & Badges -->
+                        <div class="position-relative overflow-hidden" style="height: 190px; background: #0c0f1d;">
+                            {% if course.thumbnail %}
+                                <img src="{{ course.thumbnail.url }}" alt="{{ course.title }}" class="w-100 h-100 object-fit-cover transition-flow" style="transition: transform 0.4s ease;">
+                            {% elif course.thumbnail_url %}
+                                <img src="{{ course.thumbnail_url }}" alt="{{ course.title }}" class="w-100 h-100 object-fit-cover transition-flow" style="transition: transform 0.4s ease;">
+                            {% else %}
+                                <div class="d-flex flex-column align-items-center justify-content-center h-100" style="background: radial-gradient(circle at center, #1e1b4b 0%, #0c0f1d 80%);">
+                                    <i class="bi bi-terminal-fill fs-1 text-primary opacity-75 animate-float"></i>
+                                    <span class="smaller text-muted mt-2 font-heading">{{ course.category.name }}</span>
+                                </div>
+                            {% endif %}
+                            
+                            <!-- Top Overlay Badges -->
+                            <div class="position-absolute top-0 start-0 w-100 p-3 d-flex justify-content-between align-items-center" style="background: linear-gradient(180deg, rgba(9, 10, 16, 0.8) 0%, transparent 100%);">
+                                {% if course.tag %}
+                                    <span class="badge badge-glow-fire rounded-pill px-2.5 py-1 smaller fw-bold">
+                                        <i class="bi bi-stars me-1 text-warning"></i> {{ course.tag }}
+                                    </span>
+                                {% else %}
+                                    <span class="badge badge-glow-purple rounded-pill px-2.5 py-1 smaller fw-bold">
+                                        {{ course.category.name }}
+                                    </span>
+                                {% endif %}
+
+                                {% if course.difficulty == 'Beginner' %}
+                                    <span class="badge badge-glow-emerald rounded-pill px-2.5 py-1 smaller fw-semibold">
+                                        <i class="bi bi-reception-1 me-1"></i> Beginner
+                                    </span>
+                                {% elif course.difficulty == 'Intermediate' %}
+                                    <span class="badge badge-glow-amber rounded-pill px-2.5 py-1 smaller fw-semibold">
+                                        <i class="bi bi-reception-3 me-1"></i> Medium
+                                    </span>
+                                {% else %}
+                                    <span class="badge badge-glow-rose rounded-pill px-2.5 py-1 smaller fw-semibold">
+                                        <i class="bi bi-reception-4 me-1"></i> Advanced
+                                    </span>
+                                {% endif %}
+                            </div>
+
+                            {% if course.batch_name %}
+                                <div class="position-absolute bottom-0 start-0 m-3">
+                                    <span class="badge rounded-pill px-2.5 py-1 smaller fw-semibold" style="background: rgba(13, 16, 27, 0.85); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.1); color: var(--text-primary);">
+                                        <i class="bi bi-lightning-fill text-warning me-1"></i> {{ course.batch_name }}
+                                    </span>
+                                </div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Card Body -->
+                        <div class="p-4 d-flex flex-column flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-center smaller mb-2" style="color: var(--text-secondary);">
+                                <span><i class="bi bi-clock-history text-primary me-1"></i> {{ course.batch_start_date|default:'Flexible Pace' }}</span>
+                                {% if course.average_rating %}
+                                    <span class="d-flex align-items-center gap-1">
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                        <strong style="color: var(--text-primary);">{{ course.average_rating }}</strong>
+                                        <span class="text-muted">({{ course.reviews.count }})</span>
+                                    </span>
+                                {% else %}
+                                    <span class="d-flex align-items-center gap-1 text-muted">
+                                        <i class="bi bi-star text-secondary"></i>
+                                        <span>New Batch</span>
+                                    </span>
+                                {% endif %}
+                            </div>
+
+                            <h2 class="h5 font-heading fw-bold mb-2">
+                                <a href="{% url 'courses:course_detail' course.slug %}" class="text-decoration-none" style="color: var(--text-primary); transition: color 0.2s ease;">
+                                    {{ course.title }}
+                                </a>
+                            </h2>
+
+                            <p class="smaller flex-grow-1 mb-3" style="color: var(--text-secondary); line-height: 1.55;">
+                                {{ course.short_description|truncatechars:105 }}
+                            </p>
+
+                            <!-- Key Specs Chips -->
+                            <div class="d-flex flex-wrap gap-2 mb-3 pb-3 border-bottom" style="border-color: var(--border-color) !important;">
+                                <span class="smaller px-2 py-0.5 rounded-2 text-secondary" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color);">
+                                    <i class="bi bi-clock text-primary me-1"></i> {{ course.estimated_hours }}h total
+                                </span>
+                                <span class="smaller px-2 py-0.5 rounded-2 text-secondary" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color);">
+                                    <i class="bi bi-journal-code text-info me-1"></i> {{ course.total_lessons }} lessons
+                                </span>
+                                <span class="smaller px-2 py-0.5 rounded-2 text-secondary" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color);">
+                                    <i class="bi bi-translate text-success me-1"></i> Hinglish
+                                </span>
+                            </div>
+
+                            <!-- Footer Pricing & CTA -->
+                            <div class="d-flex justify-content-between align-items-center mt-auto">
+                                <div>
+                                    {% if course.price == 0 %}
+                                        <div class="d-flex align-items-center gap-1.5">
+                                            <span class="badge badge-glow-emerald rounded-pill px-2.5 py-1 fw-bold fs-6">FREE</span>
+                                            <span class="smaller text-muted">100% Open Access</span>
+                                        </div>
+                                    {% else %}
+                                        <div class="d-flex align-items-baseline gap-1.5">
+                                            <span class="fs-5 fw-bold" style="color: var(--text-primary);">₹{{ course.price }}</span>
+                                            {% if course.original_price and course.original_price > course.price %}
+                                                <span class="smaller text-muted text-decoration-line-through">₹{{ course.original_price }}</span>
+                                            {% endif %}
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <a href="{% url 'courses:course_detail' course.slug %}" class="btn btn-codehelp-primary btn-sm rounded-pill px-3 py-2 fw-semibold btn-shimmer btn-arrow-slide shadow-xs">
+                                    <span>Explore</span>
+                                    <i class="bi bi-arrow-right ms-1"></i>
+                                </a>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            {% empty %}
+                <div class="col-12 text-center py-5">
+                    <div class="p-5 rounded-4 mx-auto" style="max-width: 520px; background: var(--bg-surface); border: 1px solid var(--border-color);">
+                        <div class="rounded-circle d-inline-flex p-3 mb-3" style="background: rgba(139, 92, 246, 0.1); color: var(--primary-purple);">
+                            <i class="bi bi-search fs-1"></i>
+                        </div>
+                        <h4 class="fw-bold font-heading mb-2" style="color: var(--text-primary);">No courses found matching criteria</h4>
+                        <p class="small text-secondary mb-4">Try clearing category or difficulty filters to see all available learning tracks.</p>
+                        <a href="{% url 'courses:course_list' %}" class="btn btn-codehelp-primary rounded-pill px-4 py-2 fw-semibold btn-shimmer">
+                            <i class="bi bi-arrow-counterclockwise me-1"></i> Reset Filters
+                        </a>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+    </div>
+</div>
+{% endblock %}

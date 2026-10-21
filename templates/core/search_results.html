@@ -1,0 +1,307 @@
+{% extends 'base.html' %}
+
+{% block title %}Search Results for "{{ query }}" — CodeWithAmit{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="mb-4">
+        <span class="text-primary text-uppercase fw-bold smaller tracking-wider">Search Results</span>
+        <h1 class="h2 fw-bold text-dark font-heading">
+            Showing results for <span class="text-gradient">"{{ query }}"</span>
+        </h1>
+        <p class="text-secondary small">{{ total_results }} items found across tutorials, courses, notes, questions, and roadmaps.</p>
+    </div>
+
+    <!-- Search Tabs: Flowable Pills -->
+    <ul class="nav nav-pills modern-pills flowable-chips mb-4" id="searchTabs" role="tablist">
+        <li class="nav-item" role="presentation">
+            <button class="nav-link active rounded-pill px-4" id="all-tab" data-bs-toggle="pill" data-bs-target="#tab-all" type="button" role="tab">
+                All ({{ total_results }})
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link rounded-pill px-4" id="tutorials-tab" data-bs-toggle="pill" data-bs-target="#tab-tutorials" type="button" role="tab">
+                Tutorials ({{ tutorial_results|length }})
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link rounded-pill px-4" id="courses-tab" data-bs-toggle="pill" data-bs-target="#tab-courses" type="button" role="tab">
+                Courses ({{ course_results|length }})
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link rounded-pill px-4" id="notes-tab" data-bs-toggle="pill" data-bs-target="#tab-notes" type="button" role="tab">
+                Notes & PDFs ({{ note_results|length }})
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link rounded-pill px-4" id="practice-tab" data-bs-toggle="pill" data-bs-target="#tab-practice" type="button" role="tab">
+                Coding Problems ({{ question_results|length }})
+            </button>
+        </li>
+        <li class="nav-item" role="presentation">
+            <button class="nav-link rounded-pill px-4" id="roadmaps-tab" data-bs-toggle="pill" data-bs-target="#tab-roadmaps" type="button" role="tab">
+                Roadmaps ({{ roadmap_results|length }})
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="searchTabsContent">
+        <!-- ALL TAB -->
+        <div class="tab-pane fade show active" id="tab-all" role="tabpanel">
+            <!-- Tutorials Section -->
+            {% if tutorial_results %}
+                <div class="mb-5">
+                    <h4 class="text-dark font-heading fw-bold mb-3"><i class="bi bi-book-half text-success me-2"></i> Tutorials ({{ tutorial_results|length }})</h4>
+                    <div class="row g-3">
+                        {% for t in tutorial_results %}
+                            <div class="col-md-6">
+                                <div class="card p-3 rounded-4 d-flex flex-row justify-content-between align-items-center hover-lift">
+                                    <div>
+                                        <span class="badge bg-secondary-subtle text-secondary-emphasis smaller mb-1">{{ t.category.name }} • {{ t.chapter }}</span>
+                                        <h6 class="text-dark mb-1 fw-bold">{{ t.title }}</h6>
+                                        <div class="text-secondary smaller">{{ t.summary|truncatewords:10 }}</div>
+                                    </div>
+                                    <a href="{% url 'tutorials:tutorial_detail' t.category.slug t.slug %}" class="btn btn-outline-success btn-sm rounded-pill px-3">Read</a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if total_results == 0 %}
+                <div class="card p-5 text-center rounded-4 my-4 shadow-sm">
+                    <i class="bi bi-search fs-1 text-muted mb-3"></i>
+                    <h4 class="text-dark fw-bold font-heading">No matching results found</h4>
+                    <p class="text-secondary small mx-auto" style="max-width: 500px;">
+                        We couldn't find anything matching "{{ query }}". Try searching for topics like "Python", "Linked List", "DBMS", or "Full Stack".
+                    </p>
+                </div>
+            {% endif %}
+
+            <!-- Courses Section -->
+            {% if course_results %}
+                <div class="mb-5">
+                    <h4 class="text-dark font-heading fw-bold mb-3"><i class="bi bi-play-circle text-primary me-2"></i> Courses ({{ course_results|length }})</h4>
+                    <div class="row g-3">
+                        {% for c in course_results %}
+                            <div class="col-md-6 col-lg-4">
+                                <div class="card p-4 rounded-4 h-100 hover-lift">
+                                    <span class="badge bg-primary-subtle text-primary smaller align-self-start mb-2">{{ c.category.name }}</span>
+                                    <h6 class="text-dark fw-bold"><a href="{% url 'courses:course_detail' c.slug %}" class="text-dark text-decoration-none hover-primary">{{ c.title }}</a></h6>
+                                    <p class="text-secondary smaller flex-grow-1">{{ c.short_description|truncatechars:90 }}</p>
+                                    <div class="d-flex justify-content-between align-items-center pt-2 border-top border-light-subtle smaller text-muted">
+                                        <span>{{ c.difficulty }} • {{ c.estimated_hours }}h</span>
+                                        <a href="{% url 'courses:course_detail' c.slug %}" class="btn btn-outline-primary btn-sm rounded-pill px-3">View</a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Notes Section -->
+            {% if note_results %}
+                <div class="mb-5">
+                    <h4 class="text-dark font-heading fw-bold mb-3"><i class="bi bi-journal-text text-info me-2"></i> Notes & Documents ({{ note_results|length }})</h4>
+                    <div class="row g-3">
+                        {% for n in note_results %}
+                            <div class="col-md-6 col-lg-4">
+                                <div class="card p-4 rounded-4 h-100 hover-lift">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span class="badge bg-info-subtle text-info smaller">{{ n.subject }}</span>
+                                        <span class="text-muted smaller">{{ n.file_size }}</span>
+                                    </div>
+                                    <h6 class="text-dark fw-bold"><a href="{% url 'notes:note_detail' n.slug %}" class="text-dark text-decoration-none hover-primary">{{ n.title }}</a></h6>
+                                    <p class="text-secondary smaller flex-grow-1">{{ n.description|truncatechars:90 }}</p>
+                                    <div class="d-flex justify-content-between align-items-center pt-2 border-top border-light-subtle smaller text-muted">
+                                        <span><i class="bi bi-download me-1"></i> {{ n.download_count }} downloads</span>
+                                        <a href="{% url 'notes:note_detail' n.slug %}" class="btn btn-outline-primary btn-sm rounded-pill px-3">Download</a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Coding Questions Section -->
+            {% if question_results %}
+                <div class="mb-5">
+                    <h4 class="text-dark font-heading fw-bold mb-3"><i class="bi bi-code-slash text-warning me-2"></i> Coding Questions ({{ question_results|length }})</h4>
+                    <div class="row g-3">
+                        {% for q in question_results %}
+                            <div class="col-md-6">
+                                <div class="card p-3 rounded-4 d-flex flex-row justify-content-between align-items-center hover-lift">
+                                    <div>
+                                        <div class="d-flex align-items-center gap-2 mb-1">
+                                            <span class="badge badge-difficulty badge-{{ q.difficulty|lower }}">{{ q.difficulty }}</span>
+                                            <span class="text-muted smaller">{{ q.category.name }}</span>
+                                        </div>
+                                        <h6 class="text-dark mb-0 fw-semibold">
+                                            <a href="{% url 'coding_practice:problem_detail' q.slug %}" class="text-dark text-decoration-none hover-primary">
+                                                #{{ q.id }} {{ q.title }}
+                                            </a>
+                                        </h6>
+                                    </div>
+                                    {% if q.leetcode_url %}
+                                        <a href="{{ q.leetcode_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-warning btn-sm rounded-pill px-3 fw-bold text-dark shadow-sm">Solve on LeetCode ↗</a>
+                                    {% else %}
+                                        <a href="{% url 'coding_practice:problem_detail' q.slug %}" class="btn btn-primary btn-sm rounded-pill px-3">Solve</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Roadmaps Section -->
+            {% if roadmap_results %}
+                <div class="mb-5">
+                    <h4 class="text-dark font-heading fw-bold mb-3"><i class="bi bi-signpost-split text-success me-2"></i> Career Roadmaps ({{ roadmap_results|length }})</h4>
+                    <div class="row g-3">
+                        {% for r in roadmap_results %}
+                            <div class="col-md-6">
+                                <div class="card p-3 rounded-4 d-flex flex-row justify-content-between align-items-center hover-lift">
+                                    <div class="d-flex align-items-center gap-3">
+                                        <div class="stat-icon-wrapper rounded-3 p-2 shadow-sm" style="background: {{ r.banner_color }};">
+                                            <i class="bi {{ r.icon }} text-white fs-4"></i>
+                                        </div>
+                                        <div>
+                                            <h6 class="text-dark mb-0 fw-bold">{{ r.title }}</h6>
+                                            <span class="text-secondary smaller">{{ r.target_role }} • {{ r.estimated_time }}</span>
+                                        </div>
+                                    </div>
+                                    <a href="{% url 'roadmaps:roadmap_detail' r.slug %}" class="btn btn-outline-primary btn-sm rounded-pill px-3">View</a>
+                                </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- TUTORIALS TAB -->
+        <div class="tab-pane fade" id="tab-tutorials" role="tabpanel">
+            <div class="row g-3">
+                {% for t in tutorial_results %}
+                    <div class="col-md-6">
+                        <div class="card p-3 rounded-4 d-flex flex-row justify-content-between align-items-center hover-lift">
+                            <div>
+                                <span class="badge bg-secondary-subtle text-secondary-emphasis smaller mb-1">{{ t.category.name }} • {{ t.chapter }}</span>
+                                <h6 class="text-dark mb-1 fw-bold">{{ t.title }}</h6>
+                                <div class="text-secondary smaller">{{ t.summary|truncatewords:10 }}</div>
+                            </div>
+                            <a href="{% url 'tutorials:tutorial_detail' t.category.slug t.slug %}" class="btn btn-outline-success btn-sm rounded-pill px-3">Read</a>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="text-muted text-center py-4">No tutorials matched "{{ query }}".</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- COURSES TAB -->
+        <div class="tab-pane fade" id="tab-courses" role="tabpanel">
+            <div class="row g-3">
+                {% for c in course_results %}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card p-4 rounded-4 h-100 hover-lift">
+                            <span class="badge bg-primary-subtle text-primary smaller align-self-start mb-2">{{ c.category.name }}</span>
+                            <h6 class="text-dark fw-bold"><a href="{% url 'courses:course_detail' c.slug %}" class="text-dark text-decoration-none hover-primary">{{ c.title }}</a></h6>
+                            <p class="text-secondary smaller flex-grow-1">{{ c.short_description|truncatechars:90 }}</p>
+                            <div class="d-flex justify-content-between align-items-center pt-2 border-top border-light-subtle smaller text-muted">
+                                <span>{{ c.difficulty }} • {{ c.estimated_hours }}h</span>
+                                <a href="{% url 'courses:course_detail' c.slug %}" class="btn btn-outline-primary btn-sm rounded-pill px-3">View</a>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="text-muted text-center py-4">No course matched "{{ query }}".</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- NOTES TAB -->
+        <div class="tab-pane fade" id="tab-notes" role="tabpanel">
+            <div class="row g-3">
+                {% for n in note_results %}
+                    <div class="col-md-6 col-lg-4">
+                        <div class="card p-4 rounded-4 h-100 hover-lift">
+                            <div class="d-flex justify-content-between mb-2">
+                                <span class="badge bg-info-subtle text-info smaller">{{ n.subject }}</span>
+                                <span class="text-muted smaller">{{ n.file_size }}</span>
+                            </div>
+                            <h6 class="text-dark fw-bold"><a href="{% url 'notes:note_detail' n.slug %}" class="text-dark text-decoration-none hover-primary">{{ n.title }}</a></h6>
+                            <p class="text-secondary smaller flex-grow-1">{{ n.description|truncatechars:90 }}</p>
+                            <div class="d-flex justify-content-between align-items-center pt-2 border-top border-light-subtle smaller text-muted">
+                                <span><i class="bi bi-download me-1"></i> {{ n.download_count }} downloads</span>
+                                <a href="{% url 'notes:note_detail' n.slug %}" class="btn btn-outline-primary btn-sm rounded-pill px-3">Download</a>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="text-muted text-center py-4">No notes matched "{{ query }}".</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- PRACTICE TAB -->
+        <div class="tab-pane fade" id="tab-practice" role="tabpanel">
+            <div class="row g-3">
+                {% for q in question_results %}
+                    <div class="col-md-6">
+                        <div class="card p-3 rounded-4 d-flex flex-row justify-content-between align-items-center hover-lift">
+                            <div>
+                                <div class="d-flex align-items-center gap-2 mb-1">
+                                    <span class="badge badge-difficulty badge-{{ q.difficulty|lower }}">{{ q.difficulty }}</span>
+                                    <span class="text-muted smaller">{{ q.category.name }}</span>
+                                </div>
+                                <h6 class="text-dark mb-0 fw-semibold">
+                                    <a href="{% url 'coding_practice:problem_detail' q.slug %}" class="text-dark text-decoration-none hover-primary">
+                                        #{{ q.id }} {{ q.title }}
+                                    </a>
+                                </h6>
+                            </div>
+                            {% if q.leetcode_url %}
+                                <a href="{{ q.leetcode_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-warning btn-sm rounded-pill px-3 fw-bold text-dark shadow-sm">Solve on LeetCode ↗</a>
+                            {% else %}
+                                <a href="{% url 'coding_practice:problem_detail' q.slug %}" class="btn btn-primary btn-sm rounded-pill px-3">Solve</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="text-muted text-center py-4">No coding questions matched "{{ query }}".</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- ROADMAPS TAB -->
+        <div class="tab-pane fade" id="tab-roadmaps" role="tabpanel">
+            <div class="row g-3">
+                {% for r in roadmap_results %}
+                    <div class="col-md-6">
+                        <div class="card p-3 rounded-4 d-flex flex-row justify-content-between align-items-center hover-lift">
+                            <div class="d-flex align-items-center gap-3">
+                                <div class="stat-icon-wrapper rounded-3 p-2 shadow-sm" style="background: {{ r.banner_color }};">
+                                    <i class="bi {{ r.icon }} text-white fs-4"></i>
+                                </div>
+                                <div>
+                                    <h6 class="text-dark mb-0 fw-bold">{{ r.title }}</h6>
+                                    <span class="text-secondary smaller">{{ r.target_role }} • {{ r.estimated_time }}</span>
+                                </div>
+                            </div>
+                            <a href="{% url 'roadmaps:roadmap_detail' r.slug %}" class="btn btn-outline-primary btn-sm rounded-pill px-3">View</a>
+                        </div>
+                    </div>
+                {% empty %}
+                    <p class="text-muted text-center py-4">No roadmaps matched "{{ query }}".</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

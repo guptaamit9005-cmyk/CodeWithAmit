@@ -1,0 +1,263 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ roadmap.title }} — Career Roadmap | CodeWithAmit{% endblock %}
+{% block meta_description %}{{ roadmap.short_description|default:'Interactive step-by-step career roadmap and milestones progression.' }}{% endblock %}
+
+{% block content %}
+<div class="container py-4 py-md-5">
+
+    <!-- Admin Action Bar (Visible to Administrators) -->
+    {% if request.user.is_staff or request.user.is_superuser %}
+        <div class="alert alert-primary rounded-4 d-flex flex-wrap justify-content-between align-items-center gap-3 p-3.5 mb-4 shadow-sm border-0" style="background: linear-gradient(135deg, rgba(37, 99, 235, 0.1) 0%, rgba(99, 102, 241, 0.1) 100%); border: 1px solid rgba(99, 102, 241, 0.25) !important;">
+            <div class="d-flex align-items-center gap-2.5">
+                <div class="rounded-circle d-flex align-items-center justify-content-center text-white" style="width: 38px; height: 38px; background: #2563eb;">
+                    <i class="bi bi-shield-lock-fill fs-5"></i>
+                </div>
+                <div>
+                    <strong class="text-dark small d-block">Admin Roadmap Architect Studio</strong>
+                    <span class="smaller text-secondary">Manage milestones, add sequential stages, and configure topics for this career track.</span>
+                </div>
+            </div>
+            <div class="d-flex flex-wrap gap-2 align-items-center">
+                <a href="{% url 'roadmaps:add_stage' %}?roadmap={{ roadmap.slug }}" class="btn btn-sm btn-success rounded-pill px-3.5 fw-semibold text-white shadow-xs">
+                    <i class="bi bi-plus-lg me-1"></i> Add Stage
+                </a>
+                <a href="{% url 'roadmaps:edit_roadmap' roadmap.slug %}" class="btn btn-sm btn-outline-primary rounded-pill px-3.5 fw-semibold bg-white">
+                    <i class="bi bi-pencil-square me-1"></i> Edit Roadmap
+                </a>
+                <a href="{% url 'roadmaps:delete_roadmap' roadmap.slug %}" class="btn btn-sm btn-outline-danger rounded-pill px-3 fw-semibold bg-white">
+                    <i class="bi bi-trash3 me-1"></i> Delete
+                </a>
+            </div>
+        </div>
+    {% endif %}
+
+    <!-- Breadcrumb Navigation -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb smaller mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'roadmaps:roadmap_list' %}" class="text-decoration-none text-secondary"><i class="bi bi-arrow-left me-1"></i> All Career Roadmaps</a></li>
+            <li class="breadcrumb-item active text-dark fw-semibold" aria-current="page">{{ roadmap.title }}</li>
+        </ol>
+    </nav>
+
+    <!-- Roadmap Hero Card -->
+    <div class="card p-4 p-md-5 rounded-4 shadow-sm mb-5 position-relative overflow-hidden border" style="background: var(--bg-surface, #ffffff); border-color: var(--border-color, #e2e8f0) !important;">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-8">
+                <div class="d-flex flex-wrap align-items-center gap-2 mb-2.5">
+                    <span class="badge rounded-pill px-3 py-1.5 smaller fw-bold" style="background: #e0f2fe; color: #0284c7; border: 1px solid #bae6fd;">
+                        <i class="bi bi-briefcase-fill me-1"></i> {{ roadmap.target_role|default:'Software Engineer' }}
+                    </span>
+                    <span class="badge rounded-pill px-2.5 py-1.5 smaller fw-semibold" style="background: #f1f5f9; color: #475569; border: 1px solid #e2e8f0;">
+                        <i class="bi bi-clock-history me-1 text-primary"></i> {{ roadmap.estimated_time }}
+                    </span>
+                    <span class="badge rounded-pill px-2.5 py-1.5 smaller" style="background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0;">
+                        <i class="bi bi-layers-fill me-1"></i> {{ stages.count }} Milestone Stages
+                    </span>
+                    <span class="badge rounded-pill px-2.5 py-1.5 smaller" style="background: #fef3c7; color: #b45309; border: 1px solid #fde68a;">
+                        <i class="bi bi-check2-square me-1"></i> {{ roadmap.total_topics }} Topics
+                    </span>
+                </div>
+
+                <h1 class="display-6 fw-bold font-heading mb-3" style="color: var(--text-primary, #0f172a); letter-spacing: -0.03em;">
+                    {{ roadmap.title }}
+                </h1>
+                
+                <p class="lead mb-4" style="color: var(--text-secondary, #475569); font-size: 1.05rem; line-height: 1.65; max-width: 680px;">
+                    {{ roadmap.description }}
+                </p>
+
+                <!-- Interactive Completion Progress Bar -->
+                <div class="p-3.5 rounded-3 border mb-4" style="max-width: 620px; background: #f8fafc; border-color: #e2e8f0 !important;">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="smaller fw-bold text-dark d-flex align-items-center gap-1.5">
+                            <i class="bi bi-trophy-fill text-warning"></i> Your Milestone Progress
+                        </span>
+                        <span id="roadmap-progress-text" class="smaller fw-bold text-primary">{{ completion_percent }}% Completed</span>
+                    </div>
+                    <div class="progress bg-white border" style="height: 10px; border-color: #e2e8f0 !important;">
+                        <div class="progress-bar bg-primary progress-bar-striped progress-bar-animated" id="roadmap-progress-bar" role="progressbar" style="width: {{ completion_percent }}%;" aria-valuenow="{{ completion_percent }}" aria-valuemin="0" aria-valuemax="100"></div>
+                    </div>
+                    <div class="smaller text-muted mt-2 d-flex justify-content-between">
+                        <span>Check off items as you learn to track mastery</span>
+                        <span><strong id="completed-count-display">{{ completed_topic_ids|length }}</strong> of {{ roadmap.total_topics }} completed</span>
+                    </div>
+                </div>
+
+                <div class="d-flex flex-wrap gap-2.5 align-items-center">
+                    {% if not is_enrolled %}
+                        <a href="{% url 'roadmaps:enroll_roadmap' roadmap.slug %}" class="btn btn-primary rounded-pill px-5 py-2.5 fw-bold shadow-sm hover-lift">
+                            <i class="bi bi-bookmark-plus-fill me-1.5"></i> Follow This Roadmap
+                        </a>
+                    {% else %}
+                        <span class="btn btn-outline-success rounded-pill px-4 py-2 fw-semibold disabled" style="opacity: 1;">
+                            <i class="bi bi-check2-circle me-1.5"></i> Enrolled &amp; Tracking
+                        </span>
+                    {% endif %}
+                    
+                    {% if request.user.is_staff or request.user.is_superuser %}
+                        <a href="{% url 'roadmaps:add_stage' %}?roadmap={{ roadmap.slug }}" class="btn btn-outline-primary rounded-pill px-4 py-2 fw-semibold">
+                            <i class="bi bi-plus-circle me-1"></i> Add Stage
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="col-lg-4 text-center">
+                <div class="stat-icon-wrapper p-4 rounded-4 shadow-sm d-inline-flex align-items-center justify-content-center" style="background: {{ roadmap.banner_color }}; width: 120px; height: 120px; font-size: 3.2rem;">
+                    <i class="bi {{ roadmap.icon }} text-white"></i>
+                </div>
+                <div class="smaller fw-semibold text-dark mt-3">{{ roadmap.target_role }}</div>
+                <div class="smaller text-muted">Complete Self-Paced Curriculum</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stages Timeline Breakdown -->
+    <div class="roadmap-timeline">
+        {% for stage in stages %}
+            <div class="stage-block mb-5 p-4 p-md-4 rounded-4 border shadow-2xs" style="background: #ffffff; border-color: #e2e8f0 !important;" id="stage-{{ stage.id }}">
+                
+                <!-- Stage Header Bar with Admin Controls -->
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-3 pb-3 border-bottom" style="border-color: #e2e8f0 !important;">
+                    <div class="d-flex align-items-center gap-3 flex-wrap">
+                        <span class="badge px-3 py-1.5 rounded-pill fs-6 fw-bold border" style="background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe !important;">
+                            Stage {{ stage.order|default:forloop.counter }}
+                        </span>
+                        <h2 class="h4 text-dark font-heading fw-bold mb-0">{{ stage.title }}</h2>
+                        <span class="badge rounded-pill px-2.5 py-1 smaller fw-semibold {% if stage.level == 'Beginner' %}bg-success-subtle text-success border border-success-subtle{% elif stage.level == 'Intermediate' %}bg-warning-subtle text-warning-emphasis border border-warning-subtle{% else %}bg-primary-subtle text-primary border border-primary-subtle{% endif %}">
+                            {{ stage.get_level_display }}
+                        </span>
+                        {% if stage.estimated_stage_time %}
+                            <span class="smaller text-muted"><i class="bi bi-hourglass-split me-1 text-primary"></i> {{ stage.estimated_stage_time }}</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Admin Stage Actions -->
+                    <div class="d-flex align-items-center gap-2">
+                        {% if request.user.is_staff or request.user.is_superuser %}
+                            <a href="{% url 'roadmaps:add_topic' %}?stage={{ stage.id }}" class="btn btn-sm btn-outline-success rounded-pill px-3 py-1 smaller fw-semibold">
+                                <i class="bi bi-plus-lg me-1"></i> Add Topic
+                            </a>
+                            <a href="{% url 'roadmaps:edit_stage' stage.id %}" class="btn btn-sm btn-outline-secondary rounded-pill px-2.5 py-1 smaller" title="Edit Stage">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <a href="{% url 'roadmaps:delete_stage' stage.id %}" class="btn btn-sm btn-outline-danger rounded-pill px-2.5 py-1 smaller" title="Delete Stage" onclick="return confirm('Are you sure you want to delete this stage and all its topics?');">
+                                <i class="bi bi-trash3"></i>
+                            </a>
+                        {% endif %}
+                        <span class="badge rounded-pill bg-light border text-secondary smaller px-2.5 py-1">
+                            {{ stage.topics.count }} Topics
+                        </span>
+                    </div>
+                </div>
+
+                {% if stage.description %}
+                    <p class="text-secondary small mb-4" style="line-height: 1.6;">{{ stage.description }}</p>
+                {% endif %}
+
+                <!-- Topics in this Stage -->
+                <div class="d-flex flex-column gap-3">
+                    {% for topic in stage.topics.all %}
+                        <div class="card rounded-3 p-3.5 shadow-2xs topic-row border transition-all {% if topic.id in completed_topic_ids %}topic-completed border-success-subtle bg-success-subtle bg-opacity-10{% else %}bg-white{% endif %}" id="topic-row-{{ topic.id }}" style="border-color: #e2e8f0 !important;">
+                            <div class="d-flex align-items-start gap-3">
+                                
+                                <!-- Interactive Checkbox -->
+                                <div class="form-check my-1">
+                                    <input class="form-check-input topic-check-input fs-5 cursor-pointer" type="checkbox" data-topic-id="{{ topic.id }}" data-roadmap-slug="{{ roadmap.slug }}" id="topic-check-{{ topic.id }}" {% if topic.id in completed_topic_ids %}checked{% endif %}>
+                                </div>
+
+                                <div class="flex-grow-1">
+                                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-1.5">
+                                        <label for="topic-check-{{ topic.id }}" class="h6 text-dark mb-0 fw-bold cursor-pointer hover-primary">
+                                            {{ topic.order }}. {{ topic.title }}
+                                        </label>
+                                        
+                                        <div class="d-flex align-items-center gap-2">
+                                            {% if topic.prerequisites %}
+                                                <span class="smaller text-muted px-2 py-0.5 rounded bg-light border"><i class="bi bi-info-circle me-1 text-primary"></i> Prereq: {{ topic.prerequisites }}</span>
+                                            {% endif %}
+
+                                            <!-- Admin Topic Actions -->
+                                            {% if request.user.is_staff or request.user.is_superuser %}
+                                                <a href="{% url 'roadmaps:edit_topic' topic.id %}" class="btn btn-sm btn-link text-secondary p-0 ms-2" title="Edit Topic">
+                                                    <i class="bi bi-pencil-square"></i>
+                                                </a>
+                                                <a href="{% url 'roadmaps:delete_topic' topic.id %}" class="btn btn-sm btn-link text-danger p-0 ms-1" title="Delete Topic" onclick="return confirm('Delete topic \'{{ topic.title|escapejs }}\'?');">
+                                                    <i class="bi bi-trash3"></i>
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+
+                                    {% if topic.description %}
+                                        <p class="text-secondary smaller mb-2.5" style="line-height: 1.55;">{{ topic.description }}</p>
+                                    {% endif %}
+
+                                    {% if topic.project_ideas %}
+                                        <div class="smaller text-secondary mb-2.5 p-2.5 bg-light rounded-2 border" style="border-color: #e2e8f0 !important;">
+                                            <strong class="text-primary"><i class="bi bi-hammer me-1"></i> Hands-on Project:</strong> {{ topic.project_ideas }}
+                                        </div>
+                                    {% endif %}
+
+                                    {% if topic.recommended_resources %}
+                                        <div class="smaller text-secondary mb-2.5">
+                                            <span class="text-muted"><i class="bi bi-book-half me-1 text-info"></i> Resources:</span> {{ topic.recommended_resources }}
+                                        </div>
+                                    {% endif %}
+
+                                    <!-- Platform Cross Links -->
+                                    {% if topic.related_course or topic.related_question %}
+                                        <div class="d-flex flex-wrap gap-2 pt-2 border-top border-light-subtle smaller mt-2">
+                                            {% if topic.related_course %}
+                                                <a href="{% url 'courses:course_detail' topic.related_course.slug %}" class="badge bg-primary-subtle text-primary text-decoration-none py-1.5 px-2.5 rounded-pill border border-primary-subtle">
+                                                    <i class="bi bi-play-circle-fill me-1"></i> Course: {{ topic.related_course.title }}
+                                                </a>
+                                            {% endif %}
+                                            {% if topic.related_question %}
+                                                <a href="{% url 'coding_practice:problem_detail' topic.related_question.slug %}" class="badge bg-warning-subtle text-warning-emphasis text-decoration-none py-1.5 px-2.5 rounded-pill border border-warning-subtle">
+                                                    <i class="bi bi-code-slash me-1"></i> Practice: {{ topic.related_question.title }}
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                    {% endif %}
+
+                                </div>
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="p-4 rounded-3 text-center border" style="background: #f8fafc; border-color: #e2e8f0 !important;">
+                            <i class="bi bi-journal-plus fs-3 text-muted mb-2 d-block"></i>
+                            <div class="text-dark small fw-semibold">No topics added to this stage yet.</div>
+                            {% if request.user.is_staff or request.user.is_superuser %}
+                                <a href="{% url 'roadmaps:add_topic' %}?stage={{ stage.id }}" class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1 mt-2">
+                                    <i class="bi bi-plus-lg me-1"></i> Add First Topic
+                                </a>
+                            {% else %}
+                                <div class="smaller text-muted">Topics for this stage are being finalized.</div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+
+            </div>
+        {% empty %}
+            <div class="card p-5 text-center rounded-4 border bg-white" style="border-color: #e2e8f0 !important;">
+                <div class="rounded-circle bg-primary-subtle text-primary mx-auto d-flex align-items-center justify-content-center mb-3" style="width: 64px; height: 64px;">
+                    <i class="bi bi-signpost-split fs-2"></i>
+                </div>
+                <h3 class="h5 fw-bold text-dark mb-2">No stages created for this roadmap yet</h3>
+                <p class="smaller text-muted mb-3" style="max-width: 480px; margin: 0 auto;">Organize this learning journey by adding sequential milestone stages (e.g., Foundations, Core Architecture, Advanced Systems).</p>
+                {% if request.user.is_staff or request.user.is_superuser %}
+                    <div>
+                        <a href="{% url 'roadmaps:add_stage' %}?roadmap={{ roadmap.slug }}" class="btn btn-primary rounded-pill px-4 py-2 fw-semibold shadow-sm hover-lift">
+                            <i class="bi bi-plus-lg me-1"></i> Add First Milestone Stage
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+
+</div>
+{% endblock %}

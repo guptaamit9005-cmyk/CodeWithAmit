@@ -1,0 +1,101 @@
+{% extends 'base.html' %}
+
+{% block title %}Schedule Live Class — CodeWithAmit Admin Studio{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="max-width: 860px;">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb smaller mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'live_classes:class_list' %}" class="text-decoration-none">Live Classes</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'dashboard:admin_dashboard' %}" class="text-decoration-none">Admin Studio</a></li>
+            <li class="breadcrumb-item active text-muted" aria-current="page">Schedule Live Class</li>
+        </ol>
+    </nav>
+
+    <div class="card flowable-card border p-4 p-md-5 rounded-4 shadow-sm bg-white">
+        <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+            <div>
+                <span class="badge bg-danger-subtle text-danger border border-danger-subtle px-3 py-1 rounded-pill mb-2">
+                    <i class="bi bi-broadcast me-1"></i> Live Mentorship Hub
+                </span>
+                <h1 class="h3 fw-bold text-slate-900 font-heading mb-1">Schedule Live Class</h1>
+                <p class="text-secondary small mb-0">Host an interactive Google Meet masterclass. Once scheduled, students can register and join directly.</p>
+            </div>
+            <a href="{% url 'live_classes:class_list' %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                <i class="bi bi-arrow-left me-1"></i> Cancel
+            </a>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger py-2 small rounded-3 mb-3">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold small text-slate-700">Class Title <span class="text-danger">*</span></label>
+                {{ form.title }}
+                {% if form.title.errors %}<div class="text-danger smaller mt-1">{{ form.title.errors }}</div>{% endif %}
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold small text-slate-700">Description & Agenda <span class="text-danger">*</span></label>
+                {{ form.description }}
+                {% if form.description.errors %}<div class="text-danger smaller mt-1">{{ form.description.errors }}</div>{% endif %}
+            </div>
+
+            <div class="row g-3 mb-3">
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold small text-slate-700">Scheduled Date <span class="text-danger">*</span></label>
+                    {{ form.scheduled_date }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold small text-slate-700">Start Time <span class="text-danger">*</span></label>
+                    {{ form.start_time }}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold small text-slate-700">Duration (Minutes) <span class="text-danger">*</span></label>
+                    {{ form.duration_minutes }}
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold small text-slate-700">Google Meet Meeting Link <span class="text-danger">*</span></label>
+                {{ form.google_meet_url }}
+                <div class="form-text smaller text-muted">Paste your Google Meet room URL (e.g., https://meet.google.com/abc-defg-hij)</div>
+                {% if form.google_meet_url.errors %}<div class="text-danger smaller mt-1">{{ form.google_meet_url.errors }}</div>{% endif %}
+            </div>
+
+            <h5 class="text-slate-900 font-heading fw-bold mt-4 mb-3 border-top pt-3">
+                <i class="bi bi-paperclip text-primary me-1"></i> Post-Class Resources (Optional)
+            </h5>
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold small text-slate-700">Recording Link (YouTube / Drive)</label>
+                {{ form.recording_url }}
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold small text-slate-700">Notes / Slides File</label>
+                {{ form.notes_attachment }}
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label fw-semibold small text-slate-700">Additional Resources / Repositories</label>
+                {{ form.additional_resources }}
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 pt-2 border-top">
+                <a href="{% url 'live_classes:class_list' %}" class="btn btn-outline-secondary rounded-pill px-4">Cancel</a>
+                <button type="submit" class="btn btn-primary rounded-pill px-5 fw-semibold shadow-sm hover-lift">
+                    <i class="bi bi-calendar-plus me-1"></i> Schedule Class Live
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

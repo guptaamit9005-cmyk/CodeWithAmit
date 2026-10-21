@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+
+{% block title %}Quiz Results — {{ lesson.title }}{% endblock %}
+
+{% block content %}
+<div class="container py-5 my-md-3">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card bg-surface border-secondary p-4 p-md-5 rounded-4 shadow-lg text-center mb-4">
+                {% if passed %}
+                    <div class="display-3 text-success mb-2"><i class="bi bi-patch-check-fill"></i></div>
+                    <h2 class="fw-bold text-light font-heading mb-1">Congratulations! You Passed!</h2>
+                    <p class="text-secondary small mb-3">You demonstrated strong understanding of the lesson material.</p>
+                {% else %}
+                    <div class="display-3 text-warning mb-2"><i class="bi bi-exclamation-octagon-fill"></i></div>
+                    <h2 class="fw-bold text-light font-heading mb-1">Almost There!</h2>
+                    <p class="text-secondary small mb-3">You need at least {{ quiz.passing_score }}% to pass this quiz.</p>
+                {% endif %}
+
+                <div class="display-5 fw-bold {% if passed %}text-success{% else %}text-warning{% endif %} font-heading mb-2">
+                    {{ score_percent }}%
+                </div>
+                <div class="text-muted smaller mb-4">
+                    {{ correct_answers }} out of {{ total_questions }} questions correct
+                </div>
+
+                <div class="d-flex justify-content-center gap-3">
+                    <a href="{% url 'courses:lesson_detail' course.slug lesson.slug %}" class="btn btn-outline-cyan rounded-pill px-4">
+                        <i class="bi bi-arrow-repeat me-1"></i> Retake / Back to Lesson
+                    </a>
+                    {% if passed %}
+                        <a href="{% url 'courses:course_detail' course.slug %}" class="btn btn-cyan rounded-pill px-4 fw-semibold">
+                            Continue Curriculum <i class="bi bi-arrow-right ms-1"></i>
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Detailed Question Breakdown -->
+            <div class="card bg-surface border-secondary p-4 rounded-4 shadow-sm">
+                <h5 class="text-light font-heading fw-bold mb-4">Review Explanations</h5>
+                <div class="d-flex flex-column gap-3">
+                    {% for item in feedback %}
+                        <div class="p-3 rounded-3 {% if item.is_correct %}bg-success-subtle border border-success-subtle{% else %}bg-danger-subtle border border-danger-subtle{% endif %}">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                {% if item.is_correct %}
+                                    <i class="bi bi-check-circle-fill text-success fs-5"></i>
+                                    <span class="fw-bold text-success smaller">Correct (+1)</span>
+                                {% else %}
+                                    <i class="bi bi-x-circle-fill text-danger fs-5"></i>
+                                    <span class="fw-bold text-danger smaller">Incorrect</span>
+                                {% endif %}
+                            </div>
+                            <h6 class="text-light mb-2 fw-semibold">{{ forloop.counter }}. {{ item.question }}</h6>
+                            <div class="smaller text-secondary mb-1">Your Choice: <strong>{{ item.user_choice|default:'None' }}</strong></div>
+                            <div class="smaller text-success mb-2">Correct Answer: <strong>{{ item.correct_option }}</strong></div>
+                            {% if item.explanation %}
+                                <div class="smaller text-light fst-italic p-2 rounded bg-surface border border-secondary">
+                                    <i class="bi bi-lightbulb-fill text-warning me-1"></i> <strong>Explanation:</strong> {{ item.explanation }}
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block title %}Weekly & Weekend Coding Contests — CodeWithAmit{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Header Banner -->
+    <div class="card border-0 rounded-4 overflow-hidden mb-4 shadow-sm" style="background: linear-gradient(135deg, #0b132b 0%, #1c2541 50%, #3a0ca3 100%); color: #fff;">
+        <div class="card-body p-4 p-md-5">
+            <div class="row align-items-center g-4">
+                <div class="col-lg-8">
+                    <span class="badge bg-warning text-dark fw-bold px-3 py-1.5 rounded-pill mb-2">
+                        <i class="bi bi-trophy-fill me-1"></i> Competitive Programming Arena
+                    </span>
+                    <h1 class="display-6 fw-bold mb-2">Weekly & Weekend Coding Battles</h1>
+                    <p class="text-light-50 fs-6 mb-3" style="max-width: 600px;">
+                        Compete in timed online algorithms contests, solve curated challenges, benchmark your speed against thousands of student coders, and earn platform badges and XP.
+                    </p>
+                    <div class="d-flex flex-wrap gap-3 align-items-center">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-award-fill text-warning fs-4"></i>
+                            <div>
+                                <div class="fw-bold fs-6">Top Ranks Win</div>
+                                <div class="smaller text-light-50">Bonus XP & Placement Badges</div>
+                            </div>
+                        </div>
+                        <div class="vr bg-secondary d-none d-sm-block" style="height: 35px;"></div>
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-clock-history text-cyan fs-4"></i>
+                            <div>
+                                <div class="fw-bold fs-6">90-Minute Format</div>
+                                <div class="smaller text-light-50">3 Algorithmic Problems</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4 text-center text-lg-end">
+                    <div class="p-3 bg-white bg-opacity-10 rounded-4 d-inline-block backdrop-blur text-center border border-white border-opacity-10 shadow-sm" style="min-width: 220px;">
+                        <i class="bi bi-lightning-charge-fill text-warning display-4 d-block mb-1"></i>
+                        <div class="fw-bold fs-5">Live Leaderboards</div>
+                        <div class="smaller text-light-50">Instant real-time penalty & scoring</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contests List -->
+    <h3 class="fw-bold mb-3 d-flex align-items-center gap-2">
+        <i class="bi bi-calendar-event text-primary"></i> All Contests
+    </h3>
+
+    <div class="row g-4">
+        {% for contest in contests %}
+            <div class="col-md-6 col-lg-4">
+                <div class="card bg-surface border-0 rounded-4 shadow-sm h-100 overflow-hidden d-flex flex-column hover-lift">
+                    <!-- Top Ribbon Header -->
+                    <div class="p-3 text-white d-flex justify-content-between align-items-center" style="background: {{ contest.banner_gradient }};">
+                        <span class="badge bg-white text-dark fw-bold rounded-pill">{{ contest.badge_label }}</span>
+                        {% if contest.is_live %}
+                            <span class="badge bg-danger rounded-pill pulse-badge d-flex align-items-center gap-1">
+                                <span class="spinner-grow spinner-grow-sm" style="width: 8px; height: 8px;"></span> LIVE NOW
+                            </span>
+                        {% elif contest.is_upcoming %}
+                            <span class="badge bg-warning text-dark rounded-pill">Upcoming</span>
+                        {% else %}
+                            <span class="badge bg-secondary rounded-pill">Completed</span>
+                        {% endif %}
+                    </div>
+
+                    <div class="card-body p-4 d-flex flex-column flex-grow-1">
+                        <h4 class="fw-bold mb-2 text-dark">{{ contest.title }}</h4>
+                        <p class="text-secondary smaller mb-3 flex-grow-1">{{ contest.description|truncatewords:25 }}</p>
+
+                        <div class="bg-surface-dark p-3 rounded-3 mb-3 border border-light-subtle">
+                            <div class="d-flex justify-content-between align-items-center smaller text-secondary mb-1">
+                                <span><i class="bi bi-calendar-check me-1"></i> Date & Time:</span>
+                                <strong class="text-dark">{{ contest.start_time|date:"M d, Y • H:i" }} UTC</strong>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center smaller text-secondary mb-1">
+                                <span><i class="bi bi-stopwatch me-1"></i> Duration:</span>
+                                <strong class="text-dark">{{ contest.duration_minutes }} Minutes</strong>
+                            </div>
+                            <div class="d-flex justify-content-between align-items-center smaller text-secondary">
+                                <span><i class="bi bi-gift me-1 text-warning"></i> Prize Pool:</span>
+                                <strong class="text-warning">+{{ contest.prize_xp }} XP</strong>
+                            </div>
+                        </div>
+
+                        <div class="d-flex justify-content-between align-items-center pt-2 border-top border-light-subtle">
+                            <div class="smaller text-muted">
+                                <i class="bi bi-people-fill me-1"></i> {{ contest.total_participants }} Registered
+                            </div>
+
+                            <div class="d-flex gap-2">
+                                <a href="{% url 'coding_practice:contest_leaderboard' contest.slug %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3" title="Leaderboard">
+                                    <i class="bi bi-bar-chart-line"></i>
+                                </a>
+
+                                {% if contest.id in registered_contest_ids %}
+                                    <a href="{% url 'coding_practice:contest_detail' contest.slug %}" class="btn btn-success btn-sm rounded-pill px-3 fw-semibold">
+                                        <i class="bi bi-check2-circle me-1"></i> Entered
+                                    </a>
+                                {% else %}
+                                    <a href="{% url 'coding_practice:contest_detail' contest.slug %}" class="btn btn-primary btn-sm rounded-pill px-3 fw-semibold">
+                                        View Details
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12 text-center py-5">
+                <i class="bi bi-trophy display-4 text-muted mb-3 d-block"></i>
+                <h5 class="text-secondary">No contests scheduled yet. Check back soon!</h5>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

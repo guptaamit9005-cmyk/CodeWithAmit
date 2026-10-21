@@ -1,0 +1,197 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Login — Student & Admin Portals | CodeWithAmit{% endblock %}
+
+{% block content %}
+<div class="login-wrapper py-5 my-md-3 position-relative">
+    <!-- Ambient Glow Orbs -->
+    <div class="hero-glow-purple" style="top: 15%; left: 30%; opacity: 0.22;"></div>
+    <div class="hero-glow-fire" style="bottom: 12%; right: 25%; opacity: 0.18;"></div>
+
+    <div class="container position-relative" style="z-index: 2;">
+        <div class="row justify-content-center">
+            <div class="col-md-7 col-lg-5 col-xl-4.5">
+                {% if request.user.is_authenticated %}
+                <div class="alert alert-info border-0 rounded-4 shadow-sm mb-3.5 d-flex align-items-center justify-content-between flex-wrap gap-2" style="background: rgba(14, 165, 233, 0.12); border: 1px solid rgba(14, 165, 233, 0.3) !important; color: #bae6fd;">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-info-circle-fill text-info fs-5"></i>
+                        <span class="smaller">Logged in as <strong>@{{ request.user.username }}</strong>. Sign in below to switch accounts.</span>
+                    </div>
+                    <a href="{% url 'accounts:logout' %}" class="btn btn-outline-info btn-sm py-0.5 px-2.5 rounded-pill smaller">
+                        Sign Out
+                    </a>
+                </div>
+                {% endif %}
+                <div class="p-4 p-md-4.5 rounded-4 shadow-lg text-light" style="background: #0f172a; border: 1px solid rgba(255, 255, 255, 0.15); box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.6);">
+
+                    <!-- Portal Role Selector Tabs -->
+                    <div class="portal-role-selector mb-4 p-1 rounded-pill d-flex" style="background: #1e293b; border: 1px solid #334155;">
+                        <button type="button" class="btn btn-sm flex-fill rounded-pill py-2 fw-bold transition-all d-flex align-items-center justify-content-center gap-1.5 {% if active_role != 'admin' %}btn-primary text-white shadow-sm{% else %}text-slate-300 bg-transparent border-0{% endif %}" id="studentTabBtn" onclick="switchPortal('student')">
+                            <i class="bi bi-mortarboard-fill"></i>
+                            <span>Student Portal</span>
+                        </button>
+                        <button type="button" class="btn btn-sm flex-fill rounded-pill py-2 fw-bold transition-all d-flex align-items-center justify-content-center gap-1.5 {% if active_role == 'admin' %}btn-warning text-dark shadow-sm{% else %}text-slate-300 bg-transparent border-0{% endif %}" id="adminTabBtn" onclick="switchPortal('admin')">
+                            <i class="bi bi-shield-lock-fill"></i>
+                            <span>Admin &amp; Staff</span>
+                        </button>
+                    </div>
+
+                    <!-- Header with Dynamic Icon & Context -->
+                    <div class="text-center mb-4">
+                        <div class="brand-logo-icon mx-auto mb-2.5 transition-all d-flex align-items-center justify-content-center rounded-circle" id="portalLogoIcon" style="width: 56px; height: 56px; font-size: 1.6rem; {% if active_role == 'admin' %}background: linear-gradient(135deg, #f59e0b, #d97706);{% else %}background: linear-gradient(135deg, #2563eb, #1d4ed8);{% endif %}">
+                            <i class="bi {% if active_role == 'admin' %}bi-shield-lock-fill text-dark{% else %}bi-mortarboard-fill text-white{% endif %}" id="portalHeaderIcon"></i>
+                        </div>
+                        <h3 class="fw-bold text-white font-heading mb-1" id="portalTitle" style="font-size: 1.4rem;">
+                            {% if active_role == 'admin' %}Administrator Sign In{% else %}Student Portal Login{% endif %}
+                        </h3>
+                        <p class="text-slate-400 smaller mb-0" id="portalSubtitle">
+                            {% if active_role == 'admin' %}
+                                Enter credentials to access Platform Administration &amp; Creator Studio
+                            {% else %}
+                                Access your 450 DSA Sheet, enrolled courses, and learning streak
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    <form method="POST" id="loginForm">
+                        {% csrf_token %}
+                        <input type="hidden" name="portal_role" id="portalRoleInput" value="{{ active_role|default:'student' }}">
+
+                        <div class="mb-3">
+                            <label class="form-label text-slate-300 fw-semibold smaller d-flex justify-content-between align-items-center">
+                                <span id="usernameLabel">{% if active_role == 'admin' %}Admin Username{% else %}Student Username / Email{% endif %}</span>
+                            </label>
+                            <div class="input-group" style="background: #1e293b; border: 1px solid #334155; border-radius: 8px;">
+                                <span class="input-group-text bg-transparent border-0 text-slate-400 ps-2.5 pe-1">
+                                    <i class="bi bi-person-fill text-primary" id="userIcon"></i>
+                                </span>
+                                <input type="text" name="username" required autofocus class="form-control bg-transparent border-0 text-white smaller py-2" id="usernameInput" placeholder="Enter username" style="box-shadow: none; color: #ffffff !important;">
+                            </div>
+                        </div>
+
+                        <div class="mb-3.5">
+                            <div class="d-flex justify-content-between align-items-center mb-1">
+                                <label class="form-label text-slate-300 fw-semibold smaller mb-0">Password</label>
+                                <a href="#" class="smaller text-info text-decoration-none" onclick="alert('Demo passwords: student123 for Student, admin123 for Admin'); return false;">Forgot Password?</a>
+                            </div>
+                            <div class="input-group" style="background: #1e293b; border: 1px solid #334155; border-radius: 8px;">
+                                <span class="input-group-text bg-transparent border-0 text-slate-400 ps-2.5 pe-1">
+                                    <i class="bi bi-lock-fill text-primary"></i>
+                                </span>
+                                <input type="password" name="password" required class="form-control bg-transparent border-0 text-white smaller py-2" id="passwordInput" placeholder="••••••••" style="box-shadow: none; color: #ffffff !important;">
+                            </div>
+                        </div>
+
+                        <!-- 1-Click Demo Credentials Dock -->
+                        <div class="p-2.5 rounded-3 mb-3.5" style="background: rgba(30, 41, 59, 0.7); border: 1px dashed #475569;">
+                            <div class="d-flex align-items-center justify-content-between mb-2">
+                                <span class="smaller text-slate-300 fw-semibold">
+                                    <i class="bi bi-lightning-charge-fill text-warning me-1"></i> 1-Click Fast Login:
+                                </span>
+                                <span class="badge bg-secondary-subtle text-light border border-secondary" style="font-size: 0.65rem;">Auto-fills Credentials</span>
+                            </div>
+                            <div class="row g-2">
+                                <div class="col-6">
+                                    <button type="button" class="btn btn-outline-primary btn-sm w-100 py-1.5 px-2 smaller fw-semibold d-flex align-items-center justify-content-center gap-1.5 text-white" onclick="selectAndFill('student', 'student', 'student123')" style="background: rgba(37, 99, 235, 0.2); border-color: #3b82f6;">
+                                        <i class="bi bi-mortarboard-fill text-info"></i>
+                                        <span>Student Demo</span>
+                                    </button>
+                                </div>
+                                <div class="col-6">
+                                    <button type="button" class="btn btn-outline-warning btn-sm w-100 py-1.5 px-2 smaller fw-semibold d-flex align-items-center justify-content-center gap-1.5 text-warning" onclick="selectAndFill('admin', 'admin', 'admin123')" style="background: rgba(245, 158, 11, 0.2); border-color: #f59e0b;">
+                                        <i class="bi bi-shield-lock-fill text-warning"></i>
+                                        <span>Admin Demo</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 rounded-pill py-2.5 fw-bold mb-3 shadow-sm d-flex align-items-center justify-content-center gap-2" id="submitBtn">
+                            <span id="submitBtnText">{% if active_role == 'admin' %}Sign In as Administrator{% else %}Sign In to Student Dashboard{% endif %}</span>
+                            <i class="bi bi-arrow-right"></i>
+                        </button>
+
+                        <div class="text-center smaller text-slate-400" id="portalFooterNote">
+                            {% if active_role == 'admin' %}
+                                Need raw database control? <a href="/admin/" target="_blank" class="text-warning text-decoration-none fw-semibold">Open Django Admin Panel <i class="bi bi-box-arrow-up-right smaller"></i></a>
+                            {% else %}
+                                Don't have a student account yet? 
+                                <a href="{% url 'accounts:register' %}?role=student" class="text-info text-decoration-none fw-semibold">Create Free Account</a>
+                            {% endif %}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function switchPortal(role) {
+    var studentBtn = document.getElementById('studentTabBtn');
+    var adminBtn = document.getElementById('adminTabBtn');
+    var roleInput = document.getElementById('portalRoleInput');
+    var title = document.getElementById('portalTitle');
+    var subtitle = document.getElementById('portalSubtitle');
+    var headerIcon = document.getElementById('portalHeaderIcon');
+    var logoIcon = document.getElementById('portalLogoIcon');
+    var usernameLabel = document.getElementById('usernameLabel');
+    var submitBtnText = document.getElementById('submitBtnText');
+    var footerNote = document.getElementById('portalFooterNote');
+    var submitBtn = document.getElementById('submitBtn');
+
+    roleInput.value = role;
+
+    if (role === 'admin') {
+        adminBtn.className = 'btn btn-sm flex-fill rounded-pill py-2 fw-bold transition-all d-flex align-items-center justify-content-center gap-1.5 btn-warning text-dark shadow-sm';
+        studentBtn.className = 'btn btn-sm flex-fill rounded-pill py-2 fw-semibold transition-all d-flex align-items-center justify-content-center gap-1.5 text-slate-300 bg-transparent border-0';
+        
+        logoIcon.style.background = 'linear-gradient(135deg, #f59e0b, #d97706)';
+        headerIcon.className = 'bi bi-shield-lock-fill text-dark';
+        
+        title.innerText = 'Administrator Sign In';
+        subtitle.innerText = 'Enter credentials to access Platform Administration & Creator Studio';
+        usernameLabel.innerText = 'Admin Username';
+        submitBtnText.innerText = 'Sign In as Administrator';
+        submitBtn.className = 'btn btn-warning w-100 rounded-pill py-2.5 fw-bold mb-3 shadow-sm d-flex align-items-center justify-content-center gap-2 text-dark';
+
+        footerNote.innerHTML = 'Need raw database control? <a href="/admin/" target="_blank" class="text-warning text-decoration-none fw-semibold">Open Django Admin Panel <i class="bi bi-box-arrow-up-right smaller"></i></a> &bull; <a href="javascript:void(0)" onclick="switchPortal(\'student\')" class="text-info text-decoration-none">Student Login</a>';
+    } else {
+        studentBtn.className = 'btn btn-sm flex-fill rounded-pill py-2 fw-bold transition-all d-flex align-items-center justify-content-center gap-1.5 btn-primary text-white shadow-sm';
+        adminBtn.className = 'btn btn-sm flex-fill rounded-pill py-2 fw-semibold transition-all d-flex align-items-center justify-content-center gap-1.5 text-slate-300 bg-transparent border-0';
+        
+        logoIcon.style.background = 'linear-gradient(135deg, #2563eb, #1d4ed8)';
+        headerIcon.className = 'bi bi-mortarboard-fill text-white';
+
+        title.innerText = 'Student Portal Login';
+        subtitle.innerText = 'Access your 450 DSA Sheet, enrolled courses, and learning streak';
+        usernameLabel.innerText = 'Student Username / Email';
+        submitBtnText.innerText = 'Sign In to Student Dashboard';
+        submitBtn.className = 'btn btn-primary w-100 rounded-pill py-2.5 fw-bold mb-3 shadow-sm d-flex align-items-center justify-content-center gap-2 text-white';
+
+        footerNote.innerHTML = 'Don\'t have a student account yet? <a href="{% url "accounts:register" %}?role=student" class="text-info text-decoration-none fw-semibold">Create Free Account</a> &bull; <a href="javascript:void(0)" onclick="switchPortal(\'admin\')" class="text-warning text-decoration-none">Admin Login</a>';
+    }
+}
+
+function selectAndFill(role, user, pass) {
+    switchPortal(role);
+    var uInput = document.getElementById('usernameInput');
+    var pInput = document.getElementById('passwordInput');
+    if (uInput && pInput) {
+        uInput.value = user;
+        pInput.value = pass;
+        uInput.focus();
+    }
+}
+
+// Handle query parameter on page load if ?role=admin
+document.addEventListener('DOMContentLoaded', function() {
+    var params = new URLSearchParams(window.location.search);
+    var requestedRole = params.get('role');
+    if (requestedRole === 'admin') {
+        switchPortal('admin');
+    }
+});
+</script>
+{% endblock %}

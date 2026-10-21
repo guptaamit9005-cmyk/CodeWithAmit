@@ -1,0 +1,975 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if is_edit %}Edit: {{ topic.title }}{% else %}Add Tutorial Topic{% endif %} — CodeWithAmit Studio{% endblock %}
+
+{% block extra_head %}
+<!-- Marked.js for markdown parsing in live preview -->
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<!-- Mermaid.js for flowchart rendering -->
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<!-- Highlight.js for code syntax preview -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="max-width: 1040px;">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb smaller mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'tutorials:tutorial_list' %}" class="text-decoration-none">Tutorials</a></li>
+            {% if is_edit and category %}
+                <li class="breadcrumb-item"><a href="{% url 'tutorials:category_root' category.slug %}" class="text-decoration-none">{{ category.name }}</a></li>
+            {% endif %}
+            <li class="breadcrumb-item active text-muted" aria-current="page">{% if is_edit %}Edit Topic{% else %}Add New Topic{% endif %}</li>
+        </ol>
+    </nav>
+
+    <div class="card border-0 shadow-lg rounded-4 p-4 p-md-5 bg-surface" style="border: 1px solid rgba(255, 255, 255, 0.08) !important;">
+        <!-- Header -->
+        <div class="d-flex flex-column flex-md-row align-items-md-center justify-content-between pb-3 mb-4 border-bottom gap-3">
+            <div>
+                <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1 rounded-pill mb-2">
+                    <i class="bi bi-shield-lock-fill me-1"></i> Admin Tutorial Studio
+                </span>
+                <h1 class="h3 fw-bold mb-1 text-body">{% if is_edit %}Edit: {{ topic.title }}{% else %}Create GFG-Style Visual Tutorial{% endif %}</h1>
+                <p class="text-secondary small mb-0">Publish rich programming articles with multi-color callout boxes, code screenshots, Mermaid diagrams, and complexity graphs.</p>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                {% if is_edit and topic %}
+                    <a href="{% url 'tutorials:tutorial_detail' topic.category.slug topic.slug %}" target="_blank" class="btn btn-outline-info btn-sm rounded-pill px-3">
+                        <i class="bi bi-box-arrow-up-right me-1"></i> View Live
+                    </a>
+                {% endif %}
+                <a href="{% url 'tutorials:tutorial_list' %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                    <i class="bi bi-arrow-left me-1"></i> Back to Tracks
+                </a>
+            </div>
+        </div>
+
+        <form method="POST" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger py-2 small rounded-3 mb-3">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <!-- SECTION 1: Categorization & Chapter -->
+            <div class="card bg-body-tertiary border border-secondary-subtle rounded-3 p-3 mb-4">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <i class="bi bi-folder-fill text-primary"></i>
+                    <h6 class="fw-bold mb-0 text-body">1. Series & Chapter Categorization</h6>
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold smaller text-secondary">Tutorial Track / Category</label>
+                        {{ form.category }}
+                        {% if form.category.errors %}<div class="text-danger smaller mt-1">{{ form.category.errors }}</div>{% endif %}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold smaller text-secondary">Or Create New Track Name</label>
+                        {{ form.new_category_name }}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold smaller text-secondary">Chapter / Section</label>
+                        {{ form.chapter }}
+                        <div class="form-text smaller text-muted">e.g. Arrays & Hashing, Binary Trees, OOPs</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 2: Topic Metadata -->
+            <div class="card bg-body-tertiary border border-secondary-subtle rounded-3 p-3 mb-4">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <i class="bi bi-pencil-square text-warning"></i>
+                    <h6 class="fw-bold mb-0 text-body">2. Title, Order & Difficulty</h6>
+                </div>
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold smaller text-secondary">Topic Title <span class="text-danger">*</span></label>
+                        {{ form.title }}
+                        {% if form.title.errors %}<div class="text-danger smaller mt-1">{{ form.title.errors }}</div>{% endif %}
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label fw-semibold smaller text-secondary">Difficulty</label>
+                        {{ form.difficulty }}
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label fw-semibold smaller text-secondary">Sequence Order</label>
+                        {{ form.order }}
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label fw-semibold smaller text-secondary">Read Time</label>
+                        {{ form.read_time }}
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-12">
+                        <label class="form-label fw-semibold smaller text-secondary">Search Tags</label>
+                        {{ form.tags }}
+                        <div class="form-text smaller text-muted">Comma separated tags e.g. Arrays, Two Pointers, FAANG, Hash Map</div>
+                    </div>
+                </div>
+
+                <div class="mt-3">
+                    <label class="form-label fw-semibold smaller text-secondary">Key Concept / Quick Summary Box</label>
+                    {{ form.summary }}
+                    <div class="form-text smaller text-muted">A crisp 1-2 sentence core concept takeaway rendered inside a top highlight banner.</div>
+                </div>
+            </div>
+
+            <!-- SECTION 3: Rich Article Content & Multi-Color Toolbar -->
+            <div class="card bg-body-tertiary border border-secondary-subtle rounded-3 p-3 mb-4">
+                <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-pencil-square text-info fs-5"></i>
+                        <h6 class="fw-bold mb-0 text-body">3. Tutorial Content Studio (Easy Markdown & Visual Flowcharts)</h6>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <span class="badge bg-success-subtle text-success border border-success-subtle smaller">
+                            <i class="bi bi-check-circle-fill me-1"></i> No HTML Needed
+                        </span>
+                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle smaller">
+                            <i class="bi bi-eye-fill me-1"></i> Real-Time Live Preview
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Admin Helpful Guidance Box -->
+                <div class="alert alert-info py-2 px-3 rounded-3 small d-flex align-items-start gap-2 mb-3 border-0 bg-info-subtle text-info-emphasis">
+                    <i class="bi bi-magic fs-5 text-info mt-0.5"></i>
+                    <div>
+                        <strong>Admin Quick Guide:</strong> Content likhne ke liye raw HTML likhne ki koi zaroorat nahi hai! Aap simple text ya Markdown likhein. Niche diye gaye <strong>1-Click Toolbar</strong> se <strong>Code Snippets</strong>, <strong>Flowcharts</strong>, aur <strong>Multi-Style Callouts</strong> insert karein. Output live dekhne ke liye <strong>"Live Preview"</strong> ya <strong>"Split View"</strong> tab dabayein.
+                    </div>
+                </div>
+
+                <!-- Editor Mode Tabs (Write vs Live Preview vs Split View) -->
+                <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2 pb-2 border-bottom border-secondary-subtle">
+                    <div class="btn-group btn-group-sm" role="group">
+                        <button type="button" class="btn btn-outline-primary active px-3" id="btnModeWrite" onclick="setEditorView('write')">
+                            <i class="bi bi-pencil-square me-1"></i> <span>Write Mode</span>
+                        </button>
+                        <button type="button" class="btn btn-outline-primary px-3" id="btnModePreview" onclick="setEditorView('preview')">
+                            <i class="bi bi-eye-fill me-1"></i> <span>Live Preview</span>
+                        </button>
+                        <button type="button" class="btn btn-outline-primary px-3 d-none d-lg-inline-flex align-items-center" id="btnModeSplit" onclick="setEditorView('split')">
+                            <i class="bi bi-layout-split me-1"></i> <span>Split View</span>
+                        </button>
+                    </div>
+                    <div class="smaller text-secondary d-none d-sm-block">
+                        <i class="bi bi-check2-all text-success me-1"></i> Supports Markdown, Callouts (:::tip), Mermaid Flowcharts & Code blocks
+                    </div>
+                </div>
+
+                <!-- 1-Click Action Toolbar -->
+                <div class="d-flex flex-wrap align-items-center gap-1.5 p-2 rounded-3 bg-black bg-opacity-40 border border-secondary-subtle mb-3">
+                    <!-- Text Formatting -->
+                    <div class="btn-group btn-group-sm" role="group">
+                        <button type="button" class="btn btn-outline-secondary smaller text-body px-2" title="Section Heading 2 (##)" onclick="insertMarkdown('## ', '', 'Section Title')">
+                            <strong>H2</strong>
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary smaller text-body px-2" title="Sub Heading 3 (###)" onclick="insertMarkdown('### ', '', 'Sub-heading')">
+                            <strong>H3</strong>
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary smaller text-body px-2" title="Bold (**text**)" onclick="insertMarkdown('**', '**', 'bold text')">
+                            <i class="bi bi-type-bold"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary smaller text-body px-2" title="Italic (*text*)" onclick="insertMarkdown('*', '*', 'italic text')">
+                            <i class="bi bi-type-italic"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary smaller text-body px-2" title="Bullet List (- item)" onclick="insertMarkdown('- ', '', 'List item')">
+                            <i class="bi bi-list-ul"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary smaller text-body px-2" title="Numbered List (1. item)" onclick="insertMarkdown('1. ', '', 'Numbered step')">
+                            <i class="bi bi-list-ol"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary smaller text-body px-2" title="Quote (> text)" onclick="insertMarkdown('> ', '', 'Important quote')">
+                            <i class="bi bi-quote"></i>
+                        </button>
+                        <button type="button" class="btn btn-outline-secondary smaller text-body px-2" title="Inline Code (`code`)" onclick="insertMarkdown('`', '`', 'code')">
+                            <i class="bi bi-code"></i>
+                        </button>
+                    </div>
+
+                    <span class="border-start border-secondary mx-1" style="height: 24px;"></span>
+
+                    <!-- ADD CODE DROPDOWN -->
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-info dropdown-toggle smaller px-2.5 py-1" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            <i class="bi bi-file-earmark-code me-1 text-info"></i> Add Code
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-dark shadow rounded-3 smaller">
+                            <li><h6 class="dropdown-header text-muted">Insert Code Block:</h6></li>
+                            <li><a class="dropdown-item py-1.5" href="javascript:void(0)" onclick="insertCodeSnippet('python')"><i class="bi bi-filetype-py text-warning me-2"></i> Python Solution</a></li>
+                            <li><a class="dropdown-item py-1.5" href="javascript:void(0)" onclick="insertCodeSnippet('cpp')"><i class="bi bi-cpu text-info me-2"></i> C++ Solution</a></li>
+                            <li><a class="dropdown-item py-1.5" href="javascript:void(0)" onclick="insertCodeSnippet('java')"><i class="bi bi-cup-hot text-danger me-2"></i> Java Solution</a></li>
+                            <li><a class="dropdown-item py-1.5" href="javascript:void(0)" onclick="insertCodeSnippet('javascript')"><i class="bi bi-filetype-js text-warning me-2"></i> JavaScript Solution</a></li>
+                            <li><a class="dropdown-item py-1.5" href="javascript:void(0)" onclick="insertCodeSnippet('sql')"><i class="bi bi-database text-success me-2"></i> SQL Query</a></li>
+                            <li><a class="dropdown-item py-1.5" href="javascript:void(0)" onclick="insertCodeSnippet('html')"><i class="bi bi-filetype-html text-danger me-2"></i> HTML / CSS</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item py-1.5" href="javascript:void(0)" onclick="insertCodeSnippet('text')"><i class="bi bi-card-text text-secondary me-2"></i> Algorithm Pseudocode</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- ADD FLOWCHART DROPDOWN (Mermaid.js) -->
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-purple dropdown-toggle smaller px-2.5 py-1 text-purple" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border-color: #8b5cf6;">
+                            <i class="bi bi-diagram-2-fill me-1 text-purple"></i> Add Flowchart
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-dark shadow rounded-3 smaller">
+                            <li><h6 class="dropdown-header text-muted">Insert Flowchart / Diagram:</h6></li>
+                            <li><a class="dropdown-item py-1.5" href="javascript:void(0)" onclick="insertFlowchartSnippet('decision')"><i class="bi bi-arrow-right-circle text-primary me-2"></i> Decision Flowchart (If-Else)</a></li>
+                            <li><a class="dropdown-item py-1.5" href="javascript:void(0)" onclick="insertFlowchartSnippet('process')"><i class="bi bi-arrow-left-right text-info me-2"></i> Pipeline Flow (Input &rarr; Process &rarr; Output)</a></li>
+                            <li><a class="dropdown-item py-1.5" href="javascript:void(0)" onclick="insertFlowchartSnippet('tree')"><i class="bi bi-tree text-success me-2"></i> Binary Tree / BST</a></li>
+                            <li><a class="dropdown-item py-1.5" href="javascript:void(0)" onclick="insertFlowchartSnippet('stack')"><i class="bi bi-layers text-warning me-2"></i> Function Call Stack / Sequence</a></li>
+                            <li><a class="dropdown-item py-1.5" href="javascript:void(0)" onclick="insertFlowchartSnippet('graph')"><i class="bi bi-share text-cyan me-2"></i> Graph Traversal (Nodes & Edges)</a></li>
+                        </ul>
+                    </div>
+
+                    <!-- MULTISTYLE WALA TEXT DROPDOWN (Callout Boxes & Highlights) -->
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-success dropdown-toggle smaller px-2.5 py-1 text-emerald" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border-color: #10b981;">
+                            <i class="bi bi-palette2 me-1 text-emerald"></i> Multistyle Callouts
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-dark shadow rounded-3 smaller">
+                            <li><h6 class="dropdown-header text-muted">Insert Multi-Style Colored Box:</h6></li>
+                            <li><a class="dropdown-item py-1.5 d-flex align-items-center gap-2" href="javascript:void(0)" onclick="insertCalloutBlock('emerald')">
+                                <span class="badge bg-success rounded-pill p-1"></span>
+                                <div><strong class="text-emerald">Emerald Pro Tip</strong> <span class="text-muted smaller d-block">Best practices & optimizations</span></div>
+                            </a></li>
+                            <li><a class="dropdown-item py-1.5 d-flex align-items-center gap-2" href="javascript:void(0)" onclick="insertCalloutBlock('purple')">
+                                <span class="badge bg-primary rounded-pill p-1" style="background-color: #8b5cf6 !important;"></span>
+                                <div><strong class="text-purple">Purple Note</strong> <span class="text-muted smaller d-block">Important concepts & take-aways</span></div>
+                            </a></li>
+                            <li><a class="dropdown-item py-1.5 d-flex align-items-center gap-2" href="javascript:void(0)" onclick="insertCalloutBlock('amber')">
+                                <span class="badge bg-warning rounded-pill p-1"></span>
+                                <div><strong class="text-warning">Amber Warning</strong> <span class="text-muted smaller d-block">Edge cases, constraints & memory limits</span></div>
+                            </a></li>
+                            <li><a class="dropdown-item py-1.5 d-flex align-items-center gap-2" href="javascript:void(0)" onclick="insertCalloutBlock('cyan')">
+                                <span class="badge bg-info rounded-pill p-1"></span>
+                                <div><strong class="text-info">Cyan Info</strong> <span class="text-muted smaller d-block">Did you know facts & background</span></div>
+                            </a></li>
+                            <li><a class="dropdown-item py-1.5 d-flex align-items-center gap-2" href="javascript:void(0)" onclick="insertCalloutBlock('rose')">
+                                <span class="badge bg-danger rounded-pill p-1"></span>
+                                <div><strong class="text-danger">Rose Pitfall</strong> <span class="text-muted smaller d-block">Common interview mistakes to avoid</span></div>
+                            </a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item py-1.5" href="javascript:void(0)" onclick="insertHighlightTemplate()"><span class="text-gradient-purple fw-bold">Gradient Highlight Text</span></a></li>
+                        </ul>
+                    </div>
+
+                    <span class="border-start border-secondary mx-1" style="height: 24px;"></span>
+
+                    <!-- Table Tool -->
+                    <button type="button" class="btn btn-sm btn-outline-secondary smaller px-2 py-1 text-body" onclick="insertMarkdownTable()" title="Insert Comparison Table">
+                        <i class="bi bi-table text-warning me-1"></i> Table
+                    </button>
+                </div>
+
+                <!-- Editor Workspace Area (Write / Preview / Split) -->
+                <div id="editorWorkspace">
+                    <!-- Write Pane -->
+                    <div id="editorWritePane">
+                        {{ form.content }}
+                        {% if form.content.errors %}<div class="text-danger smaller mt-1">{{ form.content.errors }}</div>{% endif %}
+                    </div>
+
+                    <!-- Live Preview Pane (Hidden by default, shown in Preview / Split) -->
+                    <div id="editorPreviewPane" style="display: none;">
+                        <div class="d-flex align-items-center justify-content-between p-2 px-3 rounded-top-3 bg-dark border border-secondary-subtle border-bottom-0">
+                            <span class="smaller fw-bold text-light font-monospace">
+                                <i class="bi bi-display me-1 text-primary"></i> Live Student Reader Preview
+                            </span>
+                            <span class="badge bg-secondary smaller">Real-Time Render</span>
+                        </div>
+                        <div class="editor-preview-container tutorial-content-body" id="editorPreviewArea">
+                            <div class="text-muted text-center py-5">Start typing in Write mode or click Preview to see formatted output.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 4: Visual Images (Screenshots & Architecture Diagrams) -->
+            <div class="card bg-body-tertiary border border-secondary-subtle rounded-3 p-3 mb-4">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <i class="bi bi-card-image text-success"></i>
+                    <h6 class="fw-bold mb-0 text-body">4. Code Screenshots & Visual Architecture Diagrams</h6>
+                </div>
+                <p class="smaller text-secondary mb-3">
+                    Upload code screenshots from your IDE or visual diagrams. They will be displayed in high-contrast macOS/VSCode dark frames with click-to-zoom modals.
+                </p>
+
+                <div class="row g-3">
+                    <!-- Image 1: Code Screenshot -->
+                    <div class="col-md-6">
+                        <div class="p-3 rounded-3 border border-secondary-subtle bg-black bg-opacity-30 h-100">
+                            <label class="form-label fw-bold smaller text-primary mb-1">
+                                <i class="bi bi-laptop me-1"></i> 1. Code Screenshot / Terminal Output
+                            </label>
+                            {{ form.screenshot }}
+                            <div class="mt-2">
+                                <label class="form-label fw-semibold smaller text-secondary mb-1">Screenshot Caption / File Label</label>
+                                {{ form.screenshot_caption }}
+                            </div>
+                            {% if topic.screenshot %}
+                                <div class="mt-2.5 p-2 rounded-2 bg-dark border border-secondary-subtle d-flex align-items-center gap-2">
+                                    <img src="{{ topic.screenshot.url }}" alt="Preview" style="height: 48px; width: 64px; object-fit: cover; border-radius: 4px;">
+                                    <div class="smaller text-secondary text-truncate">Current: {{ topic.screenshot.name }}</div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <!-- Image 2: Architecture / Dry-Run Diagram -->
+                    <div class="col-md-6">
+                        <div class="p-3 rounded-3 border border-secondary-subtle bg-black bg-opacity-30 h-100">
+                            <label class="form-label fw-bold smaller text-info mb-1">
+                                <i class="bi bi-diagram-3 me-1"></i> 2. System / Memory / Dry-Run Diagram Image
+                            </label>
+                            {{ form.diagram_image }}
+                            <div class="mt-2">
+                                <label class="form-label fw-semibold smaller text-secondary mb-1">Diagram Caption / Note</label>
+                                {{ form.diagram_caption }}
+                            </div>
+                            {% if topic.diagram_image %}
+                                <div class="mt-2.5 p-2 rounded-2 bg-dark border border-secondary-subtle d-flex align-items-center gap-2">
+                                    <img src="{{ topic.diagram_image.url }}" alt="Preview" style="height: 48px; width: 64px; object-fit: cover; border-radius: 4px;">
+                                    <div class="smaller text-secondary text-truncate">Current: {{ topic.diagram_image.name }}</div>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 5: Visual Graphs (Mermaid.js Flowcharts & Trees) -->
+            <div class="card bg-body-tertiary border border-secondary-subtle rounded-3 p-3 mb-4">
+                <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-diagram-2-fill text-purple"></i>
+                        <h6 class="fw-bold mb-0 text-body">5. Interactive Visual Graph / Flowchart (Mermaid.js)</h6>
+                    </div>
+                    <span class="badge bg-purple-subtle text-purple border border-purple-subtle smaller">Auto Vector Render</span>
+                </div>
+                <p class="smaller text-secondary mb-3">
+                    Add pure text diagram syntax below. It automatically renders as an interactive, razor-sharp vector diagram (Flowcharts, Binary Trees, State Machines, Call Stacks).
+                </p>
+
+                <!-- Quick Mermaid Templates -->
+                <div class="d-flex flex-wrap gap-2 mb-2">
+                    <button type="button" class="btn btn-sm btn-outline-secondary smaller" onclick="insertMermaidFlowchart()">
+                        <i class="bi bi-arrow-right-circle text-primary me-1"></i> Flowchart (If-Else)
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary smaller" onclick="insertMermaidBinaryTree()">
+                        <i class="bi bi-tree text-success me-1"></i> Binary Tree
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary smaller" onclick="insertMermaidGraph()">
+                        <i class="bi bi-share text-warning me-1"></i> Graph / Traversal
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-secondary smaller" onclick="insertMermaidStack()">
+                        <i class="bi bi-layers text-info me-1"></i> Call Stack / Recursion
+                    </button>
+                </div>
+
+                {{ form.mermaid_code }}
+                <div class="form-text smaller text-muted">Leave empty if no diagram is needed for this topic.</div>
+            </div>
+
+            <!-- SECTION 6: Visual Complexity Comparison Chart (Chart.js) -->
+            <div class="card bg-body-tertiary border border-secondary-subtle rounded-3 p-3 mb-4">
+                <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-bar-chart-line-fill text-warning"></i>
+                        <h6 class="fw-bold mb-0 text-body">6. Visual Complexity Chart (Chart.js)</h6>
+                    </div>
+                    <span class="badge bg-warning-subtle text-warning border border-warning-subtle smaller">Interactive Benchmark Bar Chart</span>
+                </div>
+                <p class="smaller text-secondary mb-3">
+                    Help students visually grasp why an algorithm is fast by displaying an operations comparison chart.
+                </p>
+
+                <!-- Quick Chart Presets -->
+                <div class="d-flex flex-wrap gap-2 mb-3">
+                    <button type="button" class="btn btn-sm btn-outline-warning smaller" onclick="insertChartPreset('dsa')">
+                        <i class="bi bi-lightning-charge me-1"></i> DSA: Hash Map vs Linear vs Nested Loop
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-info smaller" onclick="insertChartPreset('search')">
+                        <i class="bi bi-search me-1"></i> Search: Binary Search vs Linear Search
+                    </button>
+                    <button type="button" class="btn btn-sm btn-outline-success smaller" onclick="insertChartPreset('sort')">
+                        <i class="bi bi-sort-numeric-down me-1"></i> Sorting: Merge Sort vs Bubble Sort
+                    </button>
+                </div>
+
+                <div class="row g-3">
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold smaller text-secondary">Chart Title</label>
+                        {{ form.chart_title }}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold smaller text-secondary">Labels (Comma Separated)</label>
+                        {{ form.chart_labels }}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold smaller text-secondary">Values / Operations (Comma Separated)</label>
+                        {{ form.chart_values }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 7: Code Snippets & Multi-Language Implementations -->
+            <div class="card bg-body-tertiary border border-secondary-subtle rounded-3 p-3 mb-4">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <i class="bi bi-file-earmark-code-fill text-danger"></i>
+                    <h6 class="fw-bold mb-0 text-body">7. Code Solutions & Complexity Badges</h6>
+                </div>
+
+                <!-- Primary Snippet -->
+                <div class="row g-3 mb-3">
+                    <div class="col-md-9">
+                        <label class="form-label fw-semibold smaller text-secondary">Primary Solution Code</label>
+                        {{ form.code_snippet }}
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label fw-semibold smaller text-secondary">Language</label>
+                        {{ form.code_language }}
+                        
+                        <div class="mt-3">
+                            <label class="form-label fw-semibold smaller text-secondary">Time Complexity</label>
+                            {{ form.time_complexity }}
+                        </div>
+                        <div class="mt-2">
+                            <label class="form-label fw-semibold smaller text-secondary">Space Complexity</label>
+                            {{ form.space_complexity }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Multi-Language Tabs Accordion -->
+                <div class="accordion accordion-flush" id="multiLangAccordion">
+                    <div class="accordion-item bg-transparent border border-secondary-subtle rounded-3 overflow-hidden">
+                        <h2 class="accordion-header">
+                            <button class="accordion-button collapsed py-2 px-3 bg-black bg-opacity-30 text-body smaller fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#collapseMultiLang">
+                                <i class="bi bi-code-square me-2 text-primary"></i> Optional: Add C++, Java, or JavaScript Solutions
+                            </button>
+                        </h2>
+                        <div id="collapseMultiLang" class="accordion-collapse collapse p-3 bg-black bg-opacity-20">
+                            <div class="row g-3">
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold smaller text-info">C++ Solution</label>
+                                    {{ form.code_snippet_cpp }}
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold smaller text-warning">Java Solution</label>
+                                    {{ form.code_snippet_java }}
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-semibold smaller text-success">JavaScript Solution</label>
+                                    {{ form.code_snippet_js }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 8: Practice Link & Visibility -->
+            <div class="card bg-body-tertiary border border-secondary-subtle rounded-3 p-3 mb-4">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <i class="bi bi-link-45deg text-warning"></i>
+                    <h6 class="fw-bold mb-0 text-body">8. Practice Link & Publication</h6>
+                </div>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold smaller text-secondary">Practice Problem Title</label>
+                        {{ form.practice_title }}
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label fw-semibold smaller text-secondary">Practice Link (LeetCode / GFG / CodeWithAmit Sheet)</label>
+                        {{ form.practice_url }}
+                    </div>
+                </div>
+
+                <div class="mt-3 pt-2 border-top border-secondary-subtle d-flex align-items-center justify-content-between">
+                    <div class="form-check form-switch">
+                        {{ form.is_published }}
+                        <label class="form-check-label text-body fw-bold small ms-2" for="{{ form.is_published.id_for_label }}">
+                            Make Topic Live & Visible to All Students Immediately
+                        </label>
+                    </div>
+                    <span class="text-secondary smaller">Unchecking saves as draft</span>
+                </div>
+            </div>
+
+            <!-- Submit Action Bar -->
+            <div class="d-flex align-items-center justify-content-end gap-3 pt-3 border-top border-secondary-subtle">
+                <a href="{% url 'tutorials:tutorial_list' %}" class="btn btn-outline-secondary px-4 rounded-pill">Cancel</a>
+                <button type="submit" class="btn btn-success px-5 py-2.5 rounded-pill fw-bold shadow-lg d-inline-flex align-items-center gap-2">
+                    <i class="bi bi-check-circle-fill"></i>
+                    <span>{% if is_edit %}Save & Update Tutorial{% else %}Publish Tutorial Topic{% endif %}</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Helper JavaScript for Quick Callout & Diagram Insertion -->
+<script>
+// ==========================================
+// 1. TEXTAREA INSERTION HELPERS
+// ==========================================
+function getTargetField() {
+    return document.getElementById('id_content');
+}
+
+function insertAtCursor(myField, myValue) {
+    if (!myField) myField = getTargetField();
+    if (!myField) return;
+    
+    if (document.selection) {
+        myField.focus();
+        const sel = document.selection.createRange();
+        sel.text = myValue;
+    } else if (myField.selectionStart || myField.selectionStart === 0 || myField.selectionStart === '0') {
+        const startPos = myField.selectionStart;
+        const endPos = myField.selectionEnd;
+        myField.value = myField.value.substring(0, startPos)
+            + myValue
+            + myField.value.substring(endPos, myField.value.length);
+        myField.focus();
+        myField.selectionStart = startPos + myValue.length;
+        myField.selectionEnd = startPos + myValue.length;
+    } else {
+        myField.value += myValue;
+        myField.focus();
+    }
+    
+    // Trigger preview update
+    triggerPreviewUpdate();
+}
+
+function insertMarkdown(prefix, suffix, defaultText) {
+    const field = getTargetField();
+    if (!field) return;
+    
+    const startPos = field.selectionStart || 0;
+    const endPos = field.selectionEnd || 0;
+    const selectedText = field.value.substring(startPos, endPos) || defaultText || '';
+    
+    // Add newline before headings and lists if not at start of line
+    let effectivePrefix = prefix;
+    if ((prefix.startsWith('##') || prefix.startsWith('- ') || prefix.startsWith('1. ') || prefix.startsWith('> ')) && startPos > 0) {
+        const prevChar = field.value.charAt(startPos - 1);
+        if (prevChar !== '\n') {
+            effectivePrefix = '\n' + prefix;
+        }
+    }
+    
+    const replacement = effectivePrefix + selectedText + suffix;
+    insertAtCursor(field, replacement);
+}
+
+// ==========================================
+// 2. 1-CLICK CODE SNIPPET GENERATOR
+// ==========================================
+function insertCodeSnippet(lang) {
+    const field = getTargetField();
+    if (!field) return;
+    
+    let template = "";
+    if (lang === 'python') {
+        template = "\n```python\ndef solve_problem(nums, target):\n    # Hash map optimal lookup: O(N) Time | O(N) Space\n    seen = {}\n    for i, num in enumerate(nums):\n        complement = target - num\n        if complement in seen:\n            return [seen[complement], i]\n        seen[num] = i\n    return []\n```\n";
+    } else if (lang === 'cpp') {
+        template = "\n```cpp\n#include <vector>\n#include <unordered_map>\nusing namespace std;\n\nvector<int> solveProblem(vector<int>& nums, int target) {\n    unordered_map<int, int> seen;\n    for (int i = 0; i < nums.size(); ++i) {\n        int complement = target - nums[i];\n        if (seen.find(complement) != seen.end()) {\n            return {seen[complement], i};\n        }\n        seen[nums[i]] = i;\n    }\n    return {};\n}\n```\n";
+    } else if (lang === 'java') {
+        template = "\n```java\nimport java.util.HashMap;\nimport java.util.Map;\n\npublic class Solution {\n    public int[] solveProblem(int[] nums, int target) {\n        Map<Integer, Integer> seen = new HashMap<>();\n        for (int i = 0; i < nums.length; i++) {\n            int complement = target - nums[i];\n            if (seen.containsKey(complement)) {\n                return new int[]{seen.get(complement), i};\n            }\n            seen.put(nums[i], i);\n        }\n        return new int[]{};\n    }\n}\n```\n";
+    } else if (lang === 'javascript') {
+        template = "\n```javascript\nfunction solveProblem(nums, target) {\n    const seen = new Map();\n    for (let i = 0; i < nums.length; i++) {\n        const complement = target - nums[i];\n        if (seen.has(complement)) {\n            return [seen.get(complement), i];\n        }\n        seen.set(nums[i], i);\n    }\n    return [];\n}\n```\n";
+    } else if (lang === 'sql') {
+        template = "\n```sql\n-- Retrieve top 5 highest salary employees per department\nWITH RankedSalaries AS (\n    SELECT \n        employee_id,\n        department_id,\n        salary,\n        DENSE_RANK() OVER (PARTITION BY department_id ORDER BY salary DESC) AS salary_rank\n    FROM employees\n)\nSELECT department_id, employee_id, salary\nFROM RankedSalaries\nWHERE salary_rank <= 5;\n```\n";
+    } else if (lang === 'html') {
+        template = "\n```html\n<div class=\"tech-card shadow-sm\">\n    <h3>Algorithm Visualizer</h3>\n    <p>Dynamic interactive container</p>\n</div>\n```\n";
+    } else {
+        template = "\n```text\nStep 1: Initialize hash map 'seen'\nStep 2: Loop through array element 'num' at index 'i'\nStep 3: If (target - num) exists in 'seen', return indices\nStep 4: Else insert 'num' into 'seen'\n```\n";
+    }
+    
+    insertAtCursor(field, template);
+}
+
+// ==========================================
+// 3. 1-CLICK MERMAID FLOWCHART GENERATOR
+// ==========================================
+function insertFlowchartSnippet(type) {
+    const field = getTargetField();
+    if (!field) return;
+    
+    let template = "";
+    if (type === 'decision') {
+        template = "\n```mermaid\ngraph TD\n    A[Start: Read Input Array] --> B{Does Complement Exist in Map?}\n    B -- Yes --> C[Return Pair Indices [map[complement], i]]\n    B -- No --> D[Store Current Num in Map: map[num] = i]\n    D --> E{More Elements?}\n    E -- Yes --> A\n    E -- No --> F[Return Empty / Not Found]\n```\n";
+    } else if (type === 'process') {
+        template = "\n```mermaid\ngraph LR\n    A[1. Raw Input] --> B[2. Pre-process / Sort]\n    B --> C[3. Two-Pointer Scanning]\n    C --> D[4. Collect Valid Subsets]\n    D --> E[5. Optimal Result]\n```\n";
+    } else if (type === 'tree') {
+        template = "\n```mermaid\ngraph TD\n    Root((10: Root)) --> LeftNode((5: Left))\n    Root --> RightNode((15: Right))\n    LeftNode --> LL((2))\n    LeftNode --> LR((7))\n    RightNode --> RL((12))\n    RightNode --> RR((20))\n```\n";
+    } else if (type === 'stack') {
+        template = "\n```mermaid\nsequenceDiagram\n    autonumber\n    participant Main\n    participant QuickSort\n    participant Partition\n    Main->>QuickSort: sort(array, low, high)\n    QuickSort->>Partition: partition(array, low, high)\n    Partition-->>QuickSort: return pivotIndex (pi)\n    QuickSort->>QuickSort: sort(array, low, pi-1)\n    QuickSort->>QuickSort: sort(array, pi+1, high)\n```\n";
+    } else if (type === 'graph') {
+        template = "\n```mermaid\ngraph LR\n    0((Node 0)) --- 1((Node 1))\n    0 --- 2((Node 2))\n    1 --- 3((Node 3))\n    2 --- 4((Node 4))\n    3 --- 5((Node 5))\n    4 --- 5\n```\n";
+    }
+    
+    insertAtCursor(field, template);
+}
+
+// ==========================================
+// 4. 1-CLICK MULTISTYLE CALLOUT BOXES
+// ==========================================
+function insertCalloutBlock(color) {
+    const field = getTargetField();
+    if (!field) return;
+    
+    let tag = "note";
+    let title = "Important Note";
+    let body = "Write your key concept explanation or takeaway here...";
+    
+    if (color === 'emerald') {
+        tag = "tip";
+        title = "Pro Tip & Optimization";
+        body = "Using an in-place pointer reduces additional space complexity from O(N) to O(1). Always check if array mutation is allowed!";
+    } else if (color === 'purple') {
+        tag = "note";
+        title = "Important Concept";
+        body = "Remember that Hash Map offers amortized O(1) average lookup, but worst case can degrade to O(N) under high hash collisions.";
+    } else if (color === 'amber') {
+        tag = "warning";
+        title = "Warning & Edge Case";
+        body = "Watch out for Integer Overflow when calculating middle: use `mid = low + (high - low) / 2` instead of `(low + high) / 2`!";
+    } else if (color === 'cyan') {
+        tag = "info";
+        title = "Did You Know?";
+        body = "TimSort is the default sorting algorithm in Python (list.sort) and Java (Arrays.sort for objects), running in O(N log N) time and O(N) space.";
+    } else if (color === 'rose') {
+        tag = "danger";
+        title = "Common Interview Mistake";
+        body = "Forgetting 0-indexing boundaries or modifying a collection while iterating over it will trigger IndexOutOfBounds or ConcurrentModificationException.";
+    }
+    
+    const snippet = `\n:::${tag} ${title}\n${body}\n:::\n`;
+    insertAtCursor(field, snippet);
+}
+
+function insertHighlightTemplate() {
+    insertMarkdown('==', '==', 'High-Performance Concept');
+}
+
+function insertMarkdownTable() {
+    const tableTemplate = "\n| Approach | Time Complexity | Space Complexity | Best Suited For |\n|---|---|---|---|\n| **Brute Force** | `O(N²)` | `O(1)` | Naive baseline / Small inputs |\n| **Two Pointers** | `O(N log N)` | `O(1)` | Sorted collections |\n| **Hash Map** | `O(N)` | `O(N)` | Optimal FAANG benchmark |\n";
+    insertAtCursor(getTargetField(), tableTemplate);
+}
+
+// Backward-compatible wrappers for older buttons if any
+function insertCallout(color) { insertCalloutBlock(color); }
+function insertGradientText() { insertHighlightTemplate(); }
+function insertTable() { insertMarkdownTable(); }
+
+// ==========================================
+// 5. RICH MARKDOWN & CALLOUT PARSER
+// ==========================================
+function transformCallouts(text) {
+    if (!text) return '';
+    
+    // 1. Transform :::callout blocks (:::tip, :::note, :::warning, :::info, :::danger)
+    const calloutRegex = /:::([a-zA-Z_-]+)(?:[ \t]+([^\n\r]*))?[\r\n]+([\s\S]*?)[\r\n]+:::/g;
+    text = text.replace(calloutRegex, function(match, type, title, body) {
+        type = type.toLowerCase().trim();
+        let color = 'purple';
+        let icon = 'bi-bookmark-star-fill';
+        let defaultTitle = 'Important Note';
+        
+        if (type === 'tip' || type === 'success') {
+            color = 'emerald';
+            icon = 'bi-lightbulb-fill';
+            defaultTitle = 'Pro Tip & Optimization';
+        } else if (type === 'warning' || type === 'warn') {
+            color = 'amber';
+            icon = 'bi-exclamation-triangle-fill';
+            defaultTitle = 'Warning & Edge Case';
+        } else if (type === 'info') {
+            color = 'cyan';
+            icon = 'bi-info-circle-fill';
+            defaultTitle = 'Did You Know?';
+        } else if (type === 'danger' || type === 'error' || type === 'pitfall') {
+            color = 'rose';
+            icon = 'bi-x-octagon-fill';
+            defaultTitle = 'Common Mistake to Avoid';
+        } else if (type === 'note') {
+            color = 'purple';
+            icon = 'bi-bookmark-star-fill';
+            defaultTitle = 'Important Concept';
+        }
+        
+        const finalTitle = (title && title.trim()) ? title.trim() : defaultTitle;
+        return `\n<div class="callout-box callout-${color}">\n<div class="callout-title"><i class="bi ${icon}"></i> ${finalTitle}</div>\n<div class="callout-text">\n\n${body.trim()}\n\n</div>\n</div>\n`;
+    });
+
+    // 2. Transform GitHub Alert blockquotes: > [!TIP]
+    const ghAlertRegex = />\s*\[!(TIP|NOTE|WARNING|CAUTION|DANGER|INFO)\][ \t]*\n((?:>[^\n]*\n?)+)/gi;
+    text = text.replace(ghAlertRegex, function(match, alertType, lines) {
+        alertType = alertType.toUpperCase();
+        let color = 'purple';
+        let icon = 'bi-bookmark-star-fill';
+        let title = 'Important Note';
+        if (alertType === 'TIP') { color = 'emerald'; icon = 'bi-lightbulb-fill'; title = 'Pro Tip'; }
+        else if (alertType === 'WARNING') { color = 'amber'; icon = 'bi-exclamation-triangle-fill'; title = 'Warning'; }
+        else if (alertType === 'INFO') { color = 'cyan'; icon = 'bi-info-circle-fill'; title = 'Information'; }
+        else if (alertType === 'CAUTION' || alertType === 'DANGER') { color = 'rose'; icon = 'bi-x-octagon-fill'; title = 'Caution / Common Pitfall'; }
+        
+        const cleanedLines = lines.replace(/^>[ \t]?/gm, '').trim();
+        return `\n<div class="callout-box callout-${color}">\n<div class="callout-title"><i class="bi ${icon}"></i> ${title}</div>\n<div class="callout-text">\n\n${cleanedLines}\n\n</div>\n</div>\n`;
+    });
+
+    // 3. Highlight ==text==
+    text = text.replace(/==([^=\n]+)==/g, '<mark class="tutorial-highlight">$1</mark>');
+    
+    return text;
+}
+
+function renderTutorialMarkdown(raw) {
+    if (!raw) return '<div class="text-muted text-center py-5">Empty article. Start typing in Write mode!</div>';
+    
+    // Step 1: Pre-process callouts and custom tokens
+    const preprocessed = transformCallouts(raw);
+    
+    // Step 2: Parse standard Markdown
+    let html = "";
+    if (typeof marked !== 'undefined') {
+        marked.setOptions({
+            gfm: true,
+            breaks: true,
+            headerIds: true,
+            mangle: false
+        });
+        html = marked.parse(preprocessed);
+    } else {
+        html = preprocessed;
+    }
+    
+    return html;
+}
+
+// ==========================================
+// 6. LIVE PREVIEW COMPILER & ENHANCEMENTS
+// ==========================================
+let mermaidInitialized = false;
+function initMermaidIfNeeded() {
+    if (typeof mermaid !== 'undefined' && !mermaidInitialized) {
+        mermaid.initialize({
+            startOnLoad: false,
+            theme: 'dark',
+            securityLevel: 'loose',
+            themeVariables: {
+                darkMode: true,
+                primaryColor: '#7c3aed',
+                primaryTextColor: '#f8fafc',
+                primaryBorderColor: '#8b5cf6',
+                lineColor: '#06b6d4'
+            }
+        });
+        mermaidInitialized = true;
+    }
+}
+
+function updateLivePreview() {
+    const field = getTargetField();
+    const previewArea = document.getElementById('editorPreviewArea');
+    if (!field || !previewArea) return;
+    
+    const renderedHtml = renderTutorialMarkdown(field.value);
+    previewArea.innerHTML = renderedHtml;
+    
+    // Format Mermaid Diagram Code Blocks
+    const mermaidCodes = previewArea.querySelectorAll('code.language-mermaid');
+    if (mermaidCodes.length > 0) {
+        initMermaidIfNeeded();
+        mermaidCodes.forEach((codeEl, idx) => {
+            const preEl = codeEl.closest('pre');
+            const codeText = codeEl.innerText.trim();
+            const container = document.createElement('div');
+            container.className = 'mermaid-card my-3';
+            
+            const mermaidDiv = document.createElement('div');
+            mermaidDiv.className = 'mermaid';
+            mermaidDiv.id = 'preview-mermaid-' + idx + '-' + Date.now();
+            mermaidDiv.textContent = codeText;
+            
+            container.appendChild(mermaidDiv);
+            if (preEl) {
+                preEl.replaceWith(container);
+            }
+        });
+        
+        try {
+            if (typeof mermaid !== 'undefined') {
+                mermaid.run({ nodes: previewArea.querySelectorAll('.mermaid') });
+            }
+        } catch(e) {
+            console.error("Mermaid live render error:", e);
+        }
+    }
+    
+    // Format Standard Code Blocks with Header Bar & Syntax Highlighting
+    const regularCodes = previewArea.querySelectorAll('pre code:not(.language-mermaid)');
+    regularCodes.forEach(codeEl => {
+        const preEl = codeEl.closest('pre');
+        if (!preEl || preEl.parentElement.classList.contains('tutorial-code-block')) return;
+        
+        // Detect language
+        let lang = 'CODE';
+        codeEl.classList.forEach(cls => {
+            if (cls.startsWith('language-')) {
+                lang = cls.replace('language-', '').toUpperCase();
+            }
+        });
+        
+        // Highlight syntax
+        if (typeof hljs !== 'undefined') {
+            try { hljs.highlightElement(codeEl); } catch(e) {}
+        }
+        
+        // Wrap with macOS IDE Window
+        const wrapper = document.createElement('div');
+        wrapper.className = 'tutorial-code-block my-3';
+        wrapper.innerHTML = `
+            <div class="tutorial-code-block-header">
+                <div class="d-flex align-items-center gap-2">
+                    <span class="code-window-dot dot-red"></span>
+                    <span class="code-window-dot dot-yellow"></span>
+                    <span class="code-window-dot dot-green"></span>
+                    <span class="lang-badge ms-2">${lang}</span>
+                </div>
+                <button type="button" class="copy-code-btn" onclick="copyCodeFromElement(this)">
+                    <i class="bi bi-clipboard"></i> <span>Copy</span>
+                </button>
+            </div>
+        `;
+        preEl.parentNode.insertBefore(wrapper, preEl);
+        wrapper.appendChild(preEl);
+    });
+}
+
+function copyCodeFromElement(btn) {
+    const wrapper = btn.closest('.tutorial-code-block');
+    if (!wrapper) return;
+    const codeEl = wrapper.querySelector('code');
+    if (!codeEl) return;
+    
+    navigator.clipboard.writeText(codeEl.innerText).then(() => {
+        const orig = btn.innerHTML;
+        btn.innerHTML = '<i class="bi bi-check2 text-success"></i> <span>Copied!</span>';
+        setTimeout(() => { btn.innerHTML = orig; }, 2000);
+    });
+}
+
+let previewDebounceTimer = null;
+function triggerPreviewUpdate() {
+    clearTimeout(previewDebounceTimer);
+    previewDebounceTimer = setTimeout(updateLivePreview, 250);
+}
+
+// ==========================================
+// 7. EDITOR VIEW SWITCHER (Write / Preview / Split)
+// ==========================================
+let currentEditorMode = 'write';
+
+function setEditorView(mode) {
+    currentEditorMode = mode;
+    
+    const writePane = document.getElementById('editorWritePane');
+    const previewPane = document.getElementById('editorPreviewPane');
+    const workspace = document.getElementById('editorWorkspace');
+    
+    const btnWrite = document.getElementById('btnModeWrite');
+    const btnPreview = document.getElementById('btnModePreview');
+    const btnSplit = document.getElementById('btnModeSplit');
+    
+    btnWrite.classList.remove('active');
+    btnPreview.classList.remove('active');
+    if (btnSplit) btnSplit.classList.remove('active');
+    
+    if (mode === 'write') {
+        btnWrite.classList.add('active');
+        writePane.style.display = 'block';
+        previewPane.style.display = 'none';
+        workspace.className = '';
+    } else if (mode === 'preview') {
+        btnPreview.classList.add('active');
+        writePane.style.display = 'none';
+        previewPane.style.display = 'block';
+        workspace.className = '';
+        updateLivePreview();
+    } else if (mode === 'split') {
+        if (btnSplit) btnSplit.classList.add('active');
+        writePane.style.display = 'block';
+        previewPane.style.display = 'block';
+        workspace.className = 'editor-split-grid';
+        updateLivePreview();
+    }
+}
+
+// Attach live typing listener
+document.addEventListener('DOMContentLoaded', function() {
+    const field = getTargetField();
+    if (field) {
+        field.addEventListener('input', triggerPreviewUpdate);
+    }
+    initMermaidIfNeeded();
+});
+
+// Section 5 & 6 Helpers
+function insertMermaidFlowchart() {
+    const field = document.getElementById('id_mermaid_code');
+    if (!field) return;
+    field.value = `graph TD\n    A[Start: Read Input Array] --> B{Does Complement Exist in Map?}\n    B -- Yes --> C[Return Pair Indices [map[complement], i]]\n    B -- No --> D[Store Current Num in Map: map[num] = i]\n    D --> E{More Elements?}\n    E -- Yes --> A\n    E -- No --> F[Return Empty / Not Found]`;
+}
+
+function insertMermaidBinaryTree() {
+    const field = document.getElementById('id_mermaid_code');
+    if (!field) return;
+    field.value = `graph TD\n    Root((10: Root)) --> LeftNode((5: Left))\n    Root --> RightNode((15: Right))\n    LeftNode --> LL((2))\n    LeftNode --> LR((7))\n    RightNode --> RL((12))\n    RightNode --> RR((20))`;
+}
+
+function insertMermaidGraph() {
+    const field = document.getElementById('id_mermaid_code');
+    if (!field) return;
+    field.value = `graph LR\n    Node0((0)) --- Node1((1))\n    Node0 --- Node2((2))\n    Node1 --- Node3((3))\n    Node2 --- Node4((4))\n    Node3 --- Node5((5))\n    Node4 --- Node5`;
+}
+
+function insertMermaidStack() {
+    const field = document.getElementById('id_mermaid_code');
+    if (!field) return;
+    field.value = `sequenceDiagram\n    autonumber\n    participant Main\n    participant FunctionA\n    participant FunctionB\n    Main->>FunctionA: Call solve(n)\n    FunctionA->>FunctionB: Sub-problem solve(n-1)\n    FunctionB-->>FunctionA: Return Base Result\n    FunctionA-->>Main: Return Final Solution`;
+}
+
+function insertChartPreset(type) {
+    const title = document.getElementById('id_chart_title');
+    const labels = document.getElementById('id_chart_labels');
+    const values = document.getElementById('id_chart_values');
+    if (!title || !labels || !values) return;
+
+    if (type === 'dsa') {
+        title.value = "Operations Count for Input Size N = 1,000";
+        labels.value = "Hash Map O(1), Binary Search O(log N), Linear Search O(N), Nested Loop O(N^2)";
+        values.value = "1, 10, 1000, 1000000";
+    } else if (type === 'search') {
+        title.value = "Comparisons Required to Find Element (N = 100,000)";
+        labels.value = "Binary Search O(log N), Hash Lookup O(1), Linear Search O(N)";
+        values.value = "17, 1, 100000";
+    } else if (type === 'sort') {
+        title.value = "Sorting Operations Comparison (N = 5,000)";
+        labels.value = "Merge / Quick Sort O(N log N), Insertion Sort O(N^2), Bubble Sort O(N^2)";
+        values.value = "61400, 12500000, 25000000";
+    }
+}
+</script>
+{% endblock %}

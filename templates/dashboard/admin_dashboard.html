@@ -1,0 +1,664 @@
+{% extends 'base.html' %}
+
+{% block title %}Admin Creator Studio & Management Hub — CodeWithAmit{% endblock %}
+
+{% block content %}
+<div class="container py-4 py-md-5">
+    <!-- Header Banner -->
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4 pb-3 border-bottom">
+        <div>
+            <div class="d-flex align-items-center gap-2 mb-2">
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-1 rounded-pill fw-semibold">
+                    <i class="bi bi-shield-check me-1"></i> Admin & Staff Control Center
+                </span>
+                <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1 rounded-pill">
+                    <i class="bi bi-eye-fill me-1"></i> Live Content Management
+                </span>
+            </div>
+            <h1 class="h2 fw-bold text-slate-900 font-heading mb-1">Platform Creator Studio</h1>
+            <p class="text-secondary small mb-0">
+                Add tutorials, courses, coding challenges, live classes, roadmaps, and notes. Everything you publish here is immediately visible to both registered users and visitors on the website.
+            </p>
+        </div>
+        <div class="d-flex flex-wrap gap-2">
+            <a href="{% url 'dashboard:student_dashboard' %}" class="btn btn-outline-primary btn-sm rounded-pill px-3 shadow-sm hover-lift">
+                <i class="bi bi-mortarboard-fill me-1"></i> Student View
+            </a>
+            <a href="/admin/" target="_blank" class="btn btn-outline-secondary btn-sm rounded-pill px-3 shadow-sm hover-lift">
+                <i class="bi bi-database me-1"></i> Django Backend Admin
+            </a>
+            <a href="{% url 'accounts:logout' %}" class="btn btn-outline-danger btn-sm rounded-pill px-3 shadow-sm hover-lift">
+                <i class="bi bi-box-arrow-right me-1"></i> Sign Out
+            </a>
+        </div>
+    </div>
+
+    <!-- ==================================================================
+         ADMIN & STUDENT AUTHENTICATION / SESSION CONTROL SECTION
+         ================================================================== -->
+    <div class="card p-3 p-md-4 rounded-4 border bg-white shadow-sm mb-5">
+        <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3 pb-3 border-bottom">
+            <div class="d-flex align-items-center gap-2.5">
+                <div class="rounded-3 p-2 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; background: rgba(245, 158, 11, 0.12); color: #d97706;">
+                    <i class="bi bi-shield-lock-fill fs-4"></i>
+                </div>
+                <div>
+                    <h5 class="fw-bold text-slate-900 font-heading mb-0">Session &amp; Access Control Hub</h5>
+                    <span class="text-secondary smaller">Authentication management, login role switching &amp; secure session termination</span>
+                </div>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-3 py-1.5 fw-semibold">
+                    <span class="live-pulse-dot me-1"></span> Admin Session Active
+                </span>
+            </div>
+        </div>
+
+        <div class="row g-3">
+            <!-- Left: Current Admin Session & Logout -->
+            <div class="col-lg-6">
+                <div class="p-3.5 rounded-3 border h-100 d-flex flex-column justify-content-between" style="background: #f8fafc; border-color: #e2e8f0;">
+                    <div>
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="badge bg-warning text-dark rounded-pill smaller px-2.5 py-1 fw-bold">
+                                <i class="bi bi-person-badge-fill me-1"></i> Logged In Administrator
+                            </span>
+                            <span class="text-muted smaller">Username: <strong>@{{ request.user.username }}</strong></span>
+                        </div>
+                        <div class="d-flex align-items-center gap-3 mb-3">
+                            <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold shadow-xs" style="width: 48px; height: 48px; background: linear-gradient(135deg, #f59e0b, #ef4444); font-size: 1.25rem; flex-shrink: 0;">
+                                {{ request.user.username|make_list|first|upper }}
+                            </div>
+                            <div>
+                                <div class="fw-bold text-slate-900 fs-6">{{ request.user.get_full_name|default:request.user.username }}</div>
+                                <div class="smaller text-secondary">{{ request.user.email|default:'admin@codestyle.com' }}</div>
+                                <div class="smaller text-success fw-semibold mt-0.5">
+                                    <i class="bi bi-check-circle-fill me-1"></i> Superuser &amp; Staff Access Granted
+                                </div>
+                            </div>
+                        </div>
+                        <p class="smaller text-secondary mb-3">
+                            You currently possess full administrative and editorial rights across CodeWithAmit. You can publish content, inspect database records, and monitor registered learners.
+                        </p>
+                    </div>
+
+                    <div class="pt-3 border-top d-flex flex-wrap gap-2">
+                        <a href="{% url 'accounts:logout' %}" class="btn btn-danger btn-sm rounded-pill px-3.5 py-1.5 fw-semibold shadow-xs">
+                            <i class="bi bi-box-arrow-right me-1"></i> Sign Out (Logout)
+                        </a>
+                        <a href="{% url 'accounts:login' %}?role=admin" class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-1.5 smaller">
+                            <i class="bi bi-arrow-repeat me-1"></i> Switch / Re-login Admin
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right: Student View & Dual-Portal Switcher -->
+            <div class="col-lg-6">
+                <div class="p-3.5 rounded-3 border h-100 d-flex flex-column justify-content-between" style="background: #f8fafc; border-color: #e2e8f0;">
+                    <div>
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill smaller px-2.5 py-1 fw-bold">
+                                <i class="bi bi-mortarboard-fill me-1"></i> Student Experience Switcher
+                            </span>
+                            <span class="text-muted smaller">Role: <strong>Student Portal</strong></span>
+                        </div>
+                        <h6 class="fw-bold text-slate-900 mb-1">Preview as Student or Switch Account</h6>
+                        <p class="smaller text-secondary mb-3">
+                            Switch directly to the Student Command Hub to inspect courses, 450 DSA Sheet progress, in-browser code editor, and student streak heatmaps as real learners see them.
+                        </p>
+
+                        <div class="p-2.5 rounded-2 mb-3 bg-white border d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center gap-2">
+                                <i class="bi bi-key-fill text-warning"></i>
+                                <span class="smaller text-secondary">Demo Student Credentials:</span>
+                            </div>
+                            <span class="badge bg-light text-dark font-monospace border">student / student123</span>
+                        </div>
+                    </div>
+
+                    <div class="pt-3 border-top d-flex flex-wrap gap-2">
+                        <a href="{% url 'dashboard:student_dashboard' %}" class="btn btn-primary btn-sm rounded-pill px-3.5 py-1.5 fw-semibold shadow-xs">
+                            <i class="bi bi-mortarboard-fill me-1"></i> Open Student Dashboard
+                        </a>
+                        <a href="{% url 'accounts:login' %}?role=student" class="btn btn-outline-primary btn-sm rounded-pill px-3 py-1.5 smaller">
+                            <i class="bi bi-box-arrow-in-right me-1"></i> Log in as Student User
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Content Creator Hub (The Core Feature User Requested) -->
+    <div class="mb-5">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+            <h5 class="fw-bold text-slate-900 font-heading mb-0">
+                <i class="bi bi-magic text-primary me-2"></i> Quick Create Studio — Add New Features & Content
+            </h5>
+            <span class="text-muted smaller">Select a category below to publish directly to CodeWithAmit</span>
+        </div>
+
+        <div class="row g-3">
+            <!-- 1. Add Tutorial -->
+            <div class="col-lg-4 col-md-6">
+                <div class="card flowable-card p-3 p-xl-4 rounded-4 border bg-white h-100 d-flex flex-column justify-content-between shadow-sm">
+                    <div>
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <div class="rounded-3 p-2 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; background: rgba(37, 99, 235, 0.1); color: #2563eb;">
+                                <i class="bi bi-book-half fs-4"></i>
+                            </div>
+                            <span class="badge bg-blue-subtle text-primary border rounded-pill smaller px-2 py-1">Tutorials Track</span>
+                        </div>
+                        <h6 class="fw-bold text-slate-900 mb-1">Add Tutorial Article</h6>
+                        <p class="text-secondary smaller mb-3">Publish GFG-style programming tutorials with rich content, chapters, code snippets & LeetCode practice links.</p>
+                    </div>
+                    <div class="d-flex gap-2 pt-2 border-top">
+                        <a href="{% url 'tutorials:add_topic' %}" class="btn btn-primary btn-sm rounded-pill w-100 fw-semibold shadow-sm hover-lift">
+                            <i class="bi bi-plus-lg me-1"></i> Add Tutorial
+                        </a>
+                        <a href="{% url 'tutorials:tutorial_list' %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3" title="View Public Tutorials Page">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Create Course -->
+            <div class="col-lg-4 col-md-6">
+                <div class="card flowable-card p-3 p-xl-4 rounded-4 border bg-white h-100 d-flex flex-column justify-content-between shadow-sm">
+                    <div>
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <div class="rounded-3 p-2 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; background: rgba(16, 185, 129, 0.1); color: #10b981;">
+                                <i class="bi bi-play-circle-fill fs-4"></i>
+                            </div>
+                            <span class="badge bg-success-subtle text-success border rounded-pill smaller px-2 py-1">Courses</span>
+                        </div>
+                        <h6 class="fw-bold text-slate-900 mb-1">Create New Course</h6>
+                        <p class="text-secondary smaller mb-3">Launch complete curriculum courses with syllabus, video embeds, difficulty tiers, and student enrollment.</p>
+                    </div>
+                    <div class="d-flex gap-2 pt-2 border-top">
+                        <a href="{% url 'courses:create_course' %}" class="btn btn-success btn-sm rounded-pill w-100 fw-semibold shadow-sm hover-lift text-white">
+                            <i class="bi bi-plus-lg me-1"></i> Create Course
+                        </a>
+                        <a href="{% url 'courses:course_list' %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3" title="View Public Courses Page">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 3. Add Coding Question -->
+            <div class="col-lg-4 col-md-6">
+                <div class="card flowable-card p-3 p-xl-4 rounded-4 border bg-white h-100 d-flex flex-column justify-content-between shadow-sm">
+                    <div>
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <div class="rounded-3 p-2 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
+                                <i class="bi bi-code-slash fs-4"></i>
+                            </div>
+                            <span class="badge bg-warning-subtle text-warning-emphasis border rounded-pill smaller px-2 py-1">Practice Sets</span>
+                        </div>
+                        <h6 class="fw-bold text-slate-900 mb-1">Practice Sets &amp; Questions</h6>
+                        <p class="text-secondary smaller mb-3">Create course-like practice sets (DSA, Python, SQL, Web Dev) and add questions with YouTube video solutions.</p>
+                    </div>
+                    <div class="d-flex gap-2 pt-2 border-top">
+                        <a href="{% url 'coding_practice:add_practice_set' %}" class="btn btn-warning btn-sm rounded-pill fw-semibold shadow-sm hover-lift text-dark" style="font-size: 0.8rem;">
+                            <i class="bi bi-folder-plus me-1"></i> New Set
+                        </a>
+                        <a href="{% url 'coding_practice:add_question' %}" class="btn btn-outline-warning btn-sm rounded-pill fw-semibold text-dark" style="font-size: 0.8rem;">
+                            <i class="bi bi-plus-lg me-1"></i> Add Question
+                        </a>
+                        <a href="{% url 'coding_practice:problem_list' %}" class="btn btn-outline-secondary btn-sm rounded-pill px-2.5" title="View Practice Sets">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 4. Schedule Live Class -->
+            <div class="col-lg-4 col-md-6">
+                <div class="card flowable-card p-3 p-xl-4 rounded-4 border bg-white h-100 d-flex flex-column justify-content-between shadow-sm">
+                    <div>
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <div class="rounded-3 p-2 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; background: rgba(239, 68, 68, 0.1); color: #ef4444;">
+                                <i class="bi bi-broadcast fs-4"></i>
+                            </div>
+                            <span class="badge bg-danger-subtle text-danger border rounded-pill smaller px-2 py-1">Live Classes</span>
+                        </div>
+                        <h6 class="fw-bold text-slate-900 mb-1">Schedule Live Class</h6>
+                        <p class="text-secondary smaller mb-3">Host live webinars and doubt-clearing sessions with Google Meet integration and recording attachments.</p>
+                    </div>
+                    <div class="d-flex gap-2 pt-2 border-top">
+                        <a href="{% url 'live_classes:create_class' %}" class="btn btn-danger btn-sm rounded-pill w-100 fw-semibold shadow-sm hover-lift text-white">
+                            <i class="bi bi-plus-lg me-1"></i> Schedule Class
+                        </a>
+                        <a href="{% url 'live_classes:class_list' %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3" title="View Public Live Classes">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 5. Create Career Roadmap -->
+            <div class="col-lg-4 col-md-6">
+                <div class="card flowable-card p-3 p-xl-4 rounded-4 border bg-white h-100 d-flex flex-column justify-content-between shadow-sm">
+                    <div>
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <div class="rounded-3 p-2 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; background: rgba(6, 182, 212, 0.1); color: #0891b2;">
+                                <i class="bi bi-signpost-split fs-4"></i>
+                            </div>
+                            <span class="badge bg-info-subtle text-info-emphasis border rounded-pill smaller px-2 py-1">Career Paths</span>
+                        </div>
+                        <h6 class="fw-bold text-slate-900 mb-1">Create Career Roadmap</h6>
+                        <p class="text-secondary smaller mb-3">Design structured developer roadmaps with stages, milestones, target roles, and interactive checkoffs.</p>
+                    </div>
+                    <div class="d-flex gap-2 pt-2 border-top">
+                        <a href="{% url 'roadmaps:create_roadmap' %}" class="btn btn-info btn-sm rounded-pill w-100 fw-semibold shadow-sm hover-lift text-white">
+                            <i class="bi bi-plus-lg me-1"></i> Create Roadmap
+                        </a>
+                        <a href="{% url 'roadmaps:roadmap_list' %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3" title="View Public Roadmaps">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+
+            <!-- 7. Platform Feature Creator & Manager -->
+            <div class="col-lg-4 col-md-6">
+                <div class="card flowable-card p-3 p-xl-4 rounded-4 border bg-white h-100 d-flex flex-column justify-content-between shadow-sm" style="border: 1.5px solid #2563eb !important; background: linear-gradient(180deg, #f0f7ff 0%, #ffffff 40%);">
+                    <div>
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <div class="rounded-3 p-2 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; background: rgba(37, 99, 235, 0.15); color: #2563eb;">
+                                <i class="bi bi-stars fs-4"></i>
+                            </div>
+                            <span class="badge bg-primary text-white rounded-pill smaller px-2.5 py-1">New Feature Hub</span>
+                        </div>
+                        <h6 class="fw-bold text-slate-900 mb-1">Add Platform Feature</h6>
+                        <p class="text-secondary smaller mb-3">Add and configure any custom tools, compilers, AI engines, or links according to your preference for users to access.</p>
+                    </div>
+                    <div class="d-flex gap-2 pt-2 border-top">
+                        <a href="{% url 'core:add_feature' %}" class="btn btn-primary btn-sm rounded-pill w-100 fw-semibold shadow-sm hover-lift">
+                            <i class="bi bi-plus-lg me-1"></i> Add Feature
+                        </a>
+                        <a href="{% url 'core:features' %}" class="btn btn-outline-primary btn-sm rounded-pill px-3" title="Manage All Features">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Platform Metrics Overview -->
+    <div class="mb-5">
+        <h5 class="fw-bold text-slate-900 font-heading mb-3">
+            <i class="bi bi-graph-up-arrow text-primary me-2"></i> Platform Activity & Content Stats
+        </h5>
+        <div class="row g-3">
+            <div class="col-lg-2 col-md-4 col-6">
+                <div class="card p-3 rounded-4 border bg-white text-center shadow-sm hover-lift">
+                    <div class="text-primary fs-4 mb-1"><i class="bi bi-people-fill"></i></div>
+                    <h3 class="fw-bold text-slate-900 mb-0 font-heading">{{ metrics.total_users }}</h3>
+                    <span class="text-secondary smaller">Registered Users</span>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-6">
+                <div class="card p-3 rounded-4 border bg-white text-center shadow-sm hover-lift">
+                    <div class="text-primary fs-4 mb-1"><i class="bi bi-book-half"></i></div>
+                    <h3 class="fw-bold text-slate-900 mb-0 font-heading">{{ metrics.total_tutorials }}</h3>
+                    <span class="text-secondary smaller">Tutorial Topics</span>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-6">
+                <div class="card p-3 rounded-4 border bg-white text-center shadow-sm hover-lift">
+                    <div class="text-success fs-4 mb-1"><i class="bi bi-play-circle-fill"></i></div>
+                    <h3 class="fw-bold text-slate-900 mb-0 font-heading">{{ metrics.total_courses }}</h3>
+                    <span class="text-secondary smaller">Published Courses</span>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-6">
+                <div class="card p-3 rounded-4 border bg-white text-center shadow-sm hover-lift">
+                    <div class="text-warning fs-4 mb-1"><i class="bi bi-code-slash"></i></div>
+                    <h3 class="fw-bold text-slate-900 mb-0 font-heading">{{ metrics.total_coding_questions }}</h3>
+                    <span class="text-secondary smaller">Practice Questions</span>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-6">
+                <div class="card p-3 rounded-4 border bg-white text-center shadow-sm hover-lift">
+                    <div class="text-danger fs-4 mb-1"><i class="bi bi-broadcast"></i></div>
+                    <h3 class="fw-bold text-slate-900 mb-0 font-heading">{{ metrics.total_live_classes }}</h3>
+                    <span class="text-secondary smaller">Live Classes</span>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-4 col-6">
+                <div class="card p-3 rounded-4 border bg-white text-center shadow-sm hover-lift">
+                    <div class="text-info fs-4 mb-1"><i class="bi bi-signpost-split"></i></div>
+                    <h3 class="fw-bold text-slate-900 mb-0 font-heading">{{ metrics.total_roadmaps }}</h3>
+                    <span class="text-secondary smaller">Roadmaps</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live Content Management Inventory (Publicly Visible to All) -->
+    <div class="card border rounded-4 shadow-sm bg-white overflow-hidden mb-5">
+        <div class="p-4 border-bottom bg-light d-flex flex-wrap align-items-center justify-content-between gap-3">
+            <div>
+                <h5 class="fw-bold text-slate-900 font-heading mb-1">
+                    <i class="bi bi-collection-play text-primary me-2"></i> Published Content Inventory
+                </h5>
+                <p class="text-secondary smaller mb-0">Browse recently added items. Every item listed below is actively visible to both students and admins.</p>
+            </div>
+            <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-2 rounded-pill smaller fw-semibold">
+                <i class="bi bi-check-circle-fill me-1"></i> Publicly Visible on Website
+            </span>
+        </div>
+
+        <!-- Pill Tabs for Content Sections -->
+        <div class="p-3 border-bottom bg-white">
+            <ul class="nav nav-pills flowable-chips gap-2" id="inventoryTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active rounded-pill px-3 py-1 smaller fw-semibold" id="tab-tutorials" data-bs-toggle="tab" data-bs-target="#content-tutorials" type="button" role="tab">
+                        <i class="bi bi-book me-1"></i> Tutorials ({{ recent_topics|length }})
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link rounded-pill px-3 py-1 smaller fw-semibold" id="tab-courses" data-bs-toggle="tab" data-bs-target="#content-courses" type="button" role="tab">
+                        <i class="bi bi-play-circle me-1"></i> Courses ({{ recent_courses|length }})
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link rounded-pill px-3 py-1 smaller fw-semibold" id="tab-practice" data-bs-toggle="tab" data-bs-target="#content-practice" type="button" role="tab">
+                        <i class="bi bi-code-slash me-1"></i> Practice Problems ({{ recent_questions|length }})
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link rounded-pill px-3 py-1 smaller fw-semibold" id="tab-classes" data-bs-toggle="tab" data-bs-target="#content-classes" type="button" role="tab">
+                        <i class="bi bi-broadcast me-1"></i> Live Classes ({{ recent_classes|length }})
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link rounded-pill px-3 py-1 smaller fw-semibold" id="tab-roadmaps" data-bs-toggle="tab" data-bs-target="#content-roadmaps" type="button" role="tab">
+                        <i class="bi bi-signpost-split me-1"></i> Roadmaps ({{ recent_roadmaps|length }})
+                    </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link rounded-pill px-3 py-1 smaller fw-semibold" id="tab-users" data-bs-toggle="tab" data-bs-target="#content-users" type="button" role="tab">
+                        <i class="bi bi-people me-1"></i> Recent Users ({{ recent_users|length }})
+                    </button>
+                </li>
+            </ul>
+        </div>
+
+        <div class="tab-content" id="inventoryTabsContent">
+            <!-- 1. Tutorials Tab -->
+            <div class="tab-pane fade show active" id="content-tutorials" role="tabpanel">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr class="smaller text-secondary">
+                                <th class="ps-4">Topic Title</th>
+                                <th>Category / Track</th>
+                                <th>Chapter</th>
+                                <th>Status</th>
+                                <th class="text-end pe-4">Public Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for t in recent_topics %}
+                                <tr>
+                                    <td class="ps-4">
+                                        <div class="fw-bold text-slate-900">{{ t.title }}</div>
+                                        <div class="text-muted smaller">{{ t.summary|truncatechars:70 }}</div>
+                                    </td>
+                                    <td><span class="badge bg-light text-dark border">{{ t.category.name }}</span></td>
+                                    <td><span class="text-secondary smaller">{{ t.chapter|default:'General' }}</span></td>
+                                    <td>
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill smaller">
+                                            <i class="bi bi-check-circle me-1"></i> Visible to All
+                                        </span>
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <div class="d-inline-flex gap-1">
+                                            <a href="{% url 'tutorials:tutorial_detail' t.category.slug t.slug %}" class="btn btn-sm btn-outline-primary rounded-pill px-3 smaller" target="_blank">
+                                                <i class="bi bi-box-arrow-up-right me-1"></i> View Public
+                                            </a>
+                                            <a href="{% url 'tutorials:edit_topic' t.category.slug t.slug %}" class="btn btn-sm btn-outline-secondary rounded-pill px-2 smaller" title="Edit Topic">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr><td colspan="5" class="text-center py-4 text-muted">No tutorials found. Click "Add Tutorial" above to write your first article!</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 2. Courses Tab -->
+            <div class="tab-pane fade" id="content-courses" role="tabpanel">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr class="smaller text-secondary">
+                                <th class="ps-4">Course Title</th>
+                                <th>Category</th>
+                                <th>Difficulty</th>
+                                <th>Duration</th>
+                                <th>Status</th>
+                                <th class="text-end pe-4">Public Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for c in recent_courses %}
+                                <tr>
+                                    <td class="ps-4">
+                                        <div class="fw-bold text-slate-900">{{ c.title }}</div>
+                                        <div class="text-muted smaller">{{ c.short_description|truncatechars:70 }}</div>
+                                    </td>
+                                    <td><span class="badge bg-light text-dark border">{{ c.category.name }}</span></td>
+                                    <td><span class="badge bg-primary-subtle text-primary border rounded-pill smaller">{{ c.difficulty }}</span></td>
+                                    <td class="smaller text-secondary">{{ c.estimated_hours }}h</td>
+                                    <td>
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill smaller">
+                                            <i class="bi bi-check-circle me-1"></i> Live to Users
+                                        </span>
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <a href="{% url 'courses:course_detail' c.slug %}" class="btn btn-sm btn-outline-primary rounded-pill px-3 smaller" target="_blank">
+                                            <i class="bi bi-box-arrow-up-right me-1"></i> View Public Course
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr><td colspan="6" class="text-center py-4 text-muted">No courses found. Click "Create Course" to publish your first curriculum!</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 3. Coding Problems Tab -->
+            <div class="tab-pane fade" id="content-practice" role="tabpanel">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr class="smaller text-secondary">
+                                <th class="ps-4">Problem Name</th>
+                                <th>Category</th>
+                                <th>Difficulty</th>
+                                <th>Platform</th>
+                                <th>Status</th>
+                                <th class="text-end pe-4">Public Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for q in recent_questions %}
+                                <tr>
+                                    <td class="ps-4">
+                                        <div class="fw-bold text-slate-900">{{ q.title }}</div>
+                                        {% if q.company_tags %}<div class="text-muted smaller"><i class="bi bi-building me-1"></i>{{ q.company_tags|truncatechars:50 }}</div>{% endif %}
+                                    </td>
+                                    <td><span class="badge bg-light text-dark border">{{ q.category.name }}</span></td>
+                                    <td>
+                                        {% if q.difficulty == 'Easy' %}<span class="badge bg-success-subtle text-success border rounded-pill smaller">Easy</span>
+                                        {% elif q.difficulty == 'Medium' %}<span class="badge bg-warning-subtle text-warning-emphasis border rounded-pill smaller">Medium</span>
+                                        {% else %}<span class="badge bg-danger-subtle text-danger border rounded-pill smaller">Hard</span>{% endif %}
+                                    </td>
+                                    <td><span class="badge bg-light text-secondary border rounded-pill smaller">{{ q.platform }}</span></td>
+                                    <td>
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill smaller">
+                                            <i class="bi bi-check-circle me-1"></i> Active in Arena
+                                        </span>
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <div class="d-inline-flex gap-1">
+                                            <a href="{% url 'coding_practice:problem_detail' q.slug %}" class="btn btn-sm btn-outline-primary rounded-pill px-3 smaller" target="_blank">
+                                                <i class="bi bi-box-arrow-up-right me-1"></i> Solve Arena
+                                            </a>
+                                            <a href="{% url 'coding_practice:edit_question' q.slug %}" class="btn btn-sm btn-outline-secondary rounded-pill px-2 smaller" title="Edit Problem">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr><td colspan="6" class="text-center py-4 text-muted">No problems found. Click "Add Problem" to add DSA challenges.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 4. Live Classes Tab -->
+            <div class="tab-pane fade" id="content-classes" role="tabpanel">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr class="smaller text-secondary">
+                                <th class="ps-4">Class Title</th>
+                                <th>Instructor</th>
+                                <th>Date & Time</th>
+                                <th>Status</th>
+                                <th class="text-end pe-4">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for lc in recent_classes %}
+                                <tr>
+                                    <td class="ps-4">
+                                        <div class="fw-bold text-slate-900">{{ lc.title }}</div>
+                                        <div class="text-muted smaller">{{ lc.description|truncatechars:60 }}</div>
+                                    </td>
+                                    <td><span class="text-secondary smaller">{{ lc.instructor.username }}</span></td>
+                                    <td class="smaller text-secondary">{{ lc.scheduled_date }} at {{ lc.start_time|time:"H:i" }}</td>
+                                    <td>
+                                        <span class="badge bg-info-subtle text-info-emphasis border rounded-pill smaller text-capitalize">{{ lc.status }}</span>
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <a href="{% url 'live_classes:class_detail' lc.pk %}" class="btn btn-sm btn-outline-primary rounded-pill px-3 smaller" target="_blank">
+                                            <i class="bi bi-box-arrow-up-right me-1"></i> Class Details
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr><td colspan="5" class="text-center py-4 text-muted">No scheduled classes found. Click "Schedule Class" above!</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- 5. Roadmaps Tab -->
+            <div class="tab-pane fade" id="content-roadmaps" role="tabpanel">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr class="smaller text-secondary">
+                                <th class="ps-4">Roadmap Title</th>
+                                <th>Target Role</th>
+                                <th>Estimated Duration</th>
+                                <th>Status</th>
+                                <th class="text-end pe-4">Public Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for r in recent_roadmaps %}
+                                <tr>
+                                    <td class="ps-4">
+                                        <div class="fw-bold text-slate-900">{{ r.title }}</div>
+                                        <div class="text-muted smaller">{{ r.short_description|truncatechars:65 }}</div>
+                                    </td>
+                                    <td><span class="badge bg-light text-dark border">{{ r.target_role }}</span></td>
+                                    <td class="smaller text-secondary">{{ r.estimated_time }}</td>
+                                    <td>
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill smaller">
+                                            <i class="bi bi-check-circle me-1"></i> Live to Users
+                                        </span>
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <div class="d-flex align-items-center justify-content-end gap-1">
+                                            <a href="{% url 'roadmaps:roadmap_detail' r.slug %}" class="btn btn-sm btn-outline-primary rounded-pill px-2.5 py-1 smaller fw-semibold" title="Open Roadmap Studio (Stages & Checkpoints)">
+                                                <i class="bi bi-diagram-3 me-1"></i> Studio
+                                            </a>
+                                            <a href="{% url 'roadmaps:edit_roadmap' r.slug %}" class="btn btn-sm btn-outline-secondary rounded-circle p-1" style="width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center;" title="Edit Roadmap Info">
+                                                <i class="bi bi-pencil-square"></i>
+                                            </a>
+                                            <a href="{% url 'roadmaps:add_stage' %}?roadmap={{ r.slug }}" class="btn btn-sm btn-outline-success rounded-circle p-1" style="width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center;" title="Add Stage">
+                                                <i class="bi bi-plus-lg"></i>
+                                            </a>
+                                            <a href="{% url 'roadmaps:delete_roadmap' r.slug %}" class="btn btn-sm btn-outline-danger rounded-circle p-1" style="width: 28px; height: 28px; display: inline-flex; align-items: center; justify-content: center;" title="Delete Roadmap">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr><td colspan="5" class="text-center py-4 text-muted">No roadmaps found. Click "Create Roadmap" above to design one!</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+
+            <!-- 7. Recent Users Tab -->
+            <div class="tab-pane fade" id="content-users" role="tabpanel">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="bg-light">
+                            <tr class="smaller text-secondary">
+                                <th class="ps-4">Username</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Date Joined</th>
+                                <th class="text-end pe-4">Profile</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for u in recent_users %}
+                                <tr>
+                                    <td class="ps-4 fw-bold text-slate-900">{{ u.username }}</td>
+                                    <td class="smaller text-secondary">{{ u.email|default:'N/A' }}</td>
+                                    <td><span class="badge bg-secondary-subtle text-dark border smaller">{{ u.profile.get_role_display|default:'Student' }}</span></td>
+                                    <td class="smaller text-secondary">{{ u.date_joined|date:"M d, Y H:i" }}</td>
+                                    <td class="text-end pe-4">
+                                        <a href="{% url 'accounts:user_profile' u.username %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3 smaller" target="_blank">
+                                            View User
+                                        </a>
+                                    </td>
+                                </tr>
+                            {% empty %}
+                                <tr><td colspan="5" class="text-center py-4 text-muted">No users found.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

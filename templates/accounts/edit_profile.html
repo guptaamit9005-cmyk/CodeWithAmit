@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Profile — Student Success Hub{% endblock %}
+
+{% block content %}
+<div class="container py-5 my-md-3">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card bg-surface border-secondary p-4 p-md-5 rounded-4 shadow-lg">
+                <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom border-secondary">
+                    <div>
+                        <h3 class="fw-bold text-light font-heading mb-1">Edit Your Profile</h3>
+                        <p class="text-secondary small mb-0">Update your public student persona, career targets, and portfolio links</p>
+                    </div>
+                    <a href="{% url 'accounts:profile' %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                        <i class="bi bi-arrow-left me-1"></i> Back to Profile
+                    </a>
+                </div>
+
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6">
+                            <label class="form-label text-secondary small">First Name</label>
+                            {{ form.first_name }}
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label text-secondary small">Last Name</label>
+                            {{ form.last_name }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-secondary small">Email Address</label>
+                        {{ form.email }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-secondary small">Headline</label>
+                        {{ form.headline }}
+                        <div class="smaller text-muted mt-1">Brief tagline displayed beneath your name.</div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-secondary small">Target Career Goal</label>
+                        {{ form.target_career }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label text-secondary small">About / Bio</label>
+                        {{ form.bio }}
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label text-secondary small">Profile Avatar</label>
+                        {{ form.avatar }}
+                        {% if profile.avatar %}
+                            <div class="mt-2 smaller text-muted">
+                                Current: <a href="{{ profile.avatar.url }}" target="_blank" class="text-cyan">{{ profile.avatar.name }}</a>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <h5 class="text-light font-heading fw-bold mt-4 mb-3">Links & Profiles</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label class="form-label text-secondary small">GitHub URL</label>
+                            {{ form.github_url }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label text-secondary small">LinkedIn URL</label>
+                            {{ form.linkedin_url }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label text-secondary small">Personal Website</label>
+                            {{ form.website_url }}
+                        </div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <a href="{% url 'accounts:profile' %}" class="btn btn-outline-secondary rounded-pill px-4">Cancel</a>
+                        <button type="submit" class="btn btn-cyan rounded-pill px-5 fw-semibold">Save Changes</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

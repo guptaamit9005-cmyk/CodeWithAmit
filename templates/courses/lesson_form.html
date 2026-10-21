@@ -1,0 +1,123 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if is_edit %}Edit Lesson: {{ lesson.title }}{% else %}Add Lesson to Course{% endif %} — CodeWithAmit Studio{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="max-width: 860px;">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb smaller mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'courses:course_list' %}" class="text-decoration-none">Courses</a></li>
+            {% if selected_course %}
+                <li class="breadcrumb-item"><a href="{% url 'courses:course_detail' selected_course.slug %}" class="text-decoration-none">{{ selected_course.title }}</a></li>
+            {% endif %}
+            <li class="breadcrumb-item"><a href="{% url 'dashboard:admin_dashboard' %}" class="text-decoration-none">Admin Studio</a></li>
+            <li class="breadcrumb-item active text-muted" aria-current="page">{% if is_edit %}Edit Lesson{% else %}Add Lesson{% endif %}</li>
+        </ol>
+    </nav>
+
+    <div class="card flowable-card border p-4 p-md-5 rounded-4 shadow-sm bg-white">
+        <div class="d-flex align-items-center justify-content-between pb-3 mb-4 border-bottom">
+            <div>
+                <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1 rounded-pill mb-2">
+                    <i class="bi bi-play-circle-fill me-1"></i> Course Curriculum Editor
+                </span>
+                <h1 class="h3 fw-bold mb-1 text-slate-900 font-heading">
+                    {% if is_edit %}Edit Lesson: {{ lesson.title }}{% else %}Add Lesson to Course{% endif %}
+                </h1>
+                <p class="text-secondary small mb-0">Attach high-definition YouTube video embeds, lecture explanations, copyable starter code snippets, and free previews.</p>
+            </div>
+            <a href="{% url 'dashboard:admin_dashboard' %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                <i class="bi bi-arrow-left me-1"></i> Admin Dashboard
+            </a>
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger py-2 small rounded-3 mb-3">
+                    {{ form.non_field_errors }}
+                </div>
+            {% endif %}
+
+            <!-- Target Course & Order -->
+            <div class="row g-3 mb-3">
+                <div class="col-md-8">
+                    <label class="form-label fw-semibold small text-slate-700">Course / Batch <span class="text-danger">*</span></label>
+                    {{ form.course }}
+                    {% if form.course.errors %}<div class="text-danger smaller mt-1">{{ form.course.errors }}</div>{% endif %}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold small text-slate-700">Lesson Order / Sequence # <span class="text-danger">*</span></label>
+                    {{ form.order }}
+                    {% if form.order.errors %}<div class="text-danger smaller mt-1">{{ form.order.errors }}</div>{% endif %}
+                </div>
+            </div>
+
+            <!-- Title & Duration -->
+            <div class="row g-3 mb-3">
+                <div class="col-md-8">
+                    <label class="form-label fw-semibold small text-slate-700">Lesson Title <span class="text-danger">*</span></label>
+                    {{ form.title }}
+                    {% if form.title.errors %}<div class="text-danger smaller mt-1">{{ form.title.errors }}</div>{% endif %}
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold small text-slate-700">Duration (Minutes)</label>
+                    {{ form.duration_minutes }}
+                    {% if form.duration_minutes.errors %}<div class="text-danger smaller mt-1">{{ form.duration_minutes.errors }}</div>{% endif %}
+                </div>
+            </div>
+
+            <!-- Video URL (YouTube Embed) -->
+            <div class="mb-3 p-3 bg-light rounded-3 border">
+                <label class="form-label fw-semibold small text-slate-700">
+                    <i class="bi bi-youtube text-danger me-1"></i> Video URL (YouTube Embed / Watch Link)
+                </label>
+                {{ form.video_url }}
+                <div class="form-text smaller text-muted">Supports standard YouTube URLs (e.g., https://www.youtube.com/watch?v=... or youtu.be/...). The platform automatically embeds this into the player.</div>
+                {% if form.video_url.errors %}<div class="text-danger smaller mt-1">{{ form.video_url.errors }}</div>{% endif %}
+            </div>
+
+            <!-- Lesson Content -->
+            <div class="mb-3">
+                <label class="form-label fw-semibold small text-slate-700">Lesson Content / Notes <span class="text-danger">*</span></label>
+                {{ form.content }}
+                <div class="form-text smaller text-muted">Detailed concepts, lecture notes, time stamps, assignments. Markdown & HTML supported.</div>
+                {% if form.content.errors %}<div class="text-danger smaller mt-1">{{ form.content.errors }}</div>{% endif %}
+            </div>
+
+            <!-- Code Snippet & Language -->
+            <div class="row g-3 mb-3">
+                <div class="col-md-9">
+                    <label class="form-label fw-semibold small text-slate-700">Example Code Snippet (Optional)</label>
+                    {{ form.code_snippet }}
+                    <div class="form-text smaller text-muted">Copyable starter code snippet for student hands-on practice.</div>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold small text-slate-700">Code Language</label>
+                    {{ form.code_language }}
+                    <div class="form-text smaller text-muted">e.g. python, javascript, cpp, java</div>
+                </div>
+            </div>
+
+            <!-- Free Preview Checkbox -->
+            <div class="p-3 bg-light rounded-3 border mb-4">
+                <div class="form-check mb-0">
+                    {{ form.is_free_preview }}
+                    <label class="form-check-label small fw-semibold" for="{{ form.is_free_preview.id_for_label }}">
+                        <i class="bi bi-unlock-fill text-success me-1"></i> Allow Free Preview (Students can watch before enrolling)
+                    </label>
+                </div>
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 pt-2 border-top">
+                <a href="{% url 'dashboard:admin_dashboard' %}" class="btn btn-outline-secondary rounded-pill px-4">Cancel</a>
+                <button type="submit" class="btn btn-success rounded-pill px-5 fw-semibold shadow-sm hover-lift text-white">
+                    <i class="bi bi-check-circle-fill me-1"></i> {% if is_edit %}Save Lesson Changes{% else %}Add Lesson to Course{% endif %}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

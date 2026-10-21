@@ -1,0 +1,240 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ question.title }} — Doubt Community{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Back Link -->
+    <a href="{% url 'community:doubt_list' %}" class="small text-secondary text-decoration-none mb-3 d-inline-block">
+        <i class="bi bi-arrow-left me-1"></i> Back to all doubts
+    </a>
+
+    <div class="row g-4">
+        <!-- Main Column: Question & Answers -->
+        <div class="col-lg-8">
+            <!-- Question Card -->
+            <div class="card bg-surface border-0 rounded-4 shadow-sm p-4 mb-4">
+                <div class="d-flex gap-3">
+                    <!-- Upvote Column -->
+                    <div class="d-flex flex-column align-items-center gap-1 flex-shrink-0">
+                        {% if user.is_authenticated %}
+                            <button class="btn btn-outline-primary btn-sm rounded-circle p-2 upvote-q-btn" id="questionUpvoteBtn" data-id="{{ question.id }}" title="Upvote Question">
+                                <i class="bi bi-chevron-up fs-5"></i>
+                            </button>
+                        {% else %}
+                            <a href="{% url 'accounts:login' %}" class="btn btn-outline-secondary btn-sm rounded-circle p-2" title="Log in to upvote">
+                                <i class="bi bi-chevron-up fs-5"></i>
+                            </a>
+                        {% endif %}
+                        <span class="fw-bold fs-5 text-dark" id="qUpvoteCount">{{ question.total_upvotes }}</span>
+                    </div>
+
+                    <!-- Question Body -->
+                    <div class="flex-grow-1 overflow-hidden">
+                        <h2 class="fw-bold h4 mb-2 text-dark">{{ question.title }}</h2>
+                        
+                        <div class="d-flex align-items-center gap-2 smaller text-muted mb-3 flex-wrap">
+                            <span>Asked {{ question.created_at|timesince }} ago</span>
+                            <span>•</span>
+                            <span>{{ question.views_count }} Views</span>
+                            <span>•</span>
+                            <span class="text-primary fw-semibold">{{ question.answers.count }} Answers</span>
+                        </div>
+
+                        <div class="text-dark line-height-relaxed mb-3" style="white-space: pre-line;">
+                            {{ question.body }}
+                        </div>
+
+                        {% if question.code_snippet %}
+                            <div class="code-container rounded-3 border border-light-subtle overflow-hidden mb-3">
+                                <div class="bg-surface-dark px-3 py-1.5 border-bottom border-light-subtle d-flex justify-content-between align-items-center">
+                                    <span class="smaller font-monospace text-muted">{{ question.language }} snippet</span>
+                                    <button class="btn btn-sm btn-outline-secondary copy-btn py-0 px-2 smaller" type="button">Copy</button>
+                                </div>
+                                <pre class="m-0 p-3 bg-surface-dark font-monospace text-dark smaller overflow-auto"><code>{{ question.code_snippet }}</code></pre>
+                            </div>
+                        {% endif %}
+
+                        <div class="d-flex flex-wrap justify-content-between align-items-center pt-3 border-top border-light-subtle gap-2">
+                            <div class="d-flex flex-wrap gap-1">
+                                {% for tag in question.get_tag_list %}
+                                    <a href="{% url 'community:doubt_list' %}?tag={{ tag|slugify }}" class="badge bg-secondary-subtle text-secondary rounded-pill text-decoration-none smaller">
+                                        #{{ tag }}
+                                    </a>
+                                {% endfor %}
+                            </div>
+
+                            <div class="d-flex align-items-center gap-2 bg-surface-dark p-2 rounded-3 border border-light-subtle">
+                                <div class="avatar-circle-sm bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 32px; height: 32px;">
+                                    {{ question.author.username|first|upper }}
+                                </div>
+                                <div>
+                                    <div class="fw-bold smaller text-dark">{{ question.author.username }}</div>
+                                    <div class="text-muted smaller">{{ question.author.profile.headline|default:"Student Coder" }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Answers Section -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h4 class="fw-bold mb-0 text-dark">
+                    {{ answers.count }} Answers
+                </h4>
+            </div>
+
+            <!-- Answers List -->
+            <div class="d-flex flex-column gap-3 mb-5">
+                {% for ans in answers %}
+                    <div class="card bg-surface border-0 rounded-4 shadow-sm p-4 {% if ans.is_accepted %}border-start border-4 border-success{% endif %}">
+                        <div class="d-flex gap-3">
+                            <!-- Answer Upvotes Column -->
+                            <div class="d-flex flex-column align-items-center gap-1 flex-shrink-0">
+                                {% if user.is_authenticated %}
+                                    <button class="btn btn-outline-primary btn-sm rounded-circle p-2 upvote-ans-btn" data-id="{{ ans.id }}" title="Upvote Answer">
+                                        <i class="bi bi-chevron-up fs-6"></i>
+                                    </button>
+                                {% endif %}
+                                <span class="fw-bold text-dark ans-upvote-count-{{ ans.id }}">{{ ans.total_upvotes }}</span>
+
+                                {% if ans.is_accepted %}
+                                    <div class="text-success mt-2" title="Accepted Solution by Question Author">
+                                        <i class="bi bi-check-circle-fill fs-3"></i>
+                                    </div>
+                                {% elif is_author %}
+                                    <a href="{% url 'community:accept_answer' ans.id %}" class="btn btn-outline-success btn-sm rounded-circle p-1.5 mt-2" title="Accept this answer as correct solution">
+                                        <i class="bi bi-check-lg"></i>
+                                    </a>
+                                {% endif %}
+                            </div>
+
+                            <!-- Answer Body -->
+                            <div class="flex-grow-1 overflow-hidden">
+                                {% if ans.is_accepted %}
+                                    <div class="badge bg-success-subtle text-success fw-bold px-2.5 py-1 rounded-pill mb-2">
+                                        <i class="bi bi-check2-circle me-1"></i> Accepted Solution
+                                    </div>
+                                {% endif %}
+
+                                <div class="text-dark line-height-relaxed mb-3" style="white-space: pre-line;">
+                                    {{ ans.body }}
+                                </div>
+
+                                {% if ans.code_snippet %}
+                                    <div class="code-container rounded-3 border border-light-subtle overflow-hidden mb-3">
+                                        <pre class="m-0 p-3 bg-surface-dark font-monospace text-dark smaller overflow-auto"><code>{{ ans.code_snippet }}</code></pre>
+                                    </div>
+                                {% endif %}
+
+                                <div class="d-flex justify-content-between align-items-center pt-2 border-top border-light-subtle">
+                                    <span class="smaller text-muted">Answered {{ ans.created_at|timesince }} ago</span>
+                                    <div class="d-flex align-items-center gap-2">
+                                        <div class="avatar-circle-sm bg-success text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 28px; height: 28px; font-size: 11px;">
+                                            {{ ans.author.username|first|upper }}
+                                        </div>
+                                        <span class="smaller fw-bold text-dark">{{ ans.author.username }}</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div class="card bg-surface border-0 rounded-4 shadow-sm p-4 text-center">
+                        <i class="bi bi-chat-left-dots text-muted fs-2 d-block mb-2"></i>
+                        <h6 class="text-dark fw-bold">No answers yet</h6>
+                        <p class="text-secondary smaller mb-0">Know how to solve this? Write the first answer below!</p>
+                    </div>
+                {% endfor %}
+            </div>
+
+            <!-- Post Your Answer Card -->
+            <div class="card bg-surface border-0 rounded-4 shadow-sm p-4">
+                <h5 class="fw-bold mb-3 text-dark">
+                    <i class="bi bi-reply-fill text-primary me-2"></i>Your Answer
+                </h5>
+
+                {% if user.is_authenticated %}
+                    <form action="{% url 'community:post_answer' question.slug %}" method="POST">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label class="form-label smaller fw-semibold text-secondary">Detailed Solution & Explanation</label>
+                            {{ answer_form.body }}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label smaller fw-semibold text-secondary">Code Snippet (Optional)</label>
+                            {{ answer_form.code_snippet }}
+                        </div>
+                        <button type="submit" class="btn btn-primary rounded-pill px-5 fw-bold shadow-sm">
+                            <i class="bi bi-send-fill me-1"></i> Post Your Answer (+25 XP)
+                        </button>
+                    </form>
+                {% else %}
+                    <div class="p-4 bg-surface-dark rounded-3 text-center">
+                        <p class="text-secondary mb-2">You must be logged in to post an answer and earn XP.</p>
+                        <a href="{% url 'accounts:login' %}?next={{ request.get_full_path|urlencode }}" class="btn btn-primary rounded-pill px-4">
+                            Log In to Answer
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Right Column: Sidebar Guidelines & Help -->
+        <div class="col-lg-4">
+            <div class="card bg-surface border-0 rounded-4 shadow-sm p-4 mb-4">
+                <h6 class="fw-bold mb-2 text-dark">How to write a great answer:</h6>
+                <ul class="text-secondary smaller mb-0 ps-3 d-flex flex-column gap-1">
+                    <li>Directly address the core doubt or error stack trace.</li>
+                    <li>Provide clear intuition before sharing code.</li>
+                    <li>Include time and space complexity ($O(N)$) analysis.</li>
+                    <li>Be polite and supportive to fellow learners!</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Upvote question
+        const qBtn = document.getElementById('questionUpvoteBtn');
+        if (qBtn) {
+            qBtn.addEventListener('click', () => {
+                const id = qBtn.getAttribute('data-id');
+                fetch(`/community/question/${id}/upvote/`, {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        document.getElementById('qUpvoteCount').innerText = data.total_upvotes;
+                        qBtn.classList.toggle('btn-primary', data.upvoted);
+                        qBtn.classList.toggle('btn-outline-primary', !data.upvoted);
+                    }
+                });
+            });
+        }
+
+        // Upvote answers
+        document.querySelectorAll('.upvote-ans-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const id = btn.getAttribute('data-id');
+                fetch(`/community/answer/${id}/upvote/`, {
+                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
+                })
+                .then(r => r.json())
+                .then(data => {
+                    if (data.success) {
+                        const countEl = document.querySelector(`.ans-upvote-count-${id}`);
+                        if (countEl) countEl.innerText = data.total_upvotes;
+                        btn.classList.toggle('btn-primary', data.upvoted);
+                        btn.classList.toggle('btn-outline-primary', !data.upvoted);
+                    }
+                });
+            });
+        });
+    });
+</script>
+{% endblock %}

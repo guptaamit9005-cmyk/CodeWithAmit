@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block title %}Notifications — Student Success Hub{% endblock %}
+
+{% block content %}
+<div class="container py-5 my-md-3">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card bg-surface border-secondary p-4 p-md-5 rounded-4 shadow-lg">
+                <div class="d-flex justify-content-between align-items-center mb-4 pb-2 border-bottom border-secondary">
+                    <div>
+                        <h3 class="fw-bold text-light font-heading mb-1">Your Notifications</h3>
+                        <p class="text-secondary small mb-0">Live class reminders, course updates, and milestone alerts</p>
+                    </div>
+                    <a href="{% url 'notifications:mark_all_read' %}" class="btn btn-outline-cyan btn-sm rounded-pill px-3">
+                        <i class="bi bi-check-all me-1"></i> Mark All as Read
+                    </a>
+                </div>
+
+                <div class="d-flex flex-column gap-3">
+                    {% for notif in notifications %}
+                        <div class="p-3 rounded-3 {% if not notif.is_read %}bg-primary-subtle border border-cyan-subtle{% else %}bg-surface-dark border border-secondary{% endif %} d-flex align-items-start justify-content-between gap-3">
+                            <div class="d-flex align-items-start gap-3">
+                                <div class="badge {% if not notif.is_read %}bg-cyan text-dark{% else %}bg-secondary{% endif %} p-2 rounded-circle mt-1">
+                                    <i class="bi bi-bell-fill"></i>
+                                </div>
+                                <div>
+                                    <h6 class="text-light mb-1 fw-bold">{{ notif.title }}</h6>
+                                    <p class="text-secondary smaller mb-2">{{ notif.message }}</p>
+                                    <span class="smaller text-muted">{{ notif.created_at|timesince }} ago</span>
+                                </div>
+                            </div>
+
+                            <div class="d-flex flex-column gap-1 text-end">
+                                {% if notif.link_url %}
+                                    <a href="{% url 'notifications:mark_as_read' notif.pk %}" class="btn btn-cyan btn-sm rounded-pill py-0 px-3 smaller text-nowrap">
+                                        View
+                                    </a>
+                                {% endif %}
+                                {% if not notif.is_read %}
+                                    <a href="{% url 'notifications:mark_as_read' notif.pk %}" class="smaller text-secondary text-decoration-none mt-1">
+                                        Dismiss
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% empty %}
+                        <div class="text-center py-5 text-muted">
+                            <i class="bi bi-bell-slash fs-1 d-block mb-2"></i>
+                            <h6>No notifications yet</h6>
+                            <p class="smaller">When classes are scheduled or achievements unlocked, you'll be notified here.</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
