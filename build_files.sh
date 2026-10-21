@@ -1,3 +1,22 @@
 #!/bin/bash
-pip install -r requirements.txt
-python manage.py collectstatic --no-input
+set -e
+
+echo "=== Installing dependencies for build ==="
+if command -v python3 &> /dev/null; then
+    PY_BIN="python3"
+else
+    PY_BIN="python"
+fi
+
+if command -v uv &> /dev/null; then
+    echo "Using uv to install dependencies..."
+    uv pip install -r requirements.txt --system
+else
+    echo "Using pip to install dependencies..."
+    $PY_BIN -m pip install -r requirements.txt --break-system-packages
+fi
+
+echo "=== Collecting static files ==="
+$PY_BIN manage.py collectstatic --no-input --clear
+
+echo "=== Build finished successfully ==="

@@ -85,14 +85,21 @@ TEMPLATES = [
 WSGI_APPLICATION = 'config.wsgi.application'
 
 # Database
-# Uses DATABASE_URL for PostgreSQL in production (e.g. Render) or SQLite in development
+# Uses DATABASE_URL for PostgreSQL in production (e.g. Render, Supabase, Neon) or SQLite in development
 if dj_database_url and os.environ.get('DATABASE_URL'):
     DATABASES = {
         'default': dj_database_url.config(
-            default=f"sqlite:///{BASE_DIR / 'db.sqlite3'}",
+            default=os.environ.get('DATABASE_URL'),
             conn_max_age=600,
             conn_health_checks=True,
         )
+    }
+elif os.environ.get('VERCEL'):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': Path('/tmp') / 'db.sqlite3',
+        }
     }
 else:
     DATABASES = {
