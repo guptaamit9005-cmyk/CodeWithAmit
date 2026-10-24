@@ -49,10 +49,10 @@ def home(request):
 
     feature_pillars = [
         {
-            'icon': 'bi-code-square',
+            'icon': 'bi-mortarboard-fill',
             'color': 'primary',
-            'title': 'Interactive Code Sandbox',
-            'subtitle': 'Run Python, C++, Java & JS in real-time with instant test evaluation and execution metrics.'
+            'title': 'Structured Industry Batches',
+            'subtitle': 'Comprehensive courses covering full stack engineering, system architecture, databases, and algorithms.'
         },
         {
             'icon': 'bi-lightning-charge-fill',
@@ -67,21 +67,21 @@ def home(request):
             'subtitle': 'Curated problem sets across Python, DSA, SQL, and Web Dev with YouTube solution video links.'
         },
         {
-            'icon': 'bi-stars',
+            'icon': 'bi-signpost-split-fill',
             'color': 'danger',
-            'title': 'AI-Powered Quiz Generator',
-            'subtitle': 'Generate dynamic MCQs to assess technical depth and sharpen interview fundamentals.'
+            'title': 'Guided Career Roadmaps',
+            'subtitle': 'Structured role-based roadmaps for Frontend, Backend, Fullstack, and Data Engineering careers.'
         }
     ]
 
     faqs = [
         {
             'q': 'Is Codestyle free for students?',
-            'a': 'Yes! The practice sets, in-browser code editor, curated courses, and career roadmaps are completely free for all learners.'
+            'a': 'Yes! The practice sets, tutorials, curated courses, and career roadmaps are completely free for all learners.'
         },
         {
-            'q': 'How does the interactive code editor work?',
-            'a': 'You can select Python 3, C++, or Java, write your solution directly in the browser, and click "Run Code" or "Submit". The test runner evaluates your code against predefined test cases and returns execution latency and memory usage.'
+            'q': 'How do the practice problem sets work?',
+            'a': 'You can solve topic-wise practice problems in Python, C++, Java, and SQL with detailed step-by-step solutions, test cases, and video walkthroughs.'
         },
         {
             'q': 'Can I join live classes on Google Meet?',
@@ -97,6 +97,8 @@ def home(request):
         }
     ]
 
+    platform_features = PlatformFeature.objects.filter(is_active=True).order_by('order', '-created_at')[:6]
+
     context = {
         'flagship_batches': flagship_batches,
         'course_categories': course_categories,
@@ -106,6 +108,7 @@ def home(request):
         'free_notes': free_notes,
         'popular_roadmaps': popular_roadmaps,
         'upcoming_classes': upcoming_classes,
+        'platform_features': platform_features,
         'stats': stats,
         'feature_pillars': feature_pillars,
         'faqs': faqs,

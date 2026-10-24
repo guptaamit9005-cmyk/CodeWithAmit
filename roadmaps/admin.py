@@ -7,9 +7,9 @@ class RoadmapTopicInline(admin.StackedInline):
 
 @admin.register(Roadmap)
 class RoadmapAdmin(admin.ModelAdmin):
-    list_display = ('title', 'target_role', 'estimated_time', 'order', 'is_published')
+    list_display = ('title', 'target_role', 'estimated_time', 'website_url', 'order', 'is_published')
     list_filter = ('is_published',)
-    search_fields = ('title', 'target_role')
+    search_fields = ('title', 'target_role', 'website_url')
     prepopulated_fields = {'slug': ('title',)}
 
 @admin.register(RoadmapStage)

@@ -11,4 +11,5 @@ urlpatterns = [
     path('question/<int:question_id>/upvote/', views.toggle_question_upvote, name='toggle_question_upvote'),
     path('answer/<int:answer_id>/upvote/', views.toggle_answer_upvote, name='toggle_answer_upvote'),
     path('answer/<int:answer_id>/accept/', views.accept_answer, name='accept_answer'),
+    path('answer/<int:answer_id>/toggle-admin-solution/', views.toggle_admin_solution, name='toggle_admin_solution'),
 ]

@@ -63,6 +63,10 @@ class DoubtQuestion(models.Model):
             return [t.strip() for t in self.raw_tags.split(',') if t.strip()]
         return [t.name for t in self.tags.all()]
 
+    @property
+    def has_admin_solution(self):
+        return self.answers.filter(is_admin_solution=True).exists()
+
 
 class DoubtAnswer(models.Model):
     question = models.ForeignKey(DoubtQuestion, on_delete=models.CASCADE, related_name='answers')
@@ -70,12 +74,14 @@ class DoubtAnswer(models.Model):
     body = models.TextField(help_text="Detailed solution or explanation")
     code_snippet = models.TextField(blank=True, help_text="Code snippet supporting your answer")
     is_accepted = models.BooleanField(default=False)
+    is_admin_solution = models.BooleanField(default=False, help_text="Marked or authored as verified official Admin solution")
+    admin_badge_title = models.CharField(max_length=100, blank=True, default="Verified Admin Solution", help_text="Custom badge label for admin solution")
     upvotes = models.ManyToManyField(User, related_name='doubt_answer_upvotes', blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        ordering = ['-is_accepted', '-created_at']
+        ordering = ['-is_admin_solution', '-is_accepted', '-created_at']
 
     def __str__(self):
         return f"Answer by {self.author.username} on '{self.question.title}'"
@@ -83,3 +89,12 @@ class DoubtAnswer(models.Model):
     @property
     def total_upvotes(self):
         return self.upvotes.count()
+
+    @property
+    def is_by_admin(self):
+        return (
+            self.is_admin_solution or 
+            self.author.is_staff or 
+            self.author.is_superuser or 
+            getattr(getattr(self.author, 'profile', None), 'role', '') == 'admin'
+        )

@@ -25,6 +25,8 @@ def doubt_list(request):
 
     if filter_type == 'unanswered':
         questions = questions.annotate(ans_count=Count('answers')).filter(ans_count=0)
+    elif filter_type == 'admin_solved':
+        questions = questions.filter(answers__is_admin_solution=True).distinct()
     elif filter_type == 'solved':
         questions = questions.filter(has_accepted_answer=True)
     elif filter_type == 'my_doubts' and request.user.is_authenticated:
@@ -49,7 +51,9 @@ def doubt_list(request):
                 author=demo_user,
                 body="You can maintain a dictionary storing `num -> index`. For each number `x`, check if `target - x` is already in the map. If yes, return both indices in a single pass!",
                 code_snippet="def twoSum(nums, target):\n    seen = {}\n    for i, num in enumerate(nums):\n        complement = target - num\n        if complement in seen:\n            return [seen[complement], i]\n        seen[num] = i\n    return []",
-                is_accepted=True
+                is_accepted=True,
+                is_admin_solution=True,
+                admin_badge_title="Official Admin Solution"
             )
 
             DoubtQuestion.objects.create(
@@ -72,6 +76,8 @@ def doubt_list(request):
         'popular_tags': popular_tags,
         'total_doubts': DoubtQuestion.objects.count(),
         'solved_doubts': DoubtQuestion.objects.filter(has_accepted_answer=True).count(),
+        'admin_solved_doubts': DoubtQuestion.objects.filter(answers__is_admin_solution=True).distinct().count(),
+        'unanswered_doubts': DoubtQuestion.objects.annotate(ans_count=Count('answers')).filter(ans_count=0).count(),
     })
 
 
@@ -137,19 +143,64 @@ def post_answer(request, slug):
             answer = form.save(commit=False)
             answer.question = question
             answer.author = request.user
+
+            # Automatically mark as verified admin solution if author is staff/admin/superuser
+            is_admin_user = (
+                request.user.is_staff or 
+                request.user.is_superuser or 
+                getattr(getattr(request.user, 'profile', None), 'role', '') == 'admin'
+            )
+            if is_admin_user:
+                answer.is_admin_solution = True
+                answer.admin_badge_title = "Official Admin Solution" if (request.user.is_superuser or getattr(getattr(request.user, 'profile', None), 'role', '') == 'admin') else "Verified Mentor Solution"
+                # If question doesn't have an accepted answer, auto-mark this as verified
+                if not question.has_accepted_answer:
+                    question.has_accepted_answer = True
+                    question.save(update_fields=['has_accepted_answer'])
+
             answer.save()
 
             # Reward answering
             if hasattr(request.user, 'profile'):
-                request.user.profile.points += 25
+                points_to_add = 50 if is_admin_user else 25
+                request.user.profile.points += points_to_add
                 request.user.profile.save(update_fields=['points'])
             check_and_award_badges(request.user)
 
-            messages.success(request, "🎉 Your answer has been submitted (+25 XP)!")
+            if is_admin_user:
+                messages.success(request, "👑 Official Admin Solution published successfully! Verified badge applied.")
+            else:
+                messages.success(request, "🎉 Your answer has been submitted (+25 XP)!")
         else:
             messages.error(request, "Please enter a valid answer body.")
 
     return redirect('community:doubt_detail', slug=question.slug)
+
+
+@login_required
+def toggle_admin_solution(request, answer_id):
+    """Admin/Staff can mark or unmark any answer as an official verified admin solution."""
+    answer = get_object_or_404(DoubtAnswer, id=answer_id)
+    is_admin_user = (
+        request.user.is_staff or 
+        request.user.is_superuser or 
+        getattr(getattr(request.user, 'profile', None), 'role', '') == 'admin'
+    )
+    if not is_admin_user:
+        messages.error(request, "Only administrators or instructors can verify official solutions.")
+        return redirect('community:doubt_detail', slug=answer.question.slug)
+
+    answer.is_admin_solution = not answer.is_admin_solution
+    if answer.is_admin_solution:
+        answer.admin_badge_title = "Official Admin Solution"
+        answer.question.has_accepted_answer = True
+        answer.question.save(update_fields=['has_accepted_answer'])
+        messages.success(request, f"👑 Verified answer by @{answer.author.username} as the Official Admin Solution!")
+    else:
+        messages.info(request, f"Removed official admin solution badge from @{answer.author.username}.")
+    
+    answer.save(update_fields=['is_admin_solution', 'admin_badge_title'])
+    return redirect('community:doubt_detail', slug=answer.question.slug)
 
 
 @login_required

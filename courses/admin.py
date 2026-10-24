@@ -1,5 +1,8 @@
 from django.contrib import admin
-from .models import CourseCategory, Course, Lesson, Quiz, QuizQuestion, Enrollment, LessonProgress, CourseReview, CourseBookmark, LessonNote
+from .models import (
+    CourseCategory, Course, CourseSection, SectionLink, Lesson, Quiz,
+    QuizQuestion, Enrollment, LessonProgress, CourseReview, CourseBookmark, LessonNote
+)
 
 @admin.register(LessonNote)
 class LessonNoteAdmin(admin.ModelAdmin):
@@ -7,32 +10,67 @@ class LessonNoteAdmin(admin.ModelAdmin):
     list_filter = ('lesson__course',)
 
 
+class SectionLinkInline(admin.TabularInline):
+    model = SectionLink
+    extra = 1
+
+
+class CourseSectionInline(admin.StackedInline):
+    model = CourseSection
+    extra = 0
+
+
 class LessonInline(admin.StackedInline):
     model = Lesson
-    extra = 1
+    extra = 0
+    fields = ('title', 'section', 'order', 'duration_minutes', 'video_url', 'github_url', 'is_free_preview', 'content')
+
 
 class QuizQuestionInline(admin.StackedInline):
     model = QuizQuestion
-    extra = 2
+    extra = 1
+
 
 @admin.register(CourseCategory)
 class CourseCategoryAdmin(admin.ModelAdmin):
     list_display = ('name', 'slug', 'order')
     prepopulated_fields = {'slug': ('name',)}
 
+
+@admin.register(CourseSection)
+class CourseSectionAdmin(admin.ModelAdmin):
+    list_display = ('title', 'course', 'order', 'github_url', 'created_at')
+    list_filter = ('course',)
+    search_fields = ('title', 'description', 'course__title')
+    inlines = [SectionLinkInline]
+
+
+@admin.register(SectionLink)
+class SectionLinkAdmin(admin.ModelAdmin):
+    list_display = ('title', 'section', 'link_type', 'url', 'order')
+    list_filter = ('link_type', 'section__course')
+    search_fields = ('title', 'url')
+
+
 @admin.register(Course)
 class CourseAdmin(admin.ModelAdmin):
-    list_display = ('title', 'category', 'difficulty', 'instructor', 'is_published', 'is_featured', 'created_at')
+    list_display = ('title', 'category', 'difficulty', 'instructor', 'github_repo_url', 'is_published', 'is_featured', 'created_at')
     list_filter = ('category', 'difficulty', 'is_published', 'is_featured')
-    search_fields = ('title', 'description')
+    search_fields = ('title', 'description', 'github_repo_url')
     prepopulated_fields = {'slug': ('title',)}
-    inlines = [LessonInline]
+    inlines = [CourseSectionInline, LessonInline]
+
+    def save_model(self, request, obj, form, change):
+        if not obj.instructor:
+            obj.instructor = request.user
+        super().save_model(request, obj, form, change)
+
 
 @admin.register(Lesson)
 class LessonAdmin(admin.ModelAdmin):
-    list_display = ('title', 'course', 'order', 'duration_minutes', 'is_free_preview')
-    list_filter = ('course', 'is_free_preview')
-    search_fields = ('title', 'content')
+    list_display = ('title', 'course', 'section', 'order', 'duration_minutes', 'github_url', 'is_free_preview')
+    list_filter = ('course', 'section', 'is_free_preview')
+    search_fields = ('title', 'content', 'github_url')
 
 @admin.register(Quiz)
 class QuizAdmin(admin.ModelAdmin):

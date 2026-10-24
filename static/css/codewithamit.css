@@ -1,15 +1,19 @@
 /* ==========================================================================
    CodeWithAmit - Premium Coding Education Platform
-   Design System: Clean White Canvas, Deep Navy Typography, Blue/Indigo Accent,
-   Soft Neutral Cards, Controlled Shadows, Generous Whitespace.
+   Design System: Obsidian Dark & Pristine Light Dual Theme System
+   Obsidian Dark: Deep Cosmic Backgrounds, Glowing Accents, Glassmorphic Cards,
+   High-Contrast Typography, Smooth Spring Transitions.
    ========================================================================== */
 
-:root {
+:root,
+[data-bs-theme="light"] {
     /* Backgrounds */
     --cwa-bg: #ffffff;
     --cwa-bg-subtle: #f8fafc;
     --cwa-bg-muted: #f1f5f9;
     --cwa-bg-card: #ffffff;
+    --cwa-bg-card-hover: #f8fafc;
+    --cwa-bg-glass: rgba(255, 255, 255, 0.94);
     --cwa-bg-dark: #0f172a;
     --cwa-bg-dark-card: #1e293b;
 
@@ -52,7 +56,7 @@
     --cwa-radius-xl: 22px;
     --cwa-radius-pill: 9999px;
 
-    /* Shadows (Carefully Controlled) */
+    /* Shadows */
     --cwa-shadow-xs: 0 1px 2px 0 rgba(15, 23, 42, 0.04);
     --cwa-shadow-sm: 0 1px 3px 0 rgba(15, 23, 42, 0.06), 0 1px 2px -1px rgba(15, 23, 42, 0.04);
     --cwa-shadow-md: 0 4px 16px -2px rgba(15, 23, 42, 0.06), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
@@ -62,7 +66,7 @@
     /* Transitions */
     --cwa-transition: all 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 
-    /* Legacy Theme Compatibility / Fallbacks for Internal Pages */
+    /* Legacy Theme Compatibility / Fallbacks */
     --bg-canvas: #f8fafc;
     --bg-surface: #ffffff;
     --bg-surface-subtle: #f1f5f9;
@@ -74,6 +78,80 @@
     --gradient-brand: linear-gradient(135deg, #2563eb 0%, #4f46e5 100%);
 }
 
+/* ==========================================================================
+   Full Site Dark Theme (Obsidian Cyber aesthetic)
+   ========================================================================== */
+[data-bs-theme="dark"] {
+    /* Backgrounds: Deep space obsidian palette */
+    --cwa-bg: #090c15;
+    --cwa-bg-subtle: #0d111d;
+    --cwa-bg-muted: #131828;
+    --cwa-bg-card: #111524;
+    --cwa-bg-card-hover: #161c30;
+    --cwa-bg-glass: rgba(13, 17, 29, 0.88);
+    --cwa-bg-dark: #06080e;
+    --cwa-bg-dark-card: #0d111d;
+
+    /* Text & Typography: High contrast, crystal crisp */
+    --cwa-text-heading: #f8fafc;
+    --cwa-text-body: #94a3b8;
+    --cwa-text-muted: #64748b;
+    --cwa-text-light: #ffffff;
+
+    /* Primaries with glowing luminescence */
+    --cwa-primary: #6366f1;
+    --cwa-primary-hover: #818cf8;
+    --cwa-primary-subtle: rgba(99, 102, 241, 0.15);
+    --cwa-primary-border: rgba(99, 102, 241, 0.35);
+
+    --cwa-indigo: #818cf8;
+    --cwa-indigo-subtle: rgba(129, 140, 248, 0.16);
+
+    --cwa-emerald: #10b981;
+    --cwa-emerald-subtle: rgba(16, 185, 129, 0.16);
+
+    --cwa-amber: #f59e0b;
+    --cwa-amber-subtle: rgba(245, 158, 11, 0.16);
+
+    --cwa-rose: #f43f5e;
+    --cwa-rose-subtle: rgba(244, 63, 94, 0.16);
+
+    --cwa-cyan: #06b6d4;
+    --cwa-cyan-subtle: rgba(6, 182, 212, 0.16);
+
+    /* Borders: Ultra-clean frosted border lines */
+    --cwa-border: rgba(255, 255, 255, 0.08);
+    --cwa-border-subtle: rgba(255, 255, 255, 0.04);
+    --cwa-border-hover: rgba(99, 102, 241, 0.45);
+
+    /* Shadows: Deep glow shadows */
+    --cwa-shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+    --cwa-shadow-sm: 0 2px 4px 0 rgba(0, 0, 0, 0.6);
+    --cwa-shadow-md: 0 8px 24px -4px rgba(0, 0, 0, 0.65);
+    --cwa-shadow-lg: 0 16px 36px -6px rgba(0, 0, 0, 0.75);
+    --cwa-shadow-hover: 0 16px 36px -4px rgba(99, 102, 241, 0.28);
+
+    /* Fallback vars matching styles.css */
+    --bg-canvas: #090c15;
+    --bg-surface: #111524;
+    --bg-surface-subtle: #0d111d;
+    --bg-surface-dark: #06080e;
+    --border-color: rgba(255, 255, 255, 0.08);
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --gradient-brand: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+    
+    /* Bootstrap variables in dark mode */
+    --bs-body-bg: #090c15;
+    --bs-body-color: #94a3b8;
+    --bs-heading-color: #f8fafc;
+    --bs-tertiary-bg: #0d111d;
+    --bs-secondary-bg: #111524;
+    --bs-border-color: rgba(255, 255, 255, 0.08);
+    --bs-card-bg: #111524;
+}
+
 /* Global Layout & Body */
 body.cwa-theme {
     background-color: var(--cwa-bg) !important;
@@ -81,6 +159,7 @@ body.cwa-theme {
     font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
     line-height: 1.6;
     letter-spacing: -0.011em;
+    transition: background-color 0.25s ease, color 0.25s ease;
 }
 
 /* Headings */
@@ -97,9 +176,9 @@ body.cwa-theme {
     left: 0;
     width: 100%;
     z-index: 1040;
-    background: rgba(255, 255, 255, 0.94);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
+    background: var(--cwa-bg-glass);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     border-bottom: 1px solid var(--cwa-border);
     transition: var(--cwa-transition);
 }
@@ -858,8 +937,12 @@ body.cwa-theme {
 
 /* --- Desktop Mega Dropdown --- */
 .cwa-mega-dropdown {
+    background: var(--cwa-bg-card) !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
     border-radius: var(--cwa-radius-md) !important;
     border-color: var(--cwa-border) !important;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.25) !important;
     animation: cwaDropIn 0.18s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
@@ -875,21 +958,23 @@ body.cwa-theme {
     padding: 0.6rem 0.65rem;
     border-radius: 8px;
     text-decoration: none;
-    transition: background 0.15s;
+    color: var(--cwa-text-heading);
+    transition: background 0.15s, color 0.15s;
 }
 
 .cwa-dropdown-item:hover {
     background: var(--cwa-bg-subtle);
+    color: var(--cwa-primary);
 }
 
 .cwa-dropdown-icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    font-size: 0.95rem;
+    font-size: 1rem;
     flex-shrink: 0;
 }
 
@@ -1029,3 +1114,1100 @@ body.cwa-theme {
         display: none !important;
     }
 }
+
+/* ==========================================================================
+   Obsidian Dark Mode Enhancements & Glassmorphic Visuals
+   ========================================================================== */
+
+/* Theme Toggle Button */
+.cwa-theme-toggle {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 1px solid var(--cwa-border);
+    background: var(--cwa-bg-card);
+    color: var(--cwa-text-heading);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: var(--cwa-transition);
+}
+
+.cwa-theme-toggle:hover {
+    background: var(--cwa-bg-muted);
+    border-color: var(--cwa-primary-border);
+    color: var(--cwa-primary);
+    transform: rotate(15deg) scale(1.05);
+}
+
+/* Glassmorphism & Visual Glow utilities */
+.cwa-glass {
+    background: var(--cwa-bg-glass) !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid var(--cwa-border) !important;
+}
+
+.cwa-gradient-text {
+    background: linear-gradient(135deg, #818cf8 0%, #c084fc 50%, #38bdf8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+}
+
+.cwa-gradient-fire-text {
+    background: linear-gradient(135deg, #f97316 0%, #fbbf24 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+}
+
+.cwa-glow-accent {
+    box-shadow: 0 0 35px rgba(99, 102, 241, 0.22);
+}
+
+.cwa-glow-card {
+    position: relative;
+    border-radius: var(--cwa-radius-lg);
+    background: var(--cwa-bg-card);
+    border: 1px solid var(--cwa-border);
+    transition: var(--cwa-transition);
+    overflow: hidden;
+}
+
+.cwa-glow-card:hover {
+    border-color: var(--cwa-primary-border);
+    box-shadow: 0 16px 36px -4px rgba(99, 102, 241, 0.22);
+    transform: translateY(-4px);
+}
+
+/* Check Item (Interactive 450 Sheet Tracker) */
+.cwa-check-item {
+    padding: 0.85rem 1.1rem;
+    border-radius: var(--cwa-radius-md);
+    border: 1px solid var(--cwa-border);
+    background: var(--cwa-bg-card);
+    transition: var(--cwa-transition);
+    cursor: pointer;
+    user-select: none;
+}
+
+.cwa-check-item:hover {
+    border-color: var(--cwa-primary-border);
+    background: var(--cwa-bg-subtle);
+    transform: translateX(4px);
+}
+
+.cwa-check-item.completed {
+    border-color: rgba(16, 185, 129, 0.35);
+    background: rgba(16, 185, 129, 0.08);
+}
+
+/* Dark Mode Components Overrides */
+[data-bs-theme="dark"] .cwa-card,
+[data-bs-theme="dark"] .cwa-category-card,
+[data-bs-theme="dark"] .cwa-step-card,
+[data-bs-theme="dark"] .cwa-project-card,
+[data-bs-theme="dark"] .cwa-feature-item,
+[data-bs-theme="dark"] .cwa-testimonial-card {
+    background-color: var(--cwa-bg-card) !important;
+    border-color: var(--cwa-border) !important;
+}
+
+[data-bs-theme="dark"] .cwa-category-card:hover,
+[data-bs-theme="dark"] .cwa-card:hover,
+[data-bs-theme="dark"] .cwa-step-card:hover,
+[data-bs-theme="dark"] .cwa-project-card:hover,
+[data-bs-theme="dark"] .cwa-feature-item:hover,
+[data-bs-theme="dark"] .cwa-testimonial-card:hover {
+    border-color: var(--cwa-primary-border) !important;
+    box-shadow: 0 16px 36px -6px rgba(99, 102, 241, 0.25) !important;
+}
+
+[data-bs-theme="dark"] .bg-white {
+    background-color: var(--cwa-bg-card) !important;
+}
+
+[data-bs-theme="dark"] .bg-light {
+    background-color: var(--cwa-bg-subtle) !important;
+    color: var(--cwa-text-body) !important;
+}
+
+[data-bs-theme="dark"] .text-dark {
+    color: var(--cwa-text-heading) !important;
+}
+
+[data-bs-theme="dark"] .border-light-subtle {
+    border-color: var(--cwa-border) !important;
+}
+
+/* Accordion Dark Overrides */
+[data-bs-theme="dark"] .accordion-item {
+    background-color: var(--cwa-bg-card) !important;
+    border-color: var(--cwa-border) !important;
+    color: var(--cwa-text-body) !important;
+}
+
+[data-bs-theme="dark"] .accordion-button {
+    background-color: var(--cwa-bg-card) !important;
+    color: var(--cwa-text-heading) !important;
+}
+
+[data-bs-theme="dark"] .accordion-button:not(.collapsed) {
+    background-color: rgba(99, 102, 241, 0.12) !important;
+    color: #818cf8 !important;
+    border-bottom: 1px solid var(--cwa-border);
+}
+
+[data-bs-theme="dark"] .accordion-button::after {
+    filter: invert(1) brightness(1.5);
+}
+
+[data-bs-theme="dark"] .accordion-body {
+    background-color: var(--cwa-bg-card) !important;
+    color: var(--cwa-text-body) !important;
+}
+
+/* Dropdown Menu Dark */
+[data-bs-theme="dark"] .dropdown-menu {
+    background-color: #111524 !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.75) !important;
+}
+
+[data-bs-theme="dark"] .dropdown-item {
+    color: var(--cwa-text-body) !important;
+}
+
+[data-bs-theme="dark"] .dropdown-item:hover {
+    background-color: var(--cwa-bg-muted) !important;
+    color: #ffffff !important;
+}
+
+[data-bs-theme="dark"] .dropdown-divider {
+    border-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* Modals & Popups */
+[data-bs-theme="dark"] .modal-content {
+    background-color: var(--cwa-bg-card) !important;
+    border-color: var(--cwa-border) !important;
+    color: var(--cwa-text-body) !important;
+}
+
+[data-bs-theme="dark"] .modal-header,
+[data-bs-theme="dark"] .modal-footer {
+    border-color: var(--cwa-border) !important;
+}
+
+/* Form Inputs & Selects in Dark */
+[data-bs-theme="dark"] .form-control,
+[data-bs-theme="dark"] .form-select {
+    background-color: var(--cwa-bg-subtle) !important;
+    color: var(--cwa-text-heading) !important;
+    border-color: var(--cwa-border) !important;
+}
+
+[data-bs-theme="dark"] .form-control:focus,
+[data-bs-theme="dark"] .form-select:focus {
+    border-color: var(--cwa-primary) !important;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25) !important;
+    background-color: var(--cwa-bg-card) !important;
+}
+
+[data-bs-theme="dark"] .form-control::placeholder {
+    color: var(--cwa-text-muted) !important;
+}
+
+/* Tables Dark */
+[data-bs-theme="dark"] .table {
+    color: var(--cwa-text-body) !important;
+    border-color: var(--cwa-border) !important;
+}
+
+[data-bs-theme="dark"] .table > :not(caption) > * > * {
+    background-color: transparent !important;
+    border-color: var(--cwa-border) !important;
+    color: var(--cwa-text-body) !important;
+}
+
+/* Cards & Filters */
+.cwa-filter-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.45rem 1rem;
+    border-radius: var(--cwa-radius-pill);
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: 1px solid var(--cwa-border);
+    background: var(--cwa-bg-card);
+    color: var(--cwa-text-body);
+    transition: var(--cwa-transition);
+}
+
+.cwa-filter-btn:hover {
+    border-color: var(--cwa-primary-border);
+    color: var(--cwa-primary);
+    background: var(--cwa-bg-subtle);
+}
+
+.cwa-filter-btn.active {
+    background: var(--cwa-primary);
+    color: #ffffff;
+    border-color: var(--cwa-primary);
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
+}
+
+/* ==========================================================================
+   Comprehensive Mobile Optimization & UI Polish Module
+   (Touch-friendly, Zero-Horizontal-Overflow, Obsidian Dark Fluid Response)
+   ========================================================================== */
+
+/* 1. Global Anti-Overflow & Mobile Viewport Constraints */
+html, body {
+    max-width: 100vw;
+    overflow-x: hidden !important;
+    position: relative;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* Bottom spacing for fixed bottom navigation bar on mobile/tablets */
+@media (max-width: 1199.98px) {
+    body {
+        padding-bottom: 76px !important;
+    }
+}
+
+/* Ensure container widths never overflow screen width */
+.container,
+.container-fluid,
+.container-sm,
+.container-md,
+.container-lg,
+.container-xl,
+.container-xxl {
+    max-width: 100% !important;
+    overflow-x: clip;
+}
+
+/* Prevent image and media overflow */
+img, svg, video, canvas, iframe {
+    max-width: 100%;
+    height: auto;
+}
+
+/* 2. Sleek Mobile Bottom App Bar */
+.cwa-bottom-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 64px;
+    background: var(--cwa-bg-glass);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-top: 1px solid var(--cwa-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    z-index: 1045;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+    box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.2);
+    transition: var(--cwa-transition);
+}
+
+[data-bs-theme="dark"] .cwa-bottom-bar {
+    background: rgba(9, 12, 21, 0.94);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.55);
+}
+
+.cwa-bottom-bar-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    height: 100%;
+    color: var(--cwa-text-muted);
+    text-decoration: none;
+    font-size: 0.7rem;
+    font-weight: 600;
+    gap: 3px;
+    padding: 6px 0;
+    position: relative;
+    transition: var(--cwa-transition);
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.cwa-bottom-bar-item i {
+    font-size: 1.25rem;
+    line-height: 1;
+    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), color 0.22s ease;
+}
+
+.cwa-bottom-bar-item:hover,
+.cwa-bottom-bar-item:focus {
+    color: var(--cwa-primary);
+    text-decoration: none;
+}
+
+.cwa-bottom-bar-item.active {
+    color: var(--cwa-primary);
+    font-weight: 700;
+}
+
+.cwa-bottom-bar-item.active i {
+    transform: translateY(-2px) scale(1.1);
+    color: var(--cwa-primary);
+}
+
+.cwa-bottom-bar-item.active::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 28%;
+    right: 28%;
+    height: 2.5px;
+    background: linear-gradient(90deg, #6366f1, #38bdf8);
+    border-radius: 0 0 4px 4px;
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.6);
+}
+
+/* 3. Horizontal Touch-Swipe Pill & Chip Carousels */
+.cwa-filter-scroll,
+.flowable-chips {
+    display: flex !important;
+    align-items: center;
+    gap: 0.5rem;
+    overflow-x: auto !important;
+    white-space: nowrap !important;
+    -webkit-overflow-scrolling: touch !important;
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+    padding-bottom: 6px;
+    padding-top: 2px;
+    margin-bottom: 1rem;
+    width: 100%;
+}
+
+.cwa-filter-scroll::-webkit-scrollbar,
+.flowable-chips::-webkit-scrollbar {
+    display: none !important;
+}
+
+.cwa-filter-scroll > *,
+.flowable-chips > * {
+    flex-shrink: 0 !important;
+}
+
+/* 4. Code Blocks & Snippet Touch-Scroll Polish */
+pre,
+code,
+.cwa-preview-code,
+.code-container pre,
+.code-snippet-pre,
+pre code {
+    max-width: 100% !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    word-break: normal !important;
+    white-space: pre !important;
+}
+
+/* Sleek custom scrollbars for code */
+pre::-webkit-scrollbar,
+.cwa-preview-code::-webkit-scrollbar,
+.code-container pre::-webkit-scrollbar {
+    height: 6px;
+}
+
+pre::-webkit-scrollbar-track,
+.cwa-preview-code::-webkit-scrollbar-track,
+.code-container pre::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 4px;
+}
+
+pre::-webkit-scrollbar-thumb,
+.cwa-preview-code::-webkit-scrollbar-thumb,
+.code-container pre::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.35);
+    border-radius: 4px;
+}
+
+pre::-webkit-scrollbar-thumb:hover,
+.cwa-preview-code::-webkit-scrollbar-thumb:hover,
+.code-container pre::-webkit-scrollbar-thumb:hover {
+    background: rgba(148, 163, 184, 0.6);
+}
+
+/* 5. Fluid Responsive Breakpoints (< 768px & < 576px) */
+@media (max-width: 767.98px) {
+    /* Headings fluid sizing */
+    h1, .display-4, .display-3 {
+        font-size: 1.85rem !important;
+        line-height: 1.25 !important;
+        letter-spacing: -0.02em !important;
+    }
+
+    h2, .display-5, .h2 {
+        font-size: 1.45rem !important;
+        line-height: 1.3 !important;
+    }
+
+    h3, .h3 {
+        font-size: 1.25rem !important;
+        line-height: 1.35 !important;
+    }
+
+    .lead, p.lead {
+        font-size: 1rem !important;
+        line-height: 1.55 !important;
+    }
+
+    /* Card padding compression on phones */
+    .card.p-4,
+    .card.p-md-5,
+    .card.p-xl-4 {
+        padding: 1.25rem !important;
+    }
+
+    /* Hero CTA button stacking */
+    .cwa-hero-btns {
+        flex-direction: column !important;
+        width: 100% !important;
+        gap: 0.75rem !important;
+    }
+
+    .cwa-hero-btns .btn,
+    .cwa-hero-btns a {
+        width: 100% !important;
+        justify-content: center !important;
+    }
+
+    /* Navbar on phone */
+    .cwa-navbar {
+        height: 56px !important;
+    }
+
+    .cwa-brand-name {
+        font-size: 1.05rem !important;
+    }
+
+    .cwa-brand-icon {
+        width: 32px !important;
+        height: 32px !important;
+        font-size: 0.95rem !important;
+    }
+
+    /* Mobile drawer ergonomics */
+    .cwa-offcanvas {
+        width: min(88vw, 320px) !important;
+    }
+
+    .cwa-drawer-link {
+        min-height: 44px;
+        padding: 0.75rem 0.85rem !important;
+        font-size: 0.92rem !important;
+    }
+
+    /* Code editor preview box on landing page */
+    .cwa-hero-preview {
+        border-radius: var(--cwa-radius-md) !important;
+        margin-top: 1rem;
+    }
+
+    .cwa-preview-header {
+        padding: 0.6rem 0.8rem !important;
+        gap: 0.4rem !important;
+    }
+
+    .cwa-preview-code {
+        font-size: 0.78rem !important;
+        padding: 1rem 0.85rem !important;
+    }
+
+    /* Modal dialogs */
+    .modal-dialog {
+        margin: 0.75rem !important;
+    }
+}
+
+@media (max-width: 575.98px) {
+    /* Ultra-compact phones (iPhone SE, Galaxy A-series) */
+    .container {
+        padding-left: 0.85rem !important;
+        padding-right: 0.85rem !important;
+    }
+
+    h1, .display-4 {
+        font-size: 1.65rem !important;
+    }
+
+    /* Action buttons: minimum 44px touch targets */
+    .btn {
+        min-height: 42px;
+        font-size: 0.88rem;
+    }
+
+    .btn-sm {
+        min-height: 36px;
+        font-size: 0.8rem;
+    }
+
+    /* Search inputs */
+    .form-control, .form-select {
+        min-height: 44px;
+        font-size: 0.92rem;
+    }
+
+    /* Code Source & Doubt cards */
+    .card {
+        border-radius: 14px !important;
+    }
+}
+
+/* 6. Polished Interactive Hover and Tap Micro-Animations */
+.hover-lift {
+    transition: transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.22s ease !important;
+}
+
+@media (hover: hover) and (pointer: fine) {
+    .hover-lift:hover {
+        transform: translateY(-3px) !important;
+    }
+}
+
+.hover-lift:active {
+    transform: scale(0.98) !important;
+}
+
+/* 7. Enhanced Focus Rings for High-Accessibility on Touch & Keyboard */
+:focus-visible {
+    outline: 2px solid var(--cwa-primary) !important;
+    outline-offset: 2px !important;
+}
+
+/* 8. Utility classes for mobile responsive display */
+.touch-scroll-x {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+}
+
+/* ==========================================================================
+   FLOWABLE LANDING PAGE & COMPUTER WORKSTATION ENHANCEMENTS
+   ========================================================================== */
+
+/* 1. Computer / Laptop Hardware Chassis */
+.cwa-laptop-wrapper {
+    position: relative;
+    max-width: 620px;
+    margin: 0 auto;
+    perspective: 1000px;
+}
+
+.cwa-laptop-bezel {
+    background: #0d121f;
+    border: 3px solid rgba(255, 255, 255, 0.14);
+    border-radius: 20px 20px 6px 6px;
+    box-shadow: 0 30px 80px -15px rgba(99, 102, 241, 0.35), 0 0 0 1px rgba(0, 0, 0, 0.6);
+    overflow: hidden;
+    position: relative;
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s ease;
+}
+
+.cwa-laptop-bezel:hover {
+    box-shadow: 0 35px 90px -10px rgba(99, 102, 241, 0.45), 0 0 30px rgba(99, 102, 241, 0.2);
+    transform: translateY(-4px);
+}
+
+.cwa-laptop-camera {
+    display: flex;
+    justify-content: center;
+    padding: 6px 0 3px 0;
+    background: #090c15;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.cwa-camera-lens {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #1e293b;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    display: inline-block;
+    box-shadow: inset 0 0 2px rgba(6, 182, 212, 0.8);
+}
+
+.cwa-laptop-base {
+    width: 108%;
+    margin-left: -4%;
+    height: 14px;
+    background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%);
+    border-radius: 0 0 16px 16px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: none;
+    box-shadow: 0 12px 25px -4px rgba(0, 0, 0, 0.7);
+    position: relative;
+    display: flex;
+    justify-content: center;
+}
+
+.cwa-laptop-notch {
+    width: 72px;
+    height: 5px;
+    background: #090c15;
+    border-radius: 0 0 6px 6px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-top: none;
+}
+
+/* 2. Floating Holographic Developer Widgets */
+.cwa-floating-badge {
+    position: absolute;
+    background: rgba(15, 23, 42, 0.88);
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 14px;
+    padding: 0.65rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45);
+    z-index: 10;
+    animation: cwaFloat 4s ease-in-out infinite alternate;
+    pointer-events: none;
+}
+
+.cwa-floating-badge-1 {
+    top: -24px;
+    right: -24px;
+    border-color: rgba(99, 102, 241, 0.4);
+    animation-delay: 0s;
+}
+
+.cwa-floating-badge-2 {
+    bottom: 24px;
+    left: -28px;
+    border-color: rgba(16, 185, 129, 0.4);
+    animation-delay: 1.5s;
+}
+
+.cwa-floating-badge-3 {
+    top: 50%;
+    left: -32px;
+    transform: translateY(-50%);
+    border-color: rgba(245, 158, 11, 0.4);
+    animation-delay: 2.2s;
+}
+
+@keyframes cwaFloat {
+    0% { transform: translateY(0px); }
+    100% { transform: translateY(-8px); }
+}
+
+@media (max-width: 991px) {
+    .cwa-floating-badge {
+        display: none !important;
+    }
+}
+
+.cwa-pulse-dot {
+    width: 8px;
+    height: 8px;
+    background-color: #10b981;
+    border-radius: 50%;
+    display: inline-block;
+    box-shadow: 0 0 10px #10b981;
+    animation: cwaPulse 1.8s infinite;
+}
+
+@keyframes cwaPulse {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+    70% { transform: scale(1.1); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+/* 3. Tech Stack Flow Strip */
+.cwa-tech-strip {
+    background: rgba(13, 17, 29, 0.75);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.cwa-tech-badge {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--cwa-text-heading);
+    padding: 0.45rem 0.95rem;
+    border-radius: 9999px;
+    font-size: 0.84rem;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    transition: var(--cwa-transition);
+}
+
+.cwa-tech-badge:hover {
+    background: rgba(99, 102, 241, 0.16);
+    border-color: rgba(99, 102, 241, 0.45);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.2);
+}
+
+/* 4. Flowable Developer Pipeline Section */
+.cwa-flow-card {
+    background: var(--cwa-bg-card);
+    border: 1px solid var(--cwa-border);
+    border-radius: var(--cwa-radius-lg);
+    padding: 1.75rem 1.4rem;
+    position: relative;
+    transition: var(--cwa-transition);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.cwa-flow-card:hover {
+    border-color: var(--cwa-primary);
+    transform: translateY(-5px);
+    box-shadow: 0 16px 36px -8px rgba(99, 102, 241, 0.2);
+}
+
+.cwa-flow-step-badge {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: rgba(255, 255, 255, 0.07);
+    font-family: 'Outfit', sans-serif;
+    line-height: 1;
+    pointer-events: none;
+    transition: color 0.3s ease;
+}
+
+.cwa-flow-card:hover .cwa-flow-step-badge {
+    color: rgba(99, 102, 241, 0.25);
+}
+
+.cwa-flow-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    transition: transform 0.3s ease;
+}
+
+.cwa-flow-card:hover .cwa-flow-icon {
+    transform: scale(1.08);
+}
+
+.cwa-flow-tag {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.2rem 0.6rem;
+    border-radius: 9999px;
+    display: inline-block;
+    width: fit-content;
+}
+
+.cwa-flow-tag-blue { background: rgba(37, 99, 235, 0.15); color: #60a5fa; border: 1px solid rgba(37, 99, 235, 0.3); }
+.cwa-flow-tag-amber { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+.cwa-flow-tag-green { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); }
+.cwa-flow-tag-purple { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); }
+
+.cwa-flow-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-top: auto;
+    padding-top: 0.85rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.cwa-flow-chips span {
+    font-size: 0.72rem;
+    padding: 0.18rem 0.55rem;
+    border-radius: 6px;
+    background: var(--cwa-bg-subtle);
+    border: 1px solid var(--cwa-border);
+    color: var(--cwa-text-muted);
+    font-family: 'Fira Code', monospace;
+}
+
+/* 5. Interactive Visual Feature Studio inside the Computer Mockup */
+.cwa-studio-nav {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.5rem 0.85rem;
+    background: #080c16;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    overflow-x: auto;
+    scrollbar-width: none;
+}
+.cwa-studio-nav::-webkit-scrollbar { display: none; }
+
+.cwa-studio-tab {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #94a3b8;
+    padding: 0.35rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.76rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    transition: all 0.25s ease;
+}
+
+.cwa-studio-tab:hover {
+    color: #f1f5f9;
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.2);
+}
+
+.cwa-studio-tab.active {
+    background: linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(139, 92, 246, 0.25));
+    border-color: rgba(99, 102, 241, 0.6);
+    color: #e0e7ff;
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.25);
+}
+
+.cwa-studio-body {
+    background: #070a13;
+    min-height: 275px;
+    padding: 1.25rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.cwa-studio-screen {
+    display: none;
+    animation: cwaStudioFade 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.cwa-studio-screen.active {
+    display: block;
+}
+
+@keyframes cwaStudioFade {
+    0% { opacity: 0; transform: translateY(6px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Studio UI Components */
+.cwa-studio-card {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    padding: 1rem;
+    backdrop-filter: blur(8px);
+}
+
+.cwa-test-vector-item {
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 8px;
+    padding: 0.5rem 0.75rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.78rem;
+    font-family: 'Fira Code', monospace;
+}
+
+/* Interactive Roadmap Visualizer inside Studio */
+.cwa-roadmap-steps {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
+    padding: 1rem 0;
+}
+
+.cwa-roadmap-steps::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 20px;
+    right: 20px;
+    height: 3px;
+    background: linear-gradient(90deg, #10b981 0%, #6366f1 65%, rgba(255, 255, 255, 0.1) 100%);
+    transform: translateY(-50%);
+    z-index: 1;
+}
+
+.cwa-roadmap-node {
+    position: relative;
+    z-index: 2;
+    background: #0f172a;
+    border: 2px solid rgba(255, 255, 255, 0.15);
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #94a3b8;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.cwa-roadmap-node.completed {
+    background: #10b981;
+    border-color: #10b981;
+    color: #fff;
+    box-shadow: 0 0 14px rgba(16, 185, 129, 0.6);
+}
+
+.cwa-roadmap-node.current {
+    background: #6366f1;
+    border-color: #a5b4fc;
+    color: #fff;
+    box-shadow: 0 0 16px rgba(99, 102, 241, 0.8);
+    animation: cwaPulse 2s infinite;
+}
+
+/* 6. Progressive Staggered Scroll-Reveal Animation */
+.cwa-reveal {
+    opacity: 0;
+    transform: translateY(26px);
+    transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    will-change: opacity, transform;
+}
+
+.cwa-reveal.is-visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.cwa-stagger-1 { transition-delay: 0.08s; }
+.cwa-stagger-2 { transition-delay: 0.16s; }
+.cwa-stagger-3 { transition-delay: 0.24s; }
+.cwa-stagger-4 { transition-delay: 0.32s; }
+.cwa-stagger-5 { transition-delay: 0.40s; }
+.cwa-stagger-6 { transition-delay: 0.48s; }
+
+/* 7. Dedicated Interactive Feature Flow Modal */
+.cwa-flow-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1055;
+    background: rgba(4, 7, 15, 0.82);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.25rem;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.3s ease;
+}
+
+.cwa-flow-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+.cwa-flow-dialog {
+    background: #0d121f;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 24px;
+    max-width: 860px;
+    width: 100%;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 35px 90px -10px rgba(0, 0, 0, 0.8), 0 0 50px rgba(99, 102, 241, 0.25);
+    transform: scale(0.92) translateY(14px);
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.cwa-flow-overlay.active .cwa-flow-dialog {
+    transform: scale(1) translateY(0);
+}
+
+.cwa-flow-header {
+    padding: 1.25rem 1.75rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.cwa-flow-body {
+    padding: 1.75rem;
+    overflow-y: auto;
+    flex-grow: 1;
+}
+
+.cwa-flow-timeline {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    position: relative;
+    padding-left: 2rem;
+}
+
+.cwa-flow-timeline::before {
+    content: '';
+    position: absolute;
+    left: 11px;
+    top: 8px;
+    bottom: 8px;
+    width: 2px;
+    background: linear-gradient(180deg, #6366f1 0%, #10b981 100%);
+}
+
+.cwa-flow-point {
+    position: relative;
+}
+
+.cwa-flow-point-dot {
+    position: absolute;
+    left: -2rem;
+    top: 2px;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: #0d121f;
+    border: 2px solid #6366f1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #a5b4fc;
+}
+
+.cwa-flow-footer {
+    padding: 1rem 1.75rem;
+    background: rgba(255, 255, 255, 0.02);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: gap-2;
+}
+

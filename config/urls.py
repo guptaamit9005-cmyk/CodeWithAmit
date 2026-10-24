@@ -17,20 +17,29 @@ urlpatterns = [
     path('', include('core.urls')),
     path('tutorials/', include('tutorials.urls')),
     path('coding-practice/', RedirectView.as_view(url='/practice/', permanent=False)),
-    path('editor/', RedirectView.as_view(url='/practice/editor/', permanent=False)),
-    path('compiler/', RedirectView.as_view(url='/practice/compiler/', permanent=False)),
+    path('editor/', RedirectView.as_view(url='/practice/', permanent=False)),
+    path('compiler/', RedirectView.as_view(url='/practice/', permanent=False)),
     path('practice/', include('coding_practice.urls')),
     path('accounts/', include('accounts.urls')),
     path('courses/', include('courses.urls')),
     path('notes/', include('notes.urls')),
-    path('live-classes/', include('live_classes.urls')),
+    path('live-classes/', RedirectView.as_view(url='/courses/', permanent=False)),
+    path('live-classes-archive/', include('live_classes.urls')),
     path('roadmaps/', include('roadmaps.urls')),
     path('dashboard/', include('dashboard.urls')),
     path('notifications/', include('notifications.urls')),
     path('community/', include('community.urls')),
+    path('source-code/', include('code_sources.urls')),
+    path('code-sources/', RedirectView.as_view(url='/source-code/', permanent=False)),
     path('leaderboard/', leaderboard_view, name='global_leaderboard'),
 ]
 
+from django.views.static import serve
+from django.urls import re_path
+
+urlpatterns += [
+    re_path(r'^media/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
+]
+
 if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

@@ -14,6 +14,8 @@ class Roadmap(models.Model):
     short_description = models.CharField(max_length=255)
     description = models.TextField()
     estimated_time = models.CharField(max_length=100, default='6-8 Months (Estimated)', help_text="Estimated learning duration (clearly labeled)")
+    website_url = models.URLField(max_length=500, blank=True, help_text="External website or reference roadmap link (e.g. https://roadmap.sh/frontend, official guide, etc.)")
+    website_link_label = models.CharField(max_length=100, blank=True, default='', help_text="Custom label for the website link (e.g. 'roadmap.sh Interactive Guide', 'Official Website')")
     is_published = models.BooleanField(default=True)
     order = models.PositiveIntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)

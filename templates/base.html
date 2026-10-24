@@ -1,18 +1,29 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="en" data-bs-theme="light">
+<html lang="en" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="dark light">
     <title>{% block title %}CodeWithAmit — Build Skills. Write Code. Shape Your Future.{% endblock %}</title>
     
     <!-- Meta SEO -->
-    <meta name="description" content="{% block meta_description %}CodeWithAmit is a premier coding education platform. Learn programming, master Data Structures and Algorithms, explore AI/ML, build real projects, and prepare for top tech interviews.{% endblock %}">
-    <meta name="keywords" content="CodeWithAmit, coding, DSA, algorithms, web development, AI, ML, Python, interview preparation, computer science">
-    <meta name="theme-color" content="#2563eb">
+    <meta name="description" content="{% block meta_description %}CodeWithAmit is a premier coding education platform. Learn programming, master Data Structures and Algorithms, build real full-stack projects, and prepare for top tech interviews.{% endblock %}">
+    <meta name="keywords" content="CodeWithAmit, coding, DSA, algorithms, web development, Python, interview preparation, computer science">
+    <meta name="theme-color" content="#090c15">
     <meta property="og:type" content="website">
     <meta property="og:title" content="{% block og_title %}CodeWithAmit — Build Skills. Write Code.{% endblock %}">
-    <meta property="og:description" content="{% block og_desc %}Learn programming, master DSA, explore AI/ML and build real projects.{% endblock %}">
+    <meta property="og:description" content="{% block og_desc %}Learn programming, master DSA, build real projects and prepare for top tech interviews.{% endblock %}">
+
+    <!-- Immediate Theme Setup (Prevents FOUC) -->
+    <script>
+        (function() {
+            try {
+                var savedTheme = localStorage.getItem('cwa_theme') || 'dark';
+                document.documentElement.setAttribute('data-bs-theme', savedTheme);
+            } catch(e) {}
+        })();
+    </script>
 
     <!-- Bootstrap 5.3.3 CSS & Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -24,8 +35,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@400;500;600;700&family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- CodeWithAmit Core & Custom CSS -->
-    <link rel="stylesheet" href="{% static 'css/codewithamit.css' %}?v=2.0">
-    <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=4.4">
+    <link rel="stylesheet" href="{% static 'css/codewithamit.css' %}?v=3.0">
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}?v=5.0">
     {% block extra_css %}{% endblock %}
 </head>
 <body class="cwa-theme d-flex flex-column min-vh-100">
@@ -53,21 +64,37 @@
             </div>
             <!-- Mobile Nav Links -->
             <nav class="px-3 py-2 flex-grow-1 overflow-auto">
-                <div class="cwa-drawer-section-label">Main</div>
-                <a class="cwa-drawer-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'core:home' %}"><i class="bi bi-house-door-fill"></i> Home</a>
-                <a class="cwa-drawer-link {% if request.resolver_match.app_name == 'courses' %}active{% endif %}" href="{% url 'courses:course_list' %}"><i class="bi bi-play-circle-fill text-primary"></i> Courses</a>
-                <a class="cwa-drawer-link {% if request.resolver_match.app_name == 'coding_practice' %}active{% endif %}" href="{% url 'coding_practice:problem_list' %}"><i class="bi bi-collection-play-fill text-warning"></i> Practice Sets</a>
-                <a class="cwa-drawer-link" href="{% url 'courses:course_list' %}?category=ai-ml"><i class="bi bi-cpu-fill" style="color:#7c3aed;"></i> AI / ML</a>
-                <a class="cwa-drawer-link {% if request.resolver_match.url_name == 'code_editor' %}active{% endif %}" href="{% url 'coding_practice:code_editor' %}"><i class="bi bi-terminal-fill text-success"></i> Online Compiler <span class="badge bg-success-subtle text-success rounded-pill ms-auto" style="font-size:0.65rem;">Live</span></a>
-                <div class="cwa-drawer-section-label mt-3">Resources</div>
-                <a class="cwa-drawer-link" href="{% url 'roadmaps:roadmap_list' %}"><i class="bi bi-signpost-split-fill" style="color:var(--cwa-indigo);"></i> Career Roadmaps</a>
-                <a class="cwa-drawer-link" href="{% url 'tutorials:tutorial_list' %}"><i class="bi bi-book-half text-success"></i> Tutorials & Guides</a>
-                <a class="cwa-drawer-link" href="{% url 'live_classes:class_list' %}"><i class="bi bi-broadcast text-danger"></i> Live Sessions</a>
-                <a class="cwa-drawer-link {% if request.resolver_match.url_name == 'features' %}active{% endif %}" href="{% url 'core:features' %}"><i class="bi bi-stars text-warning"></i> Platform Features</a>
-                <div class="cwa-drawer-section-label mt-3">Portals</div>
+                <div class="cwa-drawer-section-label"><i class="bi bi-compass me-1"></i> Main Navigation</div>
+                <a class="cwa-drawer-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'core:home' %}"><i class="bi bi-house-door-fill text-primary"></i> Home</a>
+                <a class="cwa-drawer-link {% if request.resolver_match.app_name == 'courses' %}active{% endif %}" href="{% url 'courses:course_list' %}"><i class="bi bi-play-circle-fill text-info"></i> Courses &amp; Batches</a>
+                <a class="cwa-drawer-link {% if request.resolver_match.app_name == 'coding_practice' %}active{% endif %}" href="{% url 'coding_practice:problem_list' %}"><i class="bi bi-lightning-charge-fill text-warning"></i> Practice Sets &amp; DSA</a>
+
+                <div class="cwa-drawer-section-label mt-3"><i class="bi bi-stars me-1 text-warning"></i> Platform Features &amp; Tools</div>
+                <a class="cwa-drawer-link {% if request.resolver_match.url_name == 'features' %}active{% endif %}" href="{% url 'core:features' %}"><i class="bi bi-stars text-warning"></i> Platform Features Hub <span class="badge bg-warning-subtle text-warning border border-warning-subtle rounded-pill smaller ms-auto">All Tools</span></a>
+                <a class="cwa-drawer-link" href="{% url 'coding_practice:problem_list' %}"><i class="bi bi-terminal-fill text-primary"></i> Code Sandbox &amp; Compiler</a>
+                <a class="cwa-drawer-link" href="{% url 'coding_practice:problem_list' %}"><i class="bi bi-list-check text-success"></i> 450 DSA Sheet Tracker</a>
+                <a class="cwa-drawer-link" href="{% url 'global_leaderboard' %}"><i class="bi bi-trophy-fill text-warning"></i> Global Leaderboard &amp; Streaks</a>
+
+                <div class="cwa-drawer-section-label mt-3"><i class="bi bi-folder2-open me-1 text-info"></i> Study Resources &amp; Materials</div>
+                <a class="cwa-drawer-link {% if request.resolver_match.app_name == 'notes' %}active{% endif %}" href="{% url 'notes:note_list' %}"><i class="bi bi-file-earmark-pdf-fill text-danger"></i> Coding Notes <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill smaller ms-auto">Free PDF</span></a>
+                <a class="cwa-drawer-link {% if request.resolver_match.app_name == 'tutorials' %}active{% endif %}" href="{% url 'tutorials:tutorial_list' %}"><i class="bi bi-book-half text-success"></i> Tutorials &amp; Tech Guides</a>
+                <a class="cwa-drawer-link {% if request.resolver_match.app_name == 'roadmaps' %}active{% endif %}" href="{% url 'roadmaps:roadmap_list' %}"><i class="bi bi-signpost-split-fill" style="color:var(--cwa-indigo);"></i> Career Roadmaps</a>
+                <a class="cwa-drawer-link {% if request.resolver_match.app_name == 'code_sources' %}active{% endif %}" href="{% url 'code_sources:list' %}"><i class="bi bi-github" style="color:#38bdf8;"></i> Code Sources &amp; Repos</a>
+                <a class="cwa-drawer-link {% if request.resolver_match.app_name == 'community' %}active{% endif %}" href="{% url 'community:doubt_list' %}"><i class="bi bi-chat-square-dots-fill text-warning"></i> Doubt Community</a>
+
+                <div class="cwa-drawer-section-label mt-3"><i class="bi bi-person-workspace me-1"></i> Portals</div>
                 <a class="cwa-drawer-link" href="{% url 'dashboard:student_dashboard' %}"><i class="bi bi-mortarboard-fill text-primary"></i> Student Dashboard</a>
                 <a class="cwa-drawer-link" href="{% url 'dashboard:admin_dashboard' %}"><i class="bi bi-speedometer2 text-warning"></i> Admin Dashboard</a>
             </nav>
+            <!-- Mobile Theme Toggle -->
+            <div class="px-4 py-2.5 border-top d-flex align-items-center justify-content-between" style="background: var(--cwa-bg-subtle);">
+                <span class="small fw-semibold" style="color:var(--cwa-text-heading);"><i class="bi bi-palette-fill me-1.5 text-primary"></i> Theme Mode</span>
+                <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-1 d-inline-flex align-items-center gap-1.5" onclick="togglePlatformTheme()">
+                    <span class="theme-label-text smaller fw-semibold">Toggle Mode</span>
+                    <i class="bi bi-sun-fill text-warning theme-icon-sun d-none"></i>
+                    <i class="bi bi-moon-stars-fill text-info theme-icon-moon"></i>
+                </button>
+            </div>
             <!-- Mobile Auth -->
             <div class="px-4 py-4 border-top">
                 {% if request.user.is_authenticated %}
@@ -142,26 +169,36 @@
 
                 <a class="cwa-nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'core:home' %}">Home</a>
                 <a class="cwa-nav-link {% if request.resolver_match.app_name == 'courses' %}active{% endif %}" href="{% url 'courses:course_list' %}">Courses</a>
-                <a class="cwa-nav-link {% if request.resolver_match.app_name == 'coding_practice' %}active{% endif %}" href="{% url 'coding_practice:problem_list' %}">Practice Sets</a>
-                <a class="cwa-nav-link" href="{% url 'courses:course_list' %}?category=ai-ml">AI/ML</a>
-                <a class="cwa-nav-link {% if request.resolver_match.url_name == 'code_editor' %}active{% endif %}" href="{% url 'coding_practice:code_editor' %}">
-                    <i class="bi bi-terminal-fill me-1 text-primary" style="font-size:0.8rem;"></i>Compiler
-                    <span class="badge rounded-pill ms-1" style="background:#dcfce7;color:#16a34a;font-size:0.65rem;padding:2px 7px;">Live</span>
-                </a>
+                <a class="cwa-nav-link {% if request.resolver_match.app_name == 'coding_practice' %}active{% endif %}" href="{% url 'coding_practice:problem_list' %}">Practice &amp; DSA</a>
 
-
-                <!-- Resources Dropdown -->
+                <!-- Features Dropdown (Platform Capabilities & Interactive Tools) -->
                 <div class="position-relative">
-                    <a class="cwa-nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Resources</a>
-                    <ul class="dropdown-menu cwa-mega-dropdown shadow-lg border p-2" style="min-width:260px;">
-                        <li><a class="cwa-dropdown-item" href="{% url 'coding_practice:code_editor' %}"><span class="cwa-dropdown-icon" style="background:#eff6ff;color:#2563eb;"><i class="bi bi-code-slash"></i></span><div><div class="fw-semibold small">Online Compiler</div><div class="text-muted" style="font-size:0.75rem;">Python, C, C++, HTML, JS</div></div></a></li>
-                        <li><a class="cwa-dropdown-item" href="{% url 'tutorials:tutorial_list' %}"><span class="cwa-dropdown-icon" style="background:#ecfdf5;color:#059669;"><i class="bi bi-book-half"></i></span><div><div class="fw-semibold small">Tutorials &amp; Guides</div><div class="text-muted" style="font-size:0.75rem;">Core CS, Web Dev, Python</div></div></a></li>
-                        <li><a class="cwa-dropdown-item" href="{% url 'roadmaps:roadmap_list' %}"><span class="cwa-dropdown-icon" style="background:#eef2ff;color:#4f46e5;"><i class="bi bi-signpost-split-fill"></i></span><div><div class="fw-semibold small">Career Roadmaps</div><div class="text-muted" style="font-size:0.75rem;">Step-by-step career milestones</div></div></a></li>
-                        <li><a class="cwa-dropdown-item" href="{% url 'live_classes:class_list' %}"><span class="cwa-dropdown-icon" style="background:#fff1f2;color:#e11d48;"><i class="bi bi-broadcast"></i></span><div><div class="fw-semibold small">Live Sessions</div><div class="text-muted" style="font-size:0.75rem;">Interactive mentor video calls</div></div></a></li>
+                    <a class="cwa-nav-link dropdown-toggle {% if request.resolver_match.url_name == 'features' %}active{% endif %}" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-stars text-warning me-1"></i>Features
+                    </a>
+                    <ul class="dropdown-menu cwa-mega-dropdown shadow-lg border p-2" style="min-width:300px;">
+                        <li class="px-3 py-1 text-uppercase fw-bold" style="font-size:0.68rem;letter-spacing:0.07em;color:var(--cwa-text-muted);"><i class="bi bi-cpu-fill text-warning me-1"></i>Platform Tools &amp; Ecosystem</li>
+                        <li><a class="cwa-dropdown-item" href="{% url 'core:features' %}"><span class="cwa-dropdown-icon" style="background:rgba(245,158,11,0.12);color:#d97706;"><i class="bi bi-stars"></i></span><div><div class="fw-semibold small">Platform Features Hub</div><div class="text-muted" style="font-size:0.75rem;">Full interactive capabilities &amp; deep-dives</div></div></a></li>
+                        <li><a class="cwa-dropdown-item" href="{% url 'coding_practice:problem_list' %}"><span class="cwa-dropdown-icon" style="background:rgba(99,102,241,0.12);color:var(--cwa-primary);"><i class="bi bi-terminal-fill"></i></span><div><div class="fw-semibold small">Multi-Language Sandbox</div><div class="text-muted" style="font-size:0.75rem;">In-browser compiler for Python, C++, Java</div></div></a></li>
+                        <li><a class="cwa-dropdown-item" href="{% url 'coding_practice:problem_list' %}"><span class="cwa-dropdown-icon" style="background:rgba(16,185,129,0.12);color:#059669;"><i class="bi bi-list-check"></i></span><div><div class="fw-semibold small">450 DSA Sheet Tracker</div><div class="text-muted" style="font-size:0.75rem;">Topic-wise pattern sheets &amp; checkmarks</div></div></a></li>
+                        <li><a class="cwa-dropdown-item" href="{% url 'global_leaderboard' %}"><span class="cwa-dropdown-icon" style="background:rgba(234,179,8,0.12);color:#ca8a04;"><i class="bi bi-trophy-fill"></i></span><div><div class="fw-semibold small">Leaderboard &amp; Streaks</div><div class="text-muted" style="font-size:0.75rem;">Gamified ranking &amp; daily problem streaks</div></div></a></li>
+                    </ul>
+                </div>
+
+                <!-- Resources Dropdown (Study Materials, Notes & Repositories) -->
+                <div class="position-relative">
+                    <a class="cwa-nav-link dropdown-toggle {% if request.resolver_match.app_name in 'notes tutorials roadmaps code_sources community' %}active{% endif %}" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-folder2-open text-info me-1"></i>Resources
+                    </a>
+                    <ul class="dropdown-menu cwa-mega-dropdown shadow-lg border p-2" style="min-width:300px;">
+                        <li class="px-3 py-1 text-uppercase fw-bold" style="font-size:0.68rem;letter-spacing:0.07em;color:var(--cwa-text-muted);"><i class="bi bi-book-fill text-info me-1"></i>Study Materials &amp; Guides</li>
+                        <li><a class="cwa-dropdown-item" href="{% url 'notes:note_list' %}"><span class="cwa-dropdown-icon" style="background:rgba(239,68,68,0.12);color:#dc2626;"><i class="bi bi-file-earmark-pdf-fill"></i></span><div><div class="fw-semibold small d-flex align-items-center gap-1.5">Coding Notes <span class="badge bg-success-subtle text-success rounded-pill smaller py-0 px-1.5">Free</span></div><div class="text-muted" style="font-size:0.75rem;">OS, DBMS, Networks &amp; DSA sheets</div></div></a></li>
+                        <li><a class="cwa-dropdown-item" href="{% url 'tutorials:tutorial_list' %}"><span class="cwa-dropdown-icon" style="background:rgba(16,185,129,0.12);color:#059669;"><i class="bi bi-book-half"></i></span><div><div class="fw-semibold small">Tutorials &amp; Guides</div><div class="text-muted" style="font-size:0.75rem;">Web Development, Python &amp; CS</div></div></a></li>
+                        <li><a class="cwa-dropdown-item" href="{% url 'roadmaps:roadmap_list' %}"><span class="cwa-dropdown-icon" style="background:rgba(99,102,241,0.12);color:#4f46e5;"><i class="bi bi-signpost-split-fill"></i></span><div><div class="fw-semibold small">Career Roadmaps</div><div class="text-muted" style="font-size:0.75rem;">Frontend, Backend, Fullstack milestones</div></div></a></li>
                         <li><hr class="dropdown-divider my-1"></li>
-                        <li class="px-3 py-1 text-uppercase fw-bold" style="font-size:0.68rem;letter-spacing:0.07em;color:var(--cwa-text-muted);">Portals</li>
-                        <li><a class="cwa-dropdown-item" href="{% url 'dashboard:student_dashboard' %}"><span class="cwa-dropdown-icon" style="background:#eff6ff;color:#2563eb;width:28px;height:28px;"><i class="bi bi-mortarboard-fill"></i></span><div><div class="fw-semibold small">Student Dashboard</div><div class="text-muted" style="font-size:0.75rem;">DSA progress &amp; streaks</div></div></a></li>
-                        <li><a class="cwa-dropdown-item" href="{% url 'dashboard:admin_dashboard' %}"><span class="cwa-dropdown-icon" style="background:#fffbeb;color:#d97706;width:28px;height:28px;"><i class="bi bi-shield-lock-fill"></i></span><div><div class="fw-semibold small">Admin Dashboard</div><div class="text-muted" style="font-size:0.75rem;">Creator studio &amp; management hub</div></div></a></li>
+                        <li class="px-3 py-1 text-uppercase fw-bold" style="font-size:0.68rem;letter-spacing:0.07em;color:var(--cwa-text-muted);"><i class="bi bi-people-fill text-warning me-1"></i>Community &amp; Code</li>
+                        <li><a class="cwa-dropdown-item" href="{% url 'code_sources:list' %}"><span class="cwa-dropdown-icon" style="background:#0f172a;color:#38bdf8;"><i class="bi bi-github"></i></span><div><div class="fw-semibold small">Code Sources &amp; GitHub</div><div class="text-muted" style="font-size:0.75rem;">Topic-wise source code &amp; repositories</div></div></a></li>
+                        <li><a class="cwa-dropdown-item" href="{% url 'community:doubt_list' %}"><span class="cwa-dropdown-icon" style="background:rgba(245,158,11,0.12);color:#d97706;"><i class="bi bi-patch-question-fill"></i></span><div><div class="fw-semibold small">Doubt Community</div><div class="text-muted" style="font-size:0.75rem;">Ask doubts &amp; get mentor solutions</div></div></a></li>
                     </ul>
                 </div>
             </nav>
@@ -209,10 +246,19 @@
                         Register <i class="bi bi-arrow-right"></i>
                     </a>
                 {% endif %}
+                <!-- Theme Toggle Button -->
+                <button type="button" class="cwa-theme-toggle ms-1" onclick="togglePlatformTheme()" aria-label="Toggle Dark / Light Theme" title="Toggle Theme">
+                    <i class="bi bi-sun-fill text-warning theme-icon-sun d-none"></i>
+                    <i class="bi bi-moon-stars-fill text-info theme-icon-moon"></i>
+                </button>
             </div>
 
-            <!-- Mobile Icons (search + avatar) -->
+            <!-- Mobile Icons (theme + search + avatar) -->
             <div class="d-flex d-xl-none align-items-center gap-1 ms-auto">
+                <button type="button" class="btn border-0 p-2 text-decoration-none" onclick="togglePlatformTheme()" aria-label="Toggle Theme" title="Toggle Theme">
+                    <i class="bi bi-sun-fill text-warning theme-icon-sun d-none" style="font-size:1.15rem;"></i>
+                    <i class="bi bi-moon-stars-fill text-info theme-icon-moon" style="font-size:1.15rem;"></i>
+                </button>
                 <a href="{% url 'core:search' %}" class="btn border-0 p-2" title="Search">
                     <i class="bi bi-search" style="font-size:1.1rem;color:var(--cwa-text-body);"></i>
                 </a>
@@ -282,22 +328,32 @@
                 <div class="col-lg-2 col-md-3 col-6">
                     <h6 class="cwa-footer-heading">Learning</h6>
                     <ul class="cwa-footer-links">
-                        <li><a href="{% url 'coding_practice:problem_list' %}">DSA 450 Sheet</a></li>
                         <li><a href="{% url 'courses:course_list' %}">Featured Courses</a></li>
-                        <li><a href="{% url 'courses:course_list' %}?category=ai-ml">AI & Machine Learning</a></li>
+                        <li><a href="{% url 'coding_practice:problem_list' %}">DSA 450 Sheet</a></li>
                         <li><a href="{% url 'roadmaps:roadmap_list' %}">Career Roadmaps</a></li>
-                        <li><a href="{% url 'core:home' %}#projects">Project Showcase</a></li>
+                        <li><a href="{% url 'tutorials:tutorial_list' %}">Tech Tutorials</a></li>
                     </ul>
                 </div>
 
-                <!-- Programming Resources -->
+                <!-- Platform Features -->
                 <div class="col-lg-2 col-md-3 col-6">
-                    <h6 class="cwa-footer-heading">Resources</h6>
+                    <h6 class="cwa-footer-heading" style="color: #f59e0b;"><i class="bi bi-stars me-1"></i>Features</h6>
                     <ul class="cwa-footer-links">
-                        <li><a href="{% url 'tutorials:tutorial_list' %}">Tutorials & Guides</a></li>
-                        <li><a href="{% url 'live_classes:class_list' %}">Live Doubt Sessions</a></li>
-                        <li><a href="{% url 'coding_practice:contest_list' %}">Coding Contests</a></li>
+                        <li><a href="{% url 'core:features' %}" class="fw-semibold text-warning">Platform Features Hub</a></li>
+                        <li><a href="{% url 'coding_practice:problem_list' %}">Multi-Language Sandbox</a></li>
+                        <li><a href="{% url 'coding_practice:problem_list' %}">Interactive Sheet Tracker</a></li>
                         <li><a href="{% url 'global_leaderboard' %}">Learner Leaderboard</a></li>
+                    </ul>
+                </div>
+
+                <!-- Study Resources -->
+                <div class="col-lg-2 col-md-3 col-6">
+                    <h6 class="cwa-footer-heading" style="color: #38bdf8;"><i class="bi bi-folder2-open me-1"></i>Resources</h6>
+                    <ul class="cwa-footer-links">
+                        <li><a href="{% url 'notes:note_list' %}" class="fw-semibold text-danger"><i class="bi bi-file-earmark-pdf me-1"></i>Coding Notes</a></li>
+                        <li><a href="{% url 'code_sources:list' %}" class="fw-semibold" style="color: #38bdf8;"><i class="bi bi-github me-1"></i>Code Sources &amp; Repos</a></li>
+                        <li><a href="{% url 'community:doubt_list' %}" class="fw-semibold" style="color: #f59e0b;"><i class="bi bi-patch-question me-1"></i>Doubt Community</a></li>
+                        <li><a href="{% url 'tutorials:tutorial_list' %}">Cheat-sheets &amp; Guides</a></li>
                     </ul>
                 </div>
 
@@ -309,7 +365,6 @@
                         <li><a href="{% url 'dashboard:student_dashboard' %}">Student Dashboard</a></li>
                         <li><a href="{% url 'accounts:admin_login' %}" class="fw-bold" style="color:#d97706;"><i class="bi bi-shield-lock-fill me-1"></i>Admin Login</a></li>
                         <li><a href="{% url 'dashboard:admin_dashboard' %}">Admin Dashboard</a></li>
-                        <li><a href="/admin/" target="_blank">Django Admin</a></li>
                     </ul>
                 </div>
 
@@ -321,7 +376,6 @@
                         <li><a href="{% url 'core:contact' %}">Contact Support</a></li>
                         <li><a href="{% url 'core:privacy_policy' %}">Privacy Policy</a></li>
                         <li><a href="{% url 'core:terms_of_service' %}">Terms of Service</a></li>
-                        <li><a href="{% url 'core:features' %}">Platform Features</a></li>
                     </ul>
                 </div>
 
@@ -356,13 +410,13 @@
             <i class="bi bi-list-check"></i>
             <span>DSA</span>
         </a>
-        <a href="{% url 'coding_practice:code_editor' %}" class="cwa-bottom-bar-item cwa-bottom-bar-fab" title="Online Compiler">
-            <i class="bi bi-terminal-fill"></i>
-            <span>Compile</span>
+        <a href="{% url 'code_sources:list' %}" class="cwa-bottom-bar-item {% if request.resolver_match.app_name == 'code_sources' %}active{% endif %}" title="Code Sources &amp; GitHub">
+            <i class="bi bi-github"></i>
+            <span>Code</span>
         </a>
-        <a href="{% url 'dashboard:student_dashboard' %}" class="cwa-bottom-bar-item">
-            <i class="bi bi-person"></i>
-            <span>Profile</span>
+        <a href="{% url 'community:doubt_list' %}" class="cwa-bottom-bar-item {% if request.resolver_match.app_name == 'community' %}active{% endif %}" title="Doubt Community">
+            <i class="bi bi-chat-square-dots{% if request.resolver_match.app_name == 'community' %}-fill{% endif %}"></i>
+            <span>Doubts</span>
         </a>
     </nav>
 
@@ -371,6 +425,36 @@
 
     <!-- Custom Application JS -->
     <script src="{% static 'js/main.js' %}"></script>
+
+    <!-- Global Dual-Theme Management System -->
+    <script>
+        function updateThemeUI(theme) {
+            var sunIcons = document.querySelectorAll('.theme-icon-sun');
+            var moonIcons = document.querySelectorAll('.theme-icon-moon');
+            if (theme === 'dark') {
+                sunIcons.forEach(function(el) { el.classList.remove('d-none'); });
+                moonIcons.forEach(function(el) { el.classList.add('d-none'); });
+            } else {
+                sunIcons.forEach(function(el) { el.classList.add('d-none'); });
+                moonIcons.forEach(function(el) { el.classList.remove('d-none'); });
+            }
+        }
+
+        function togglePlatformTheme() {
+            var currentTheme = document.documentElement.getAttribute('data-bs-theme') || 'dark';
+            var newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-bs-theme', newTheme);
+            try {
+                localStorage.setItem('cwa_theme', newTheme);
+            } catch(e) {}
+            updateThemeUI(newTheme);
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            var activeTheme = document.documentElement.getAttribute('data-bs-theme') || 'dark';
+            updateThemeUI(activeTheme);
+        });
+    </script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

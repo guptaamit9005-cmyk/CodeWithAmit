@@ -43,15 +43,21 @@
 
                 <!-- Quick Action Hub Buttons & Auth Controls -->
                 <div class="d-flex flex-wrap align-items-center gap-2">
-                    <button class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-1.5 btn-shimmer" onclick="switchDashboardTab('tab-compiler-btn')" style="font-size: 0.82rem; border-color: var(--border-color); color: var(--text-primary); background: var(--bg-surface-subtle);">
-                        <i class="bi bi-code-square text-primary me-1"></i> Code Sandbox
-                    </button>
                     <button class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-1.5 btn-shimmer" onclick="switchDashboardTab('tab-practice-btn')" style="font-size: 0.82rem; border-color: var(--border-color); color: var(--text-primary); background: var(--bg-surface-subtle);">
                         <i class="bi bi-lightning-charge text-warning me-1"></i> 450 Sheet
                     </button>
-                    <button class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-1.5 btn-shimmer" onclick="switchDashboardTab('tab-aiquiz-btn')" style="font-size: 0.82rem; border-color: var(--border-color); color: var(--text-primary); background: var(--bg-surface-subtle);">
-                        <i class="bi bi-stars text-danger me-1"></i> AI Quiz
+                    <button class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-1.5 btn-shimmer" onclick="switchDashboardTab('tab-courses-btn')" style="font-size: 0.82rem; border-color: var(--border-color); color: var(--text-primary); background: var(--bg-surface-subtle);">
+                        <i class="bi bi-mortarboard text-info me-1"></i> My Batches
                     </button>
+                    <button class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-1.5 btn-shimmer" onclick="switchDashboardTab('tab-tutorials-btn')" style="font-size: 0.82rem; border-color: var(--border-color); color: var(--text-primary); background: var(--bg-surface-subtle);">
+                        <i class="bi bi-book-half text-success me-1"></i> Tutorials
+                    </button>
+                    <a href="{% url 'code_sources:list' %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-1.5 btn-shimmer" style="font-size: 0.82rem; border-color: var(--border-color); color: var(--text-primary); background: var(--bg-surface-subtle);">
+                        <i class="bi bi-github text-info me-1"></i> Code &amp; Repos
+                    </a>
+                    <a href="{% url 'community:doubt_list' %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-1.5 btn-shimmer" style="font-size: 0.82rem; border-color: var(--border-color); color: var(--text-primary); background: var(--bg-surface-subtle);">
+                        <i class="bi bi-patch-question text-warning me-1"></i> Doubts
+                    </a>
 
                     <!-- Role & Session Controls -->
                     {% if request.user.is_staff or request.user.is_superuser or request.user.profile.role == 'admin' %}
@@ -233,11 +239,6 @@
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link rounded-pill px-3 py-1.5 small fw-semibold" id="tab-compiler-btn" data-bs-toggle="pill" data-bs-target="#tab-compiler" type="button" role="tab" aria-selected="false">
-                        <i class="bi bi-code-square me-1 text-primary"></i> Code Sandbox
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
                     <button class="nav-link rounded-pill px-3 py-1.5 small fw-semibold" id="tab-practice-btn" data-bs-toggle="pill" data-bs-target="#tab-practice" type="button" role="tab" aria-selected="false">
                         <i class="bi bi-collection-play me-1 text-warning"></i> Practice Sets
                     </button>
@@ -253,13 +254,8 @@
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link rounded-pill px-3 py-1.5 small fw-semibold" id="tab-live-btn" data-bs-toggle="pill" data-bs-target="#tab-live" type="button" role="tab" aria-selected="false">
-                        <i class="bi bi-broadcast me-1 text-danger"></i> Live Classes
-                    </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link rounded-pill px-3 py-1.5 small fw-semibold" id="tab-aiquiz-btn" data-bs-toggle="pill" data-bs-target="#tab-aiquiz" type="button" role="tab" aria-selected="false">
-                        <i class="bi bi-stars me-1 text-danger"></i> AI Quiz
+                    <button class="nav-link rounded-pill px-3 py-1.5 small fw-semibold" id="tab-codesources-btn" data-bs-toggle="pill" data-bs-target="#tab-codesources" type="button" role="tab" aria-selected="false">
+                        <i class="bi bi-github me-1 text-info"></i> Code Sources &amp; Repos
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
@@ -508,40 +504,39 @@
                             </button>
                         </div>
 
-                        <!-- Upcoming Live Class Card -->
+                        <!-- Code Sources & Repositories Quick Launcher Card -->
                         <div class="card p-3.5 rounded-4 mb-4 shadow-xs" style="background: var(--bg-surface); border: 1px solid var(--border-color);">
                             <div class="d-flex justify-content-between align-items-center mb-3">
-                                <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill smaller px-2.5 py-1 fw-bold">
-                                    <i class="bi bi-broadcast me-1"></i> Live Doubt Session
+                                <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill smaller px-2.5 py-1 fw-bold">
+                                    <i class="bi bi-github me-1"></i> Code Sources &amp; Repos
                                 </span>
-                                {% if live_now_class %}
-                                    <span class="badge bg-danger text-white rounded-pill smaller animate-pulse">LIVE NOW</span>
-                                {% endif %}
+                                <span class="badge bg-primary-subtle text-primary rounded-pill smaller fw-semibold">Open Source</span>
                             </div>
 
-                            {% if live_now_class %}
-                                <h4 class="h6 fw-bold font-heading mb-1" style="color: var(--text-primary);">{{ live_now_class.title }}</h4>
-                                <p class="text-secondary smaller mb-3">Mentor: {{ live_now_class.instructor.get_full_name|default:live_now_class.instructor.username }}</p>
-                                <a href="{{ live_now_class.google_meet_link|default:'#' }}" target="_blank" class="btn btn-danger btn-sm w-100 fw-semibold rounded-pill py-1.5">
-                                    <i class="bi bi-camera-video-fill me-1"></i> Join Google Meet Room
-                                </a>
-                            {% elif upcoming_classes %}
-                                {% with upcoming_classes|first as next_class %}
-                                    <h4 class="h6 fw-bold font-heading mb-1" style="color: var(--text-primary);">{{ next_class.title }}</h4>
+                            {% if recent_code_sources %}
+                                {% with recent_code_sources|first as top_code %}
+                                    <h4 class="h6 fw-bold font-heading mb-1" style="color: var(--text-primary);">{{ top_code.title }}</h4>
                                     <p class="text-secondary smaller mb-2">
-                                        <i class="bi bi-calendar-event text-primary me-1"></i> {{ next_class.scheduled_date|date:"D, M d" }} at {{ next_class.start_time|time:"H:i" }}
+                                        <i class="bi bi-tag-fill text-info me-1"></i> {{ top_code.topic }} • <span class="badge bg-secondary-subtle text-secondary py-0.5 px-2">{{ top_code.language }}</span>
                                     </p>
-                                    <p class="text-secondary smaller mb-3">Mentor: {{ next_class.instructor.get_full_name|default:next_class.instructor.username }}</p>
-                                    <a href="{% url 'live_classes:class_detail' next_class.pk %}" class="btn btn-outline-danger btn-sm w-100 fw-semibold rounded-pill py-1.5">
-                                        View Session Details &rarr;
-                                    </a>
+                                    <p class="text-secondary smaller mb-3">{{ top_code.description|truncatewords:12 }}</p>
+                                    <div class="d-flex gap-2">
+                                        <a href="{% url 'code_sources:detail' top_code.slug %}" class="btn btn-outline-primary btn-sm flex-grow-1 fw-semibold rounded-pill py-1.5">
+                                            View Code Snippet &rarr;
+                                        </a>
+                                        {% if top_code.github_repo_url %}
+                                            <a href="{{ top_code.github_repo_url }}" target="_blank" class="btn btn-dark btn-sm rounded-pill px-3 py-1.5" title="GitHub Repo">
+                                                <i class="bi bi-github"></i>
+                                            </a>
+                                        {% endif %}
+                                    </div>
                                 {% endwith %}
                             {% else %}
                                 <div class="text-center py-3">
-                                    <p class="text-secondary smaller mb-2">No live classes scheduled for today.</p>
-                                    <button class="btn btn-outline-secondary btn-sm rounded-pill px-3" onclick="switchDashboardTab('tab-live-btn')">
-                                        Browse Upcoming Schedule
-                                    </button>
+                                    <p class="text-secondary smaller mb-2">Explore production-ready code &amp; GitHub repos.</p>
+                                    <a href="{% url 'code_sources:list' %}" class="btn btn-outline-info btn-sm rounded-pill px-3">
+                                        Browse Code Sources &rarr;
+                                    </a>
                                 </div>
                             {% endif %}
                         </div>
@@ -550,10 +545,10 @@
                         <div class="card p-3.5 rounded-4 shadow-xs" style="background: var(--bg-surface); border: 1px solid var(--border-color);">
                             <h5 class="smaller fw-bold text-uppercase text-muted mb-2.5" style="letter-spacing: 0.5px;">Student Feature Suite</h5>
                             <div class="d-flex flex-column gap-1.5">
-                                <a href="javascript:void(0)" onclick="switchDashboardTab('tab-compiler-btn')" class="p-2 rounded-2 text-decoration-none d-flex align-items-center justify-content-between topic-quick-item" style="color: var(--text-secondary); background: var(--bg-surface-subtle); border: 1px solid var(--border-color);">
+                                <a href="javascript:void(0)" onclick="switchDashboardTab('tab-courses-btn')" class="p-2 rounded-2 text-decoration-none d-flex align-items-center justify-content-between topic-quick-item" style="color: var(--text-secondary); background: var(--bg-surface-subtle); border: 1px solid var(--border-color);">
                                     <div class="d-flex align-items-center gap-2">
-                                        <i class="bi bi-code-square text-primary"></i>
-                                        <span class="small fw-semibold" style="color: var(--text-primary);">Code Sandbox</span>
+                                        <i class="bi bi-mortarboard text-primary"></i>
+                                        <span class="small fw-semibold" style="color: var(--text-primary);">My Batches</span>
                                     </div>
                                     <i class="bi bi-chevron-right smaller text-muted"></i>
                                 </a>
@@ -571,10 +566,10 @@
                                     </div>
                                     <i class="bi bi-chevron-right smaller text-muted"></i>
                                 </a>
-                                <a href="javascript:void(0)" onclick="switchDashboardTab('tab-aiquiz-btn')" class="p-2 rounded-2 text-decoration-none d-flex align-items-center justify-content-between topic-quick-item" style="color: var(--text-secondary); background: var(--bg-surface-subtle); border: 1px solid var(--border-color);">
+                                <a href="{% url 'notes:note_list' %}" class="p-2 rounded-2 text-decoration-none d-flex align-items-center justify-content-between topic-quick-item" style="color: var(--text-secondary); background: var(--bg-surface-subtle); border: 1px solid var(--border-color);">
                                     <div class="d-flex align-items-center gap-2">
-                                        <i class="bi bi-stars text-danger"></i>
-                                        <span class="small fw-semibold" style="color: var(--text-primary);">AI Technical Quiz</span>
+                                        <i class="bi bi-file-earmark-pdf text-info"></i>
+                                        <span class="small fw-semibold" style="color: var(--text-primary);">Handwritten Notes</span>
                                     </div>
                                     <i class="bi bi-chevron-right smaller text-muted"></i>
                                 </a>
@@ -897,76 +892,7 @@
                 </div>
             </div>
 
-            <!-- --------------------------------------------------------------
-                 TAB 2: IN-DASHBOARD CODE SANDBOX / COMPILER ARENA
-                 -------------------------------------------------------------- -->
-            <div class="tab-pane fade" id="tab-compiler" role="tabpanel" aria-labelledby="tab-compiler-btn">
-                <div class="card p-4 rounded-4 shadow-xs" style="background: var(--bg-surface); border: 1px solid var(--border-color);">
-                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2 mb-3 pb-3 border-bottom" style="border-color: var(--border-color) !important;">
-                        <div>
-                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill smaller px-2.5 py-0.5 fw-bold mb-1">
-                                <i class="bi bi-cpu-fill me-1"></i> In-Dashboard Code Sandbox
-                            </span>
-                            <h3 class="h5 fw-bold font-heading mb-0" style="color: var(--text-primary);">Interactive Multi-Language Compiler</h3>
-                        </div>
-                        <div class="d-flex align-items-center gap-2">
-                            <!-- Language Tabs -->
-                            <div class="btn-group btn-group-sm" role="group">
-                                <button type="button" class="btn btn-primary btn-sm py-1 px-3 active" onclick="setDashboardCompilerLang('python', this)">Python 3</button>
-                                <button type="button" class="btn btn-outline-secondary btn-sm py-1 px-3" onclick="setDashboardCompilerLang('cpp', this)">C++</button>
-                                <button type="button" class="btn btn-outline-secondary btn-sm py-1 px-3" onclick="setDashboardCompilerLang('java', this)">Java</button>
-                                <button type="button" class="btn btn-outline-secondary btn-sm py-1 px-3" onclick="setDashboardCompilerLang('javascript', this)">JavaScript</button>
-                            </div>
-                        </div>
-                    </div>
 
-                    <!-- Code Editor Box -->
-                    <div class="rounded-3 overflow-hidden mb-3" style="background: var(--bg-surface-elevated); border: 1px solid var(--border-color);">
-                        <div class="p-2.5 d-flex justify-content-between align-items-center border-bottom" style="background: var(--bg-surface-subtle); border-color: var(--border-color) !important;">
-                            <span class="smaller text-muted" id="compilerFilename"><i class="bi bi-file-earmark-code me-1"></i> solution.py</span>
-                            <button class="btn btn-sm btn-outline-secondary py-0.5 px-2 smaller" onclick="copyCompilerCode()">
-                                <i class="bi bi-clipboard me-1"></i> Copy
-                            </button>
-                        </div>
-                        <textarea class="form-control bg-transparent border-0 font-monospace p-3" id="dashboardCodeInput" rows="10" style="color: var(--text-primary); font-family: var(--font-code); font-size: 0.9rem; resize: vertical;"># Two Sum Problem (Hash Map Solution)
-def two_sum(nums, target):
-    seen = {}
-    for i, num in enumerate(nums):
-        complement = target - num
-        if complement in seen:
-            return [seen[complement], i]
-        seen[num] = i
-    return []
-
-# Test execution
-nums = [2, 7, 11, 15]
-target = 9
-result = two_sum(nums, target)
-print(f"Input: nums={nums}, target={target}")
-print(f"Indices Output: {result}")
-</textarea>
-                    </div>
-
-                    <!-- Action Bar & Run Button -->
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <div class="smaller text-secondary">
-                            <span class="text-success"><i class="bi bi-check2 me-1"></i> Compiler ready</span>
-                            <span class="mx-1">&bull;</span>
-                            <span>Memory: <strong>14.2 MB</strong></span>
-                        </div>
-                        <div class="d-flex gap-2">
-                            <button class="btn btn-codehelp-fire btn-sm py-1.5 px-4 fw-semibold shadow-xs" id="dashboardRunBtn" onclick="runDashboardCompiler()">
-                                <i class="bi bi-play-fill"></i> Execute Code
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Execution Output Terminal Console -->
-                    <div class="rounded-3 p-3 font-monospace smaller" id="dashboardCompilerOutput" style="background: #080a12; border: 1px solid rgba(255, 255, 255, 0.08); color: #a5b4fc; min-height: 80px;">
-                        <span class="text-muted">// Output terminal ready. Click "Execute Code" to evaluate solution...</span>
-                    </div>
-                </div>
-            </div>
 
             <!-- --------------------------------------------------------------
                  TAB 3: 450 DSA SHEET ARENA
@@ -1212,123 +1138,56 @@ print(f"Indices Output: {result}")
 
 
             <!-- --------------------------------------------------------------
-                 TAB 7: LIVE DOUBT CLASSES (Google Meet)
+                 TAB 7: CODE SOURCES & GITHUB REPOSITORIES
                  -------------------------------------------------------------- -->
-            <div class="tab-pane fade" id="tab-live" role="tabpanel" aria-labelledby="tab-live-btn">
+            <div class="tab-pane fade" id="tab-codesources" role="tabpanel" aria-labelledby="tab-codesources-btn">
                 <div class="card p-4 rounded-4 shadow-xs" style="background: var(--bg-surface); border: 1px solid var(--border-color);">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3 gap-2">
                         <div>
-                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill smaller px-2.5 py-0.5 fw-bold mb-1">
-                                Google Meet Schedule
+                            <span class="badge bg-info-subtle text-info border border-info-subtle rounded-pill smaller px-2.5 py-0.5 fw-bold mb-1">
+                                Developer Resources
                             </span>
-                            <h3 class="h5 fw-bold font-heading mb-0" style="color: var(--text-primary);">Interactive Live Masterclasses</h3>
+                            <h3 class="h5 fw-bold font-heading mb-0" style="color: var(--text-primary);">Curated Code Sources &amp; GitHub Repositories</h3>
                         </div>
-                        <a href="{% url 'live_classes:class_list' %}" class="btn btn-outline-danger btn-sm rounded-pill px-3 py-1.5 fw-semibold">
-                            Full Calendar <i class="bi bi-calendar3 ms-1"></i>
+                        <a href="{% url 'code_sources:list' %}" class="btn btn-outline-primary btn-sm rounded-pill px-3 py-1.5 fw-semibold">
+                            Browse All Repos <i class="bi bi-box-arrow-up-right ms-1"></i>
                         </a>
                     </div>
 
                     <div class="row g-3">
-                        {% for cls in all_upcoming_classes %}
+                        {% for cs in recent_code_sources %}
                             <div class="col-md-6">
-                                <div class="card p-3.5 rounded-4 h-100" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color);">
-                                    <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <span class="smaller fw-bold text-primary">
-                                            <i class="bi bi-calendar-event me-1"></i> {{ cls.scheduled_date|date:"D, M d" }} • {{ cls.start_time|time:"H:i" }}
-                                        </span>
-                                        {% if cls.status == 'live' %}
-                                            <span class="badge bg-danger text-white rounded-pill smaller">LIVE NOW</span>
-                                        {% else %}
-                                            <span class="badge bg-secondary-subtle text-secondary rounded-pill smaller">Upcoming</span>
-                                        {% endif %}
+                                <div class="card p-3.5 rounded-4 h-100 d-flex flex-column justify-content-between" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color);">
+                                    <div>
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="smaller fw-bold text-info">
+                                                <i class="bi bi-tag-fill me-1"></i> {{ cs.topic }}
+                                            </span>
+                                            <span class="badge bg-secondary-subtle text-secondary rounded-pill smaller">{{ cs.language }}</span>
+                                        </div>
+                                        <h4 class="h6 fw-bold font-heading mb-1.5" style="color: var(--text-primary);">{{ cs.title }}</h4>
+                                        <p class="smaller text-secondary mb-3">{{ cs.description|truncatewords:14 }}</p>
                                     </div>
-                                    <h4 class="h6 fw-bold font-heading mb-1.5" style="color: var(--text-primary);">{{ cls.title }}</h4>
-                                    <p class="smaller text-secondary mb-3">{{ cls.description|truncatewords:14 }}</p>
                                     <div class="d-flex justify-content-between align-items-center pt-2 border-top" style="border-color: var(--border-color) !important;">
-                                        <span class="smaller text-secondary">Mentor: {{ cls.instructor.get_full_name|default:cls.instructor.username }}</span>
-                                        {% if cls.google_meet_link %}
-                                            <a href="{{ cls.google_meet_link }}" target="_blank" class="btn btn-codehelp-fire btn-sm rounded-pill px-3 py-1 smaller fw-semibold">
-                                                <i class="bi bi-camera-video me-1"></i> Join Meet
-                                            </a>
-                                        {% else %}
-                                            <a href="{% url 'live_classes:class_detail' cls.pk %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3 py-1 smaller">
-                                                Details
+                                        <a href="{% url 'code_sources:detail' cs.slug %}" class="btn btn-outline-primary btn-sm rounded-pill px-3 py-1 smaller fw-semibold">
+                                            <i class="bi bi-code-slash me-1"></i> View Code
+                                        </a>
+                                        {% if cs.github_repo_url %}
+                                            <a href="{{ cs.github_repo_url }}" target="_blank" class="btn btn-dark btn-sm rounded-pill px-3 py-1 smaller text-white">
+                                                <i class="bi bi-github me-1"></i> GitHub Repo
                                             </a>
                                         {% endif %}
                                     </div>
                                 </div>
                             </div>
                         {% empty %}
-                            <div class="col-12 text-center py-4 text-secondary small">No upcoming live classes right now. Check back shortly.</div>
+                            <div class="col-12 text-center py-4 text-secondary small">No code sources published yet. Check back shortly.</div>
                         {% endfor %}
                     </div>
                 </div>
             </div>
 
-            <!-- --------------------------------------------------------------
-                 TAB 8: AI TECHNICAL QUIZ GENERATOR
-                 -------------------------------------------------------------- -->
-            <div class="tab-pane fade" id="tab-aiquiz" role="tabpanel" aria-labelledby="tab-aiquiz-btn">
-                <div class="card p-4 rounded-4 shadow-xs" style="background: var(--bg-surface); border: 1px solid var(--border-color);">
-                    <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4 pb-3 border-bottom" style="border-color: var(--border-color) !important;">
-                        <div>
-                            <span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill smaller px-2.5 py-0.5 fw-bold mb-1">
-                                AI Powered Assessment
-                            </span>
-                            <h3 class="h5 fw-bold font-heading mb-0" style="color: var(--text-primary);">Test Your Technical Depth</h3>
-                        </div>
-                        <a href="{% url 'courses:ai_quiz_generator' %}" class="btn btn-codehelp-primary btn-sm rounded-pill px-3.5 py-1.5 fw-semibold shadow-xs">
-                            <i class="bi bi-stars me-1"></i> Custom AI Quiz Generator
-                        </a>
-                    </div>
 
-                    <div class="row g-4">
-                        <div class="col-md-6 col-lg-3">
-                            <div class="card p-3.5 rounded-4 h-100 text-center" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color);">
-                                <i class="bi bi-filetype-py fs-2 text-primary mb-2"></i>
-                                <h4 class="h6 fw-bold mb-1" style="color: var(--text-primary);">Python Mastery</h4>
-                                <p class="smaller text-secondary mb-3">Syntax, OOP, Lambda, Decorators</p>
-                                <a href="{% url 'courses:ai_quiz_generator' %}?topic=Python" class="btn btn-outline-primary btn-sm rounded-pill w-100 py-1.5 smaller fw-semibold">
-                                    Start 5-Min Test &rarr;
-                                </a>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6 col-lg-3">
-                            <div class="card p-3.5 rounded-4 h-100 text-center" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color);">
-                                <i class="bi bi-diagram-3-fill fs-2 text-warning mb-2"></i>
-                                <h4 class="h6 fw-bold mb-1" style="color: var(--text-primary);">Data Structures</h4>
-                                <p class="smaller text-secondary mb-3">Arrays, Linked Lists, Trees, DP</p>
-                                <a href="{% url 'courses:ai_quiz_generator' %}?topic=DSA" class="btn btn-outline-warning btn-sm rounded-pill w-100 py-1.5 smaller fw-semibold">
-                                    Start 5-Min Test &rarr;
-                                </a>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6 col-lg-3">
-                            <div class="card p-3.5 rounded-4 h-100 text-center" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color);">
-                                <i class="bi bi-database-fill fs-2 text-info mb-2"></i>
-                                <h4 class="h6 fw-bold mb-1" style="color: var(--text-primary);">DBMS & SQL</h4>
-                                <p class="smaller text-secondary mb-3">Joins, Normalization, ACID</p>
-                                <a href="{% url 'courses:ai_quiz_generator' %}?topic=DBMS" class="btn btn-outline-info btn-sm rounded-pill w-100 py-1.5 smaller fw-semibold">
-                                    Start 5-Min Test &rarr;
-                                </a>
-                            </div>
-                        </div>
-
-                        <div class="col-md-6 col-lg-3">
-                            <div class="card p-3.5 rounded-4 h-100 text-center" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color);">
-                                <i class="bi bi-cpu-fill fs-2 text-success mb-2"></i>
-                                <h4 class="h6 fw-bold mb-1" style="color: var(--text-primary);">Operating Systems</h4>
-                                <p class="smaller text-secondary mb-3">Scheduling, Threads, Virtual Memory</p>
-                                <a href="{% url 'courses:ai_quiz_generator' %}?topic=OS" class="btn btn-outline-success btn-sm rounded-pill w-100 py-1.5 smaller fw-semibold">
-                                    Start 5-Min Test &rarr;
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             <!-- --------------------------------------------------------------
                  TAB: ACCOUNT, AUTHENTICATION & SESSION CONTROL (LOGIN / LOGOUT)
@@ -1465,7 +1324,7 @@ print(f"Indices Output: {result}")
                                         </div>
                                         <div>
                                             <div class="fw-bold small" style="color: var(--text-primary);">Administrator &amp; Creator Studio</div>
-                                            <div class="smaller text-muted">Add courses, live classes, challenges, &amp; notes</div>
+                                            <div class="smaller text-muted">Add courses, tutorials, practice challenges, code sources &amp; notes</div>
                                         </div>
                                     </div>
                                     <span class="badge bg-warning text-dark smaller px-2 py-0.5 fw-bold">Admin</span>
@@ -1545,169 +1404,7 @@ print(f"Indices Output: {result}")
         }
     }
 
-    // In-Dashboard Code Sandbox Presets & Execution
-    const compilerSnippets = {
-        python: `# Two Sum Problem (Hash Map Solution)
-def two_sum(nums, target):
-    seen = {}
-    for i, num in enumerate(nums):
-        complement = target - num
-        if complement in seen:
-            return [seen[complement], i]
-        seen[num] = i
-    return []
 
-# Test execution
-nums = [2, 7, 11, 15]
-target = 9
-result = two_sum(nums, target)
-print(f"Input: nums={nums}, target={target}")
-print(f"Indices Output: {result}")
-`,
-        cpp: `// Two Sum Problem (C++ STL Unordered Map)
-#include <iostream>
-#include <vector>
-#include <unordered_map>
-
-std::vector<int> twoSum(std::vector<int>& nums, int target) {
-    std::unordered_map<int, int> seen;
-    for (int i = 0; i < nums.size(); ++i) {
-        int diff = target - nums[i];
-        if (seen.count(diff)) {
-            return {seen[diff], i};
-        }
-        seen[nums[i]] = i;
-    }
-    return {};
-}
-
-int main() {
-    std::vector<int> nums = {2, 7, 11, 15};
-    auto ans = twoSum(nums, 9);
-    std::cout << "Indices: [" << ans[0] << ", " << ans[1] << "]" << std::endl;
-    return 0;
-}`,
-        java: `// Two Sum Problem (Java HashMap)
-import java.util.*;
-
-public class Solution {
-    public static int[] twoSum(int[] nums, int target) {
-        Map<Integer, Integer> map = new HashMap<>();
-        for (int i = 0; i < nums.length; i++) {
-            int complement = target - nums[i];
-            if (map.containsKey(complement)) {
-                return new int[] { map.get(complement), i };
-            }
-            map.put(nums[i], i);
-        }
-        return new int[0];
-    }
-
-    public static void main(String[] args) {
-        int[] nums = {2, 7, 11, 15};
-        int[] res = twoSum(nums, 9);
-        System.out.println("Output: " + Arrays.toString(res));
-    }
-}`,
-        javascript: `// Two Sum (JavaScript Map)
-function twoSum(nums, target) {
-    const map = new Map();
-    for (let i = 0; i < nums.length; i++) {
-        const diff = target - nums[i];
-        if (map.has(diff)) {
-            return [map.get(diff), i];
-        }
-        map.set(nums[i], i);
-    }
-    return [];
-}
-
-const res = twoSum([2, 7, 11, 15], 9);
-console.log("Indices:", res);
-`
-    };
-
-    let currentDashCompilerLang = 'python';
-
-    function setDashboardCompilerLang(lang, btn) {
-        currentDashCompilerLang = lang;
-        const textarea = document.getElementById('dashboardCodeInput');
-        const filename = document.getElementById('compilerFilename');
-        
-        if (compilerSnippets[lang]) {
-            textarea.value = compilerSnippets[lang];
-        }
-        
-        const extMap = { python: 'solution.py', cpp: 'solution.cpp', java: 'Solution.java', javascript: 'solution.js' };
-        if (filename && extMap[lang]) {
-            filename.innerHTML = '<i class="bi bi-file-earmark-code me-1"></i> ' + extMap[lang];
-        }
-
-        const buttons = btn.parentElement.querySelectorAll('button');
-        buttons.forEach(b => {
-            b.classList.remove('active', 'btn-primary');
-            b.classList.add('btn-outline-secondary');
-        });
-        btn.classList.remove('btn-outline-secondary');
-        btn.classList.add('active', 'btn-primary');
-    }
-
-    function escapeDashHtml(str) {
-        if (!str) return '';
-        const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-        return String(str).replace(/[&<>"']/g, function(m) { return map[m]; });
-    }
-
-    async function runDashboardCompiler() {
-        const btn = document.getElementById('dashboardRunBtn');
-        const output = document.getElementById('dashboardCompilerOutput');
-        const code = document.getElementById('dashboardCodeInput').value;
-        const lang = currentDashCompilerLang || 'python';
-        
-        btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Compiling...';
-        btn.disabled = true;
-        output.innerHTML = '<span class="text-muted"><i class="bi bi-hourglass-split me-1"></i> Submitting to sandbox runner...</span>';
-
-        try {
-            const res = await fetch('/practice/sandbox/run/', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ language: lang, code: code, stdin: '' })
-            });
-            const data = await res.json();
-            btn.innerHTML = '<i class="bi bi-play-fill"></i> Execute Code';
-            btn.disabled = false;
-
-            const isSuccess = data.success !== false && (data.exit_code === 0 || data.exit_code === null || data.exit_code === undefined);
-            const statusBadge = isSuccess
-                ? '<span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill smaller px-2 py-0.5"><i class="bi bi-check-circle-fill me-1"></i> Execution Successful • Exit ' + (data.exit_code !== undefined ? data.exit_code : 0) + '</span>'
-                : '<span class="badge bg-danger-subtle text-danger border border-danger-subtle rounded-pill smaller px-2 py-0.5"><i class="bi bi-exclamation-triangle-fill me-1"></i> Exit Code ' + (data.exit_code || 1) + '</span>';
-
-            const runTime = data.runtime_ms ? data.runtime_ms + ' ms' : '< 50 ms';
-            const stdout = data.stdout || data.output || 'Code executed with no output.';
-            const stderr = data.stderr ? '<div class="text-danger mt-2"><strong>Error Output:</strong><pre class="m-0 text-danger-emphasis">' + escapeDashHtml(data.stderr) + '</pre></div>' : '';
-
-            output.innerHTML = `
-                <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom border-secondary border-opacity-25">
-                    <div>${statusBadge}</div>
-                    <div class="text-muted smaller">Time: <strong>${runTime}</strong> | Memory: <strong>14.2 MB</strong></div>
-                </div>
-                <pre class="m-0 font-monospace text-light" style="white-space: pre-wrap; font-size: 0.88rem;">${escapeDashHtml(stdout)}</pre>
-                ${stderr}
-            `;
-        } catch (err) {
-            btn.innerHTML = '<i class="bi bi-play-fill"></i> Execute Code';
-            btn.disabled = false;
-            output.innerHTML = '<span class="text-danger"><i class="bi bi-x-circle me-1"></i> Error: ' + escapeDashHtml(err.message) + '</span>';
-        }
-    }
-
-    function copyCompilerCode() {
-        const text = document.getElementById('dashboardCodeInput').value;
-        navigator.clipboard.writeText(text).then(() => {
-            alert('Code copied to clipboard!');
-        });
-    }
 
     // 450 DSA Sheet Instant Filter on Dashboard
     let currentDashDiff = 'all';

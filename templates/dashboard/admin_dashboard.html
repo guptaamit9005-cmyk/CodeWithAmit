@@ -17,7 +17,7 @@
             </div>
             <h1 class="h2 fw-bold text-slate-900 font-heading mb-1">Platform Creator Studio</h1>
             <p class="text-secondary small mb-0">
-                Add tutorials, courses, coding challenges, live classes, roadmaps, and notes. Everything you publish here is immediately visible to both registered users and visitors on the website.
+                Add tutorials, courses, coding challenges, code sources, roadmaps, and notes. Everything you publish here is immediately visible to both registered users and visitors on the website.
             </p>
         </div>
         <div class="d-flex flex-wrap gap-2">
@@ -177,11 +177,14 @@
                         <h6 class="fw-bold text-slate-900 mb-1">Create New Course</h6>
                         <p class="text-secondary smaller mb-3">Launch complete curriculum courses with syllabus, video embeds, difficulty tiers, and student enrollment.</p>
                     </div>
-                    <div class="d-flex gap-2 pt-2 border-top">
-                        <a href="{% url 'courses:create_course' %}" class="btn btn-success btn-sm rounded-pill w-100 fw-semibold shadow-sm hover-lift text-white">
+                    <div class="d-flex flex-wrap gap-1.5 pt-2 border-top">
+                        <a href="{% url 'courses:create_course' %}" class="btn btn-success btn-sm rounded-pill flex-grow-1 fw-semibold shadow-sm hover-lift text-white" style="font-size: 0.82rem;">
                             <i class="bi bi-plus-lg me-1"></i> Create Course
                         </a>
-                        <a href="{% url 'courses:course_list' %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3" title="View Public Courses Page">
+                        <a href="{% url 'courses:add_lesson' %}" class="btn btn-outline-success btn-sm rounded-pill px-2.5" title="Add Lesson to Course" style="font-size: 0.82rem;">
+                            <i class="bi bi-play-btn me-1"></i> + Lesson
+                        </a>
+                        <a href="{% url 'courses:course_list' %}" class="btn btn-outline-secondary btn-sm rounded-pill px-2.5" title="View Public Courses Page">
                             <i class="bi bi-eye"></i>
                         </a>
                     </div>
@@ -215,24 +218,24 @@
                 </div>
             </div>
 
-            <!-- 4. Schedule Live Class -->
+            <!-- 4. Add Code Source & GitHub Repo -->
             <div class="col-lg-4 col-md-6">
                 <div class="card flowable-card p-3 p-xl-4 rounded-4 border bg-white h-100 d-flex flex-column justify-content-between shadow-sm">
                     <div>
                         <div class="d-flex align-items-center justify-content-between mb-3">
-                            <div class="rounded-3 p-2 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; background: rgba(239, 68, 68, 0.1); color: #ef4444;">
-                                <i class="bi bi-broadcast fs-4"></i>
+                            <div class="rounded-3 p-2 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; background: rgba(14, 165, 233, 0.1); color: #0ea5e9;">
+                                <i class="bi bi-github fs-4"></i>
                             </div>
-                            <span class="badge bg-danger-subtle text-danger border rounded-pill smaller px-2 py-1">Live Classes</span>
+                            <span class="badge bg-info-subtle text-info border rounded-pill smaller px-2 py-1">Code Sources</span>
                         </div>
-                        <h6 class="fw-bold text-slate-900 mb-1">Schedule Live Class</h6>
-                        <p class="text-secondary smaller mb-3">Host live webinars and doubt-clearing sessions with Google Meet integration and recording attachments.</p>
+                        <h6 class="fw-bold text-slate-900 mb-1">Code Sources &amp; Repos</h6>
+                        <p class="text-secondary smaller mb-3">Share topic-wise production code snippets, blueprints, and direct GitHub repository links for students.</p>
                     </div>
                     <div class="d-flex gap-2 pt-2 border-top">
-                        <a href="{% url 'live_classes:create_class' %}" class="btn btn-danger btn-sm rounded-pill w-100 fw-semibold shadow-sm hover-lift text-white">
-                            <i class="bi bi-plus-lg me-1"></i> Schedule Class
+                        <a href="{% url 'code_sources:add' %}" class="btn btn-info btn-sm rounded-pill w-100 fw-semibold shadow-sm hover-lift text-white">
+                            <i class="bi bi-plus-lg me-1"></i> Add Code Source
                         </a>
-                        <a href="{% url 'live_classes:class_list' %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3" title="View Public Live Classes">
+                        <a href="{% url 'code_sources:list' %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3" title="View Public Code Sources">
                             <i class="bi bi-eye"></i>
                         </a>
                     </div>
@@ -275,13 +278,61 @@
                             <span class="badge bg-primary text-white rounded-pill smaller px-2.5 py-1">New Feature Hub</span>
                         </div>
                         <h6 class="fw-bold text-slate-900 mb-1">Add Platform Feature</h6>
-                        <p class="text-secondary smaller mb-3">Add and configure any custom tools, compilers, AI engines, or links according to your preference for users to access.</p>
+                        <p class="text-secondary smaller mb-3">Add and configure custom learning tools, practice sets, resources, or links for students to access.</p>
                     </div>
                     <div class="d-flex gap-2 pt-2 border-top">
                         <a href="{% url 'core:add_feature' %}" class="btn btn-primary btn-sm rounded-pill w-100 fw-semibold shadow-sm hover-lift">
                             <i class="bi bi-plus-lg me-1"></i> Add Feature
                         </a>
                         <a href="{% url 'core:features' %}" class="btn btn-outline-primary btn-sm rounded-pill px-3" title="Manage All Features">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 8. Code Sources & GitHub Repositories (New Feature) -->
+            <div class="col-lg-4 col-md-6">
+                <div class="card flowable-card p-3 p-xl-4 rounded-4 border bg-white h-100 d-flex flex-column justify-content-between shadow-sm" style="border: 1.5px solid #0284c7 !important; background: linear-gradient(180deg, rgba(2, 132, 199, 0.05) 0%, #ffffff 40%);">
+                    <div>
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <div class="rounded-3 p-2 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; background: rgba(2, 132, 199, 0.12); color: #0284c7;">
+                                <i class="bi bi-github fs-4"></i>
+                            </div>
+                            <span class="badge bg-info-subtle text-info-emphasis border rounded-pill smaller px-2 py-1">Open Source Hub</span>
+                        </div>
+                        <h6 class="fw-bold text-slate-900 mb-1">Publish Code &amp; GitHub Repo</h6>
+                        <p class="text-secondary smaller mb-3">Post topic-wise source code, algorithms, full-stack boilerplates, and official GitHub repository links for students.</p>
+                    </div>
+                    <div class="d-flex gap-2 pt-2 border-top">
+                        <a href="{% url 'code_sources:add' %}" class="btn btn-info btn-sm rounded-pill w-100 fw-semibold shadow-sm hover-lift text-white" style="background:#0284c7;border-color:#0284c7;">
+                            <i class="bi bi-plus-lg me-1"></i> Add Code &amp; Repo
+                        </a>
+                        <a href="{% url 'code_sources:list' %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3" title="Browse Code Sources">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 9. Doubt Community & Admin Solutions (New Feature) -->
+            <div class="col-lg-4 col-md-6">
+                <div class="card flowable-card p-3 p-xl-4 rounded-4 border bg-white h-100 d-flex flex-column justify-content-between shadow-sm" style="border: 1.5px solid #f59e0b !important; background: linear-gradient(180deg, rgba(245, 158, 11, 0.05) 0%, #ffffff 40%);">
+                    <div>
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <div class="rounded-3 p-2 d-flex align-items-center justify-content-center" style="width: 44px; height: 44px; background: rgba(245, 158, 11, 0.15); color: #d97706;">
+                                <i class="bi bi-patch-question-fill fs-4"></i>
+                            </div>
+                            <span class="badge bg-warning-subtle text-warning-emphasis border rounded-pill smaller px-2 py-1">Q&amp;A Support</span>
+                        </div>
+                        <h6 class="fw-bold text-slate-900 mb-1">Doubt Community &amp; Solutions</h6>
+                        <p class="text-secondary smaller mb-3">Inspect questions asked by students and provide verified official Admin solutions with code fixes.</p>
+                    </div>
+                    <div class="d-flex gap-2 pt-2 border-top">
+                        <a href="{% url 'community:doubt_list' %}?filter=unanswered" class="btn btn-warning btn-sm rounded-pill w-100 fw-bold shadow-sm hover-lift text-dark">
+                            <i class="bi bi-shield-check me-1"></i> Solve Doubts
+                        </a>
+                        <a href="{% url 'community:doubt_list' %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3" title="View Doubt Community">
                             <i class="bi bi-eye"></i>
                         </a>
                     </div>
@@ -326,9 +377,9 @@
             </div>
             <div class="col-lg-2 col-md-4 col-6">
                 <div class="card p-3 rounded-4 border bg-white text-center shadow-sm hover-lift">
-                    <div class="text-danger fs-4 mb-1"><i class="bi bi-broadcast"></i></div>
-                    <h3 class="fw-bold text-slate-900 mb-0 font-heading">{{ metrics.total_live_classes }}</h3>
-                    <span class="text-secondary smaller">Live Classes</span>
+                    <div class="text-info fs-4 mb-1"><i class="bi bi-github"></i></div>
+                    <h3 class="fw-bold text-slate-900 mb-0 font-heading">{{ metrics.total_code_sources|default:0 }}</h3>
+                    <span class="text-secondary smaller">Code Sources</span>
                 </div>
             </div>
             <div class="col-lg-2 col-md-4 col-6">
@@ -374,8 +425,8 @@
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link rounded-pill px-3 py-1 smaller fw-semibold" id="tab-classes" data-bs-toggle="tab" data-bs-target="#content-classes" type="button" role="tab">
-                        <i class="bi bi-broadcast me-1"></i> Live Classes ({{ recent_classes|length }})
+                    <button class="nav-link rounded-pill px-3 py-1 smaller fw-semibold" id="tab-sources" data-bs-toggle="tab" data-bs-target="#content-sources" type="button" role="tab">
+                        <i class="bi bi-github me-1"></i> Code Sources ({{ recent_code_sources|length }})
                     </button>
                 </li>
                 <li class="nav-item" role="presentation">
@@ -533,39 +584,45 @@
                 </div>
             </div>
 
-            <!-- 4. Live Classes Tab -->
-            <div class="tab-pane fade" id="content-classes" role="tabpanel">
+            <!-- 4. Code Sources Tab -->
+            <div class="tab-pane fade" id="content-sources" role="tabpanel">
                 <div class="table-responsive">
                     <table class="table table-hover align-middle mb-0">
                         <thead class="bg-light">
                             <tr class="smaller text-secondary">
-                                <th class="ps-4">Class Title</th>
-                                <th>Instructor</th>
-                                <th>Date & Time</th>
-                                <th>Status</th>
+                                <th class="ps-4">Title &amp; Topic</th>
+                                <th>Language</th>
+                                <th>Difficulty</th>
+                                <th>GitHub Repository</th>
                                 <th class="text-end pe-4">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {% for lc in recent_classes %}
+                            {% for cs in recent_code_sources %}
                                 <tr>
                                     <td class="ps-4">
-                                        <div class="fw-bold text-slate-900">{{ lc.title }}</div>
-                                        <div class="text-muted smaller">{{ lc.description|truncatechars:60 }}</div>
+                                        <div class="fw-bold text-slate-900">{{ cs.title }}</div>
+                                        <div class="text-muted smaller"><i class="bi bi-tag me-1"></i>{{ cs.topic }}</div>
                                     </td>
-                                    <td><span class="text-secondary smaller">{{ lc.instructor.username }}</span></td>
-                                    <td class="smaller text-secondary">{{ lc.scheduled_date }} at {{ lc.start_time|time:"H:i" }}</td>
-                                    <td>
-                                        <span class="badge bg-info-subtle text-info-emphasis border rounded-pill smaller text-capitalize">{{ lc.status }}</span>
+                                    <td><span class="badge bg-secondary-subtle text-secondary border rounded-pill smaller px-2.5 py-1">{{ cs.language }}</span></td>
+                                    <td><span class="badge {% if cs.difficulty == 'Easy' %}bg-success-subtle text-success{% elif cs.difficulty == 'Medium' %}bg-warning-subtle text-warning{% else %}bg-danger-subtle text-danger{% endif %} border rounded-pill smaller">{{ cs.difficulty }}</span></td>
+                                    <td class="smaller">
+                                        {% if cs.github_repo_url %}
+                                            <a href="{{ cs.github_repo_url }}" target="_blank" class="text-decoration-none fw-semibold text-primary">
+                                                <i class="bi bi-github me-1"></i>Repo Link
+                                            </a>
+                                        {% else %}
+                                            <span class="text-muted">—</span>
+                                        {% endif %}
                                     </td>
                                     <td class="text-end pe-4">
-                                        <a href="{% url 'live_classes:class_detail' lc.pk %}" class="btn btn-sm btn-outline-primary rounded-pill px-3 smaller" target="_blank">
-                                            <i class="bi bi-box-arrow-up-right me-1"></i> Class Details
+                                        <a href="{% url 'code_sources:detail' cs.slug %}" class="btn btn-sm btn-outline-primary rounded-pill px-3 smaller" target="_blank">
+                                            <i class="bi bi-box-arrow-up-right me-1"></i> View Code
                                         </a>
                                     </td>
                                 </tr>
                             {% empty %}
-                                <tr><td colspan="5" class="text-center py-4 text-muted">No scheduled classes found. Click "Schedule Class" above!</td></tr>
+                                <tr><td colspan="5" class="text-center py-4 text-muted">No code sources found. Click "Add Code Source" above!</td></tr>
                             {% endfor %}
                         </tbody>
                     </table>

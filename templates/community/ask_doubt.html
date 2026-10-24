@@ -1,61 +1,86 @@
 {% extends 'base.html' %}
 
-{% block title %}Ask a Doubt — Doubt Community — CodeWithAmit{% endblock %}
+{% block title %}Ask a Technical Doubt — Doubt Community — CodeWithAmit{% endblock %}
 
 {% block content %}
-<div class="container py-4" style="max-width: 850px;">
+<div class="container py-4 py-md-5" style="max-width: 860px;">
     <!-- Breadcrumb -->
     <a href="{% url 'community:doubt_list' %}" class="small text-secondary text-decoration-none mb-3 d-inline-block">
         <i class="bi bi-arrow-left me-1"></i> Back to Doubt Community
     </a>
 
-    <div class="card bg-surface border-0 rounded-4 shadow-sm p-4 p-md-5">
-        <div class="d-flex align-items-center gap-3 mb-4">
-            <div class="p-3 bg-primary-subtle text-primary rounded-circle">
+    <div class="card p-4 p-md-5 rounded-4 shadow-sm" style="background: var(--cwa-bg-card); border: 1px solid var(--cwa-border);">
+        <div class="d-flex align-items-center gap-3 mb-4 pb-3 border-bottom" style="border-color: var(--cwa-border) !important;">
+            <div class="rounded-3 p-2.5 d-flex align-items-center justify-content-center text-primary" style="background: rgba(37, 99, 235, 0.12); width: 48px; height: 48px;">
                 <i class="bi bi-question-circle-fill fs-3"></i>
             </div>
             <div>
-                <h2 class="fw-bold mb-1 text-dark">Ask a Technical Doubt</h2>
-                <p class="text-secondary smaller mb-0">Describe your problem clearly to get fast, accurate answers from instructors and peers.</p>
+                <h1 class="h3 fw-bold mb-1 font-heading" style="color: var(--cwa-text-heading);">
+                    Ask a Technical Doubt
+                </h1>
+                <p class="text-secondary smaller mb-0">Describe your issue clearly to get fast, accurate answers and verified solutions from instructors and peers.</p>
             </div>
         </div>
 
         <form method="POST">
             {% csrf_token %}
+
+            {% if form.errors %}
+                <div class="alert alert-danger rounded-3 mb-4">
+                    <h6 class="fw-bold mb-1"><i class="bi bi-exclamation-triangle-fill me-1"></i> Please correct the following errors:</h6>
+                    <ul class="mb-0 smaller">
+                        {% for field, errors in form.errors.items %}
+                            <li><strong>{{ field|title }}:</strong> {{ errors|join:", " }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
             
             <div class="mb-4">
-                <label class="form-label fw-bold text-dark mb-1">Doubt Title</label>
-                <div class="smaller text-muted mb-2">Be specific and imagine you’re asking a question to another developer.</div>
+                <label class="form-label fw-bold small mb-1" style="color: var(--cwa-text-heading);">
+                    Doubt Title <span class="text-danger">*</span>
+                </label>
+                <div class="smaller text-muted mb-2">Be specific and summarize your core problem in one sentence.</div>
                 {{ form.title }}
             </div>
 
             <div class="row g-3 mb-4">
                 <div class="col-md-6">
-                    <label class="form-label fw-bold text-dark mb-1">Programming Language / Domain</label>
+                    <label class="form-label fw-bold small mb-1" style="color: var(--cwa-text-heading);">
+                        Programming Language / Tech Stack
+                    </label>
                     {{ form.language }}
                 </div>
                 <div class="col-md-6">
-                    <label class="form-label fw-bold text-dark mb-1">Tags (Comma-separated)</label>
+                    <label class="form-label fw-bold small mb-1" style="color: var(--cwa-text-heading);">
+                        Tags (Comma-separated)
+                    </label>
                     {{ form.raw_tags }}
-                    <div class="smaller text-muted mt-1">e.g. python, dsa, recursion, dynamic-programming</div>
+                    <div class="smaller text-muted mt-1">e.g. <code>python, dsa, recursion, dynamic-programming</code></div>
                 </div>
             </div>
 
             <div class="mb-4">
-                <label class="form-label fw-bold text-dark mb-1">Detailed Explanation & Error Context</label>
-                <div class="smaller text-muted mb-2">Include what you tried, what you expected, and any error message you received.</div>
+                <label class="form-label fw-bold small mb-1" style="color: var(--cwa-text-heading);">
+                    Detailed Problem Explanation &amp; Error Context <span class="text-danger">*</span>
+                </label>
+                <div class="smaller text-muted mb-2">Explain what you are trying to solve, what inputs you tested, and what error or wrong output occurred.</div>
                 {{ form.body }}
             </div>
 
             <div class="mb-4">
-                <label class="form-label fw-bold text-dark mb-1">Relevant Code Snippet (Optional)</label>
-                <div class="smaller text-muted mb-2">Paste the exact code block causing the issue.</div>
+                <label class="form-label fw-bold small mb-1" style="color: var(--cwa-text-heading);">
+                    Relevant Code Snippet (Optional)
+                </label>
+                <div class="smaller text-muted mb-2">Paste the exact snippet, function, or loop that contains the bug.</div>
                 {{ form.code_snippet }}
             </div>
 
-            <div class="d-flex justify-content-end gap-2 pt-3 border-top border-light-subtle">
-                <a href="{% url 'community:doubt_list' %}" class="btn btn-outline-secondary rounded-pill px-4">Cancel</a>
-                <button type="submit" class="btn btn-primary rounded-pill px-5 fw-bold shadow-sm">
+            <div class="d-flex justify-content-end gap-2 pt-3 border-top" style="border-color: var(--cwa-border) !important;">
+                <a href="{% url 'community:doubt_list' %}" class="btn btn-outline-secondary rounded-pill px-4 py-2 small">
+                    Cancel
+                </a>
+                <button type="submit" class="cwa-btn-primary rounded-pill px-5 py-2 fw-bold shadow-sm">
                     <i class="bi bi-send-fill me-1"></i> Post Question (+15 XP)
                 </button>
             </div>

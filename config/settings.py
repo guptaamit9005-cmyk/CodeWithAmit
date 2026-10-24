@@ -4,6 +4,7 @@ Django settings for Student Success Hub project.
 
 from pathlib import Path
 import os
+import shutil
 try:
     import dj_database_url
 except ImportError:
@@ -15,11 +16,12 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure-gn3sj_n89e5m#t^98(b@+
 
 DEBUG = os.environ.get('DEBUG', 'True').lower() in ('true', '1', 'yes')
 
-ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '*').split(',')
+ALLOWED_HOSTS = [h.strip() for h in os.environ.get('ALLOWED_HOSTS', '*').split(',') if h.strip()]
 
 CSRF_TRUSTED_ORIGINS = [
     origin.strip() for origin in
-    os.environ.get('CSRF_TRUSTED_ORIGINS', 'https://*.vercel.app').split(',')
+    os.environ.get('CSRF_TRUSTED_ORIGINS', 'https://*.vercel.app,http://127.0.0.1:8000,http://localhost:8000').split(',')
+    if origin.strip()
 ]
 
 INSTALLED_APPS = [
@@ -42,6 +44,7 @@ INSTALLED_APPS = [
     'notifications.apps.NotificationsConfig',
     'tutorials.apps.TutorialsConfig',
     'community.apps.CommunityConfig',
+    'code_sources.apps.CodeSourcesConfig',
 ]
 
 MIDDLEWARE = [
@@ -95,10 +98,17 @@ if dj_database_url and os.environ.get('DATABASE_URL'):
         )
     }
 elif os.environ.get('VERCEL'):
+    tmp_db = Path('/tmp') / 'db.sqlite3'
+    # Seed the tmp database from repository sqlite database if present
+    if not tmp_db.exists() and (BASE_DIR / 'db.sqlite3').exists():
+        try:
+            shutil.copyfile(BASE_DIR / 'db.sqlite3', tmp_db)
+        except Exception:
+            pass
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': Path('/tmp') / 'db.sqlite3',
+            'NAME': tmp_db,
         }
     }
 else:
@@ -136,7 +146,7 @@ STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 try:
     import whitenoise
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 except ImportError:
     pass
 

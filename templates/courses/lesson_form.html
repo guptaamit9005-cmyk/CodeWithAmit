@@ -1,123 +1,805 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}{% if is_edit %}Edit Lesson: {{ lesson.title }}{% else %}Add Lesson to Course{% endif %} — CodeWithAmit Studio{% endblock %}
+{% block title %}{% if is_edit %}Edit Lesson: {{ lesson.title }}{% else %}Add Lesson{% endif %} — CodeWithAmit Studio{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* ============================================================
+     LESSON STUDIO — shared tokens with course_form.html
+  ============================================================ */
+  #lesson-studio {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #06474322 0%, #05283022 50%, #09291f22 100%);
+    padding: 2rem 0 4rem;
+  }
+
+  .studio-wrapper { max-width: 900px; margin: 0 auto; padding: 0 1.25rem; }
+
+  /* Breadcrumb */
+  .studio-breadcrumb {
+    display: flex; align-items: center; gap: .45rem;
+    font-size: .8rem; color: #6b7280; margin-bottom: 1.5rem; flex-wrap: wrap;
+  }
+  .studio-breadcrumb a { color: #059669; text-decoration: none; }
+  .studio-breadcrumb a:hover { text-decoration: underline; }
+  .studio-breadcrumb .sep { color: #d1d5db; }
+
+  /* Header */
+  .lesson-header-card {
+    background: linear-gradient(135deg, #064e3b 0%, #065f46 50%, #0c3321 100%);
+    border-radius: 20px;
+    padding: 2rem 2.25rem;
+    margin-bottom: 1.75rem;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  }
+  .lesson-header-card::before {
+    content: '';
+    position: absolute; top: -80px; right: -80px;
+    width: 260px; height: 260px;
+    background: radial-gradient(circle, rgba(52,211,153,0.2) 0%, transparent 70%);
+    border-radius: 50%; pointer-events: none;
+  }
+  .lesson-header-card::after {
+    content: '';
+    position: absolute; bottom: -60px; left: -60px;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(16,185,129,0.12) 0%, transparent 70%);
+    border-radius: 50%; pointer-events: none;
+  }
+  .lesson-header-badge {
+    display: inline-flex; align-items: center; gap: .4rem;
+    background: rgba(255,255,255,0.12);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.18);
+    color: #6ee7b7;
+    font-size: .75rem; font-weight: 600;
+    padding: .3rem .8rem; border-radius: 100px;
+    margin-bottom: .85rem;
+    letter-spacing: .04em; text-transform: uppercase;
+  }
+  .lesson-header-title {
+    font-size: 1.85rem; font-weight: 800;
+    color: #fff; margin: 0 0 .4rem;
+    font-family: 'Outfit', sans-serif; line-height: 1.15;
+  }
+  .lesson-header-title span {
+    background: linear-gradient(90deg, #6ee7b7 0%, #34d399 50%, #67e8f9 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .lesson-header-sub { color: rgba(255,255,255,0.55); font-size: .875rem; margin: 0; }
+  .btn-cancel-lesson {
+    display: inline-flex; align-items: center; gap: .4rem;
+    background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.18);
+    color: rgba(255,255,255,0.8); padding: .45rem 1rem; border-radius: 100px;
+    font-size: .82rem; font-weight: 600; text-decoration: none; transition: all .2s;
+  }
+  .btn-cancel-lesson:hover { background: rgba(255,255,255,0.18); color: #fff; border-color: rgba(255,255,255,0.3); }
+
+  /* Card system */
+  .lesson-card {
+    background: #fff; border-radius: 20px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+    border: 1px solid #e5e7eb; overflow: hidden; margin-bottom: 1.25rem;
+  }
+  .lesson-card-header {
+    padding: 1.25rem 1.75rem; border-bottom: 1px solid #f3f4f6;
+    display: flex; align-items: center; gap: .85rem; background: #fafafa;
+  }
+  .lesson-card-icon {
+    width: 40px; height: 40px; border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem; flex-shrink: 0;
+  }
+  .icon-green { background: #dcfce7; color: #16a34a; }
+  .icon-blue { background: #dbeafe; color: #2563eb; }
+  .icon-red { background: #fee2e2; color: #dc2626; }
+  .icon-dark { background: #f3f4f6; color: #1f2937; }
+  .icon-amber { background: #fef3c7; color: #d97706; }
+  .icon-teal { background: #ccfbf1; color: #0d9488; }
+  .icon-violet { background: #ede9fe; color: #7c3aed; }
+  .lesson-card-title { font-size: 1rem; font-weight: 700; color: #111827; margin: 0; font-family: 'Outfit', sans-serif; }
+  .lesson-card-sub { font-size: .78rem; color: #6b7280; margin: .1rem 0 0; }
+  .lesson-card-body { padding: 1.5rem 1.75rem; }
+
+  /* Fields */
+  .field-group { margin-bottom: 1.25rem; }
+  .field-label {
+    display: block; font-size: .8rem; font-weight: 600;
+    color: #374151; margin-bottom: .45rem; letter-spacing: .01em;
+  }
+  .field-label .req { color: #ef4444; margin-left: 2px; }
+  .field-label .opt {
+    font-weight: 400; color: #9ca3af; font-size: .72rem;
+    background: #f9fafb; border: 1px solid #e5e7eb;
+    padding: .05rem .4rem; border-radius: 100px; margin-left: .35rem;
+  }
+  .lesson-card-body input[type="text"],
+  .lesson-card-body input[type="url"],
+  .lesson-card-body input[type="number"],
+  .lesson-card-body select,
+  .lesson-card-body textarea {
+    width: 100%; background: #f9fafb;
+    border: 1.5px solid #e5e7eb; border-radius: 10px;
+    padding: .65rem .9rem; font-size: .875rem; color: #111827;
+    transition: all .2s; outline: none; font-family: inherit; box-sizing: border-box;
+  }
+  .lesson-card-body input[type="text"]:focus,
+  .lesson-card-body input[type="url"]:focus,
+  .lesson-card-body input[type="number"]:focus,
+  .lesson-card-body select:focus,
+  .lesson-card-body textarea:focus {
+    border-color: #10b981; background: #fff;
+    box-shadow: 0 0 0 3px rgba(16,185,129,0.12);
+  }
+  .lesson-card-body textarea { resize: vertical; min-height: 120px; line-height: 1.6; }
+  .field-hint { font-size: .75rem; color: #9ca3af; margin-top: .35rem; }
+  .field-hint code { background: #f3f4f6; padding: .1rem .35rem; border-radius: 4px; font-size: .72rem; color: #059669; }
+  .field-error { font-size: .75rem; color: #ef4444; margin-top: .3rem; }
+
+  /* Grid */
+  .field-row { display: grid; gap: 1rem; }
+  .field-row.col-2 { grid-template-columns: 1fr 1fr; }
+  .field-row.col-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .field-row.col-3-2 { grid-template-columns: 3fr 1fr; }
+  .field-row.col-2-1 { grid-template-columns: 2fr 1fr; }
+  @media (max-width: 640px) {
+    .field-row.col-2, .field-row.col-3, .field-row.col-3-2, .field-row.col-2-1 { grid-template-columns: 1fr; }
+  }
+
+  /* Char counter */
+  .char-counter { font-size: .7rem; color: #9ca3af; margin-top: .3rem; text-align: right; }
+  .char-counter.warn { color: #f59e0b; }
+  .char-counter.danger { color: #ef4444; }
+
+  /* YouTube embed preview */
+  .video-preview {
+    margin-top: .75rem;
+    border-radius: 12px;
+    overflow: hidden;
+    background: #000;
+    display: none;
+    position: relative;
+    padding-bottom: 56.25%;
+    height: 0;
+  }
+  .video-preview.show { display: block; }
+  .video-preview iframe {
+    position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+    border: none; border-radius: 12px;
+  }
+  .video-no-preview {
+    border: 2px dashed #e5e7eb; border-radius: 12px;
+    padding: 1.5rem; text-align: center;
+    background: #fafafa; margin-top: .75rem;
+  }
+  .video-no-preview i { font-size: 2rem; color: #fca5a5; display: block; margin-bottom: .5rem; }
+  .video-no-preview span { font-size: .8rem; color: #9ca3af; }
+
+  /* Code snippet area */
+  .code-snippet-wrap { position: relative; }
+  .code-snippet-wrap textarea {
+    font-family: 'Fira Code', 'Consolas', monospace !important;
+    font-size: .8rem !important;
+    background: #0d1117 !important;
+    color: #e6edf3 !important;
+    border-color: #30363d !important;
+    min-height: 150px !important;
+  }
+  .code-snippet-wrap textarea:focus {
+    border-color: #58a6ff !important;
+    box-shadow: 0 0 0 3px rgba(88,166,255,0.15) !important;
+    background: #0d1117 !important;
+  }
+  .code-lang-badge {
+    position: absolute; top: .6rem; right: .75rem;
+    background: #21262d; border: 1px solid #30363d;
+    color: #8b949e; font-size: .7rem; font-weight: 600;
+    padding: .2rem .6rem; border-radius: 6px; font-family: 'Fira Code', monospace;
+    pointer-events: none;
+  }
+
+  /* GitHub box dark */
+  .github-box {
+    background: #0d1117; border: 1.5px solid #30363d; border-radius: 12px; padding: 1.1rem 1.25rem;
+  }
+  .github-box .field-label { color: #e6edf3; }
+  .github-box .field-hint { color: #8b949e; }
+  .github-box input[type="url"] {
+    background: #161b22 !important; border-color: #30363d !important; color: #e6edf3 !important;
+  }
+  .github-box input[type="url"]:focus {
+    border-color: #58a6ff !important;
+    box-shadow: 0 0 0 3px rgba(88,166,255,0.15) !important;
+    background: #0d1117 !important;
+  }
+
+  /* Free preview toggle */
+  .free-preview-toggle {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.1rem 1.25rem; border-radius: 14px;
+    background: #f0fdf4; border: 1.5px solid #bbf7d0;
+    cursor: pointer; transition: all .2s; user-select: none;
+  }
+  .free-preview-toggle:hover { background: #dcfce7; border-color: #86efac; }
+  .free-preview-toggle.active { background: #dcfce7; border-color: #22c55e; }
+  .toggle-pill {
+    width: 46px; height: 26px; border-radius: 100px;
+    position: relative; transition: background .25s; flex-shrink: 0;
+  }
+  .toggle-pill .knob {
+    position: absolute; width: 20px; height: 20px;
+    background: #fff; border-radius: 50%;
+    top: 3px; transition: left .25s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  }
+
+  /* Submit button */
+  .lesson-submit-btn {
+    display: inline-flex; align-items: center; gap: .5rem;
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    border: none; color: #fff;
+    padding: .7rem 2.25rem; border-radius: 10px; font-size: .9rem;
+    font-weight: 700; cursor: pointer; transition: all .2s;
+    box-shadow: 0 4px 14px rgba(5,150,105,0.35); font-family: inherit;
+  }
+  .lesson-submit-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(5,150,105,0.45); }
+  .lesson-submit-btn:active { transform: none; }
+  .lesson-submit-btn .spinner {
+    width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff; border-radius: 50%;
+    animation: spin .7s linear infinite; display: none;
+  }
+  .lesson-submit-btn.loading .spinner { display: block; }
+  .lesson-submit-btn.loading .btn-text { display: none; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* Non-field errors */
+  .studio-alert {
+    padding: .85rem 1.1rem; border-radius: 10px; font-size: .85rem;
+    margin-bottom: 1.25rem; display: flex; align-items: flex-start; gap: .65rem; border: 1px solid;
+  }
+  .studio-alert.error { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
+
+  ul.errorlist { list-style: none; padding: 0; margin: .3rem 0 0; }
+  ul.errorlist li { font-size: .75rem; color: #ef4444; }
+  .helptext { display: none; }
+
+  @keyframes fadeInSlide {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Duration badge */
+  .duration-badge {
+    display: inline-flex; align-items: center; gap: .4rem;
+    background: #dbeafe; color: #1e40af; border: 1px solid #93c5fd;
+    border-radius: 100px; padding: .25rem .75rem;
+    font-size: .78rem; font-weight: 600;
+    transition: all .25s; margin-top: .5rem;
+  }
+
+  @media (max-width: 640px) {
+    .lesson-header-card { padding: 1.5rem; }
+    .lesson-header-title { font-size: 1.35rem; }
+    .lesson-card-body { padding: 1.25rem; }
+  }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="container py-4" style="max-width: 860px;">
+<div id="lesson-studio">
+  <div class="studio-wrapper">
+
     <!-- Breadcrumb -->
-    <nav aria-label="breadcrumb" class="mb-3">
-        <ol class="breadcrumb smaller mb-0">
-            <li class="breadcrumb-item"><a href="{% url 'courses:course_list' %}" class="text-decoration-none">Courses</a></li>
-            {% if selected_course %}
-                <li class="breadcrumb-item"><a href="{% url 'courses:course_detail' selected_course.slug %}" class="text-decoration-none">{{ selected_course.title }}</a></li>
-            {% endif %}
-            <li class="breadcrumb-item"><a href="{% url 'dashboard:admin_dashboard' %}" class="text-decoration-none">Admin Studio</a></li>
-            <li class="breadcrumb-item active text-muted" aria-current="page">{% if is_edit %}Edit Lesson{% else %}Add Lesson{% endif %}</li>
-        </ol>
+    <nav class="studio-breadcrumb">
+      <a href="{% url 'core:home' %}"><i class="bi bi-house-fill"></i> Home</a>
+      <span class="sep">›</span>
+      <a href="{% url 'courses:course_list' %}">Courses</a>
+      {% if selected_course %}
+        <span class="sep">›</span>
+        <a href="{% url 'courses:course_detail' selected_course.slug %}">{{ selected_course.title|truncatechars:30 }}</a>
+      {% endif %}
+      <span class="sep">›</span>
+      <a href="{% url 'dashboard:admin_dashboard' %}">Studio</a>
+      <span class="sep">›</span>
+      <span>{% if is_edit %}Edit Lesson{% else %}Add Lesson{% endif %}</span>
     </nav>
 
-    <div class="card flowable-card border p-4 p-md-5 rounded-4 shadow-sm bg-white">
-        <div class="d-flex align-items-center justify-content-between pb-3 mb-4 border-bottom">
-            <div>
-                <span class="badge bg-success-subtle text-success border border-success-subtle px-3 py-1 rounded-pill mb-2">
-                    <i class="bi bi-play-circle-fill me-1"></i> Course Curriculum Editor
-                </span>
-                <h1 class="h3 fw-bold mb-1 text-slate-900 font-heading">
-                    {% if is_edit %}Edit Lesson: {{ lesson.title }}{% else %}Add Lesson to Course{% endif %}
-                </h1>
-                <p class="text-secondary small mb-0">Attach high-definition YouTube video embeds, lecture explanations, copyable starter code snippets, and free previews.</p>
-            </div>
-            <a href="{% url 'dashboard:admin_dashboard' %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
-                <i class="bi bi-arrow-left me-1"></i> Admin Dashboard
-            </a>
+    <!-- Header -->
+    <div class="lesson-header-card d-flex justify-content-between align-items-start flex-wrap gap-3">
+      <div style="position:relative;z-index:2;">
+        <div class="lesson-header-badge">
+          <i class="bi bi-play-circle-fill"></i> Curriculum Editor
         </div>
-
-        <form method="POST">
-            {% csrf_token %}
-
-            {% if form.non_field_errors %}
-                <div class="alert alert-danger py-2 small rounded-3 mb-3">
-                    {{ form.non_field_errors }}
-                </div>
-            {% endif %}
-
-            <!-- Target Course & Order -->
-            <div class="row g-3 mb-3">
-                <div class="col-md-8">
-                    <label class="form-label fw-semibold small text-slate-700">Course / Batch <span class="text-danger">*</span></label>
-                    {{ form.course }}
-                    {% if form.course.errors %}<div class="text-danger smaller mt-1">{{ form.course.errors }}</div>{% endif %}
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label fw-semibold small text-slate-700">Lesson Order / Sequence # <span class="text-danger">*</span></label>
-                    {{ form.order }}
-                    {% if form.order.errors %}<div class="text-danger smaller mt-1">{{ form.order.errors }}</div>{% endif %}
-                </div>
-            </div>
-
-            <!-- Title & Duration -->
-            <div class="row g-3 mb-3">
-                <div class="col-md-8">
-                    <label class="form-label fw-semibold small text-slate-700">Lesson Title <span class="text-danger">*</span></label>
-                    {{ form.title }}
-                    {% if form.title.errors %}<div class="text-danger smaller mt-1">{{ form.title.errors }}</div>{% endif %}
-                </div>
-                <div class="col-md-4">
-                    <label class="form-label fw-semibold small text-slate-700">Duration (Minutes)</label>
-                    {{ form.duration_minutes }}
-                    {% if form.duration_minutes.errors %}<div class="text-danger smaller mt-1">{{ form.duration_minutes.errors }}</div>{% endif %}
-                </div>
-            </div>
-
-            <!-- Video URL (YouTube Embed) -->
-            <div class="mb-3 p-3 bg-light rounded-3 border">
-                <label class="form-label fw-semibold small text-slate-700">
-                    <i class="bi bi-youtube text-danger me-1"></i> Video URL (YouTube Embed / Watch Link)
-                </label>
-                {{ form.video_url }}
-                <div class="form-text smaller text-muted">Supports standard YouTube URLs (e.g., https://www.youtube.com/watch?v=... or youtu.be/...). The platform automatically embeds this into the player.</div>
-                {% if form.video_url.errors %}<div class="text-danger smaller mt-1">{{ form.video_url.errors }}</div>{% endif %}
-            </div>
-
-            <!-- Lesson Content -->
-            <div class="mb-3">
-                <label class="form-label fw-semibold small text-slate-700">Lesson Content / Notes <span class="text-danger">*</span></label>
-                {{ form.content }}
-                <div class="form-text smaller text-muted">Detailed concepts, lecture notes, time stamps, assignments. Markdown & HTML supported.</div>
-                {% if form.content.errors %}<div class="text-danger smaller mt-1">{{ form.content.errors }}</div>{% endif %}
-            </div>
-
-            <!-- Code Snippet & Language -->
-            <div class="row g-3 mb-3">
-                <div class="col-md-9">
-                    <label class="form-label fw-semibold small text-slate-700">Example Code Snippet (Optional)</label>
-                    {{ form.code_snippet }}
-                    <div class="form-text smaller text-muted">Copyable starter code snippet for student hands-on practice.</div>
-                </div>
-                <div class="col-md-3">
-                    <label class="form-label fw-semibold small text-slate-700">Code Language</label>
-                    {{ form.code_language }}
-                    <div class="form-text smaller text-muted">e.g. python, javascript, cpp, java</div>
-                </div>
-            </div>
-
-            <!-- Free Preview Checkbox -->
-            <div class="p-3 bg-light rounded-3 border mb-4">
-                <div class="form-check mb-0">
-                    {{ form.is_free_preview }}
-                    <label class="form-check-label small fw-semibold" for="{{ form.is_free_preview.id_for_label }}">
-                        <i class="bi bi-unlock-fill text-success me-1"></i> Allow Free Preview (Students can watch before enrolling)
-                    </label>
-                </div>
-            </div>
-
-            <div class="d-flex justify-content-end gap-2 pt-2 border-top">
-                <a href="{% url 'dashboard:admin_dashboard' %}" class="btn btn-outline-secondary rounded-pill px-4">Cancel</a>
-                <button type="submit" class="btn btn-success rounded-pill px-5 fw-semibold shadow-sm hover-lift text-white">
-                    <i class="bi bi-check-circle-fill me-1"></i> {% if is_edit %}Save Lesson Changes{% else %}Add Lesson to Course{% endif %}
-                </button>
-            </div>
-        </form>
+        <h1 class="lesson-header-title">
+          {% if is_edit %}Edit <span>Lesson</span>{% else %}Add <span>New Lesson</span>{% endif %}
+        </h1>
+        <p class="lesson-header-sub">
+          Attach YouTube videos, lecture notes, code snippets &amp; control free preview access.
+        </p>
+      </div>
+      <div style="position:relative;z-index:2;">
+        <a href="{% url 'dashboard:admin_dashboard' %}" class="btn-cancel-lesson">
+          <i class="bi bi-arrow-left"></i> Dashboard
+        </a>
+      </div>
     </div>
+
+    <!-- Non-field errors -->
+    {% if form.non_field_errors %}
+    <div class="studio-alert error">
+      <i class="bi bi-exclamation-triangle-fill" style="margin-top:2px;flex-shrink:0;"></i>
+      <div>{{ form.non_field_errors }}</div>
+    </div>
+    {% endif %}
+
+    <form method="POST" id="lesson-form" novalidate>
+      {% csrf_token %}
+
+      <!-- ==============================
+           CARD 1: Assignment (Course / Section / Order)
+      ============================== -->
+      <div class="lesson-card">
+        <div class="lesson-card-header">
+          <div class="lesson-card-icon icon-green"><i class="bi bi-diagram-3-fill"></i></div>
+          <div>
+            <p class="lesson-card-title">Course Assignment</p>
+            <p class="lesson-card-sub">Which course and section does this lesson belong to?</p>
+          </div>
+        </div>
+        <div class="lesson-card-body">
+          <div class="field-row col-3">
+            <div class="field-group" style="grid-column: 1 / 3;">
+              <label class="field-label" for="{{ form.course.id_for_label }}">
+                Course / Batch <span class="req">*</span>
+              </label>
+              {{ form.course }}
+              {% if form.course.errors %}<div class="field-error">{{ form.course.errors }}</div>{% endif %}
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="{{ form.order.id_for_label }}">
+                Lesson # <span class="req">*</span>
+              </label>
+              {{ form.order }}
+              {% if form.order.errors %}<div class="field-error">{{ form.order.errors }}</div>{% endif %}
+            </div>
+          </div>
+          <div class="field-group">
+            <label class="field-label" for="{{ form.section.id_for_label }}">
+              <i class="bi bi-folder2-open" style="color:#2563eb;margin-right:.35rem;"></i>
+              Section / Module <span class="opt">optional</span>
+            </label>
+            {{ form.section }}
+            <p class="field-hint">Group lessons under modules for better curriculum structure.</p>
+            {% if form.section.errors %}<div class="field-error">{{ form.section.errors }}</div>{% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- ==============================
+           CARD 2: Lesson Identity
+      ============================== -->
+      <div class="lesson-card">
+        <div class="lesson-card-header">
+          <div class="lesson-card-icon icon-teal"><i class="bi bi-journal-bookmark-fill"></i></div>
+          <div>
+            <p class="lesson-card-title">Lesson Identity</p>
+            <p class="lesson-card-sub">Title and estimated duration for the curriculum overview</p>
+          </div>
+        </div>
+        <div class="lesson-card-body">
+          <div class="field-row col-3-2">
+            <div class="field-group">
+              <label class="field-label" for="{{ form.title.id_for_label }}">
+                Lesson Title <span class="req">*</span>
+              </label>
+              {{ form.title }}
+              <div id="title-counter-mount"></div>
+              {% if form.title.errors %}<div class="field-error">{{ form.title.errors }}</div>{% endif %}
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="{{ form.duration_minutes.id_for_label }}">
+                Duration (Minutes)
+              </label>
+              {{ form.duration_minutes }}
+              <div id="duration-badge-mount"></div>
+              {% if form.duration_minutes.errors %}<div class="field-error">{{ form.duration_minutes.errors }}</div>{% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==============================
+           CARD 3: Video & GitHub
+      ============================== -->
+      <div class="lesson-card">
+        <div class="lesson-card-header">
+          <div class="lesson-card-icon icon-red"><i class="bi bi-youtube"></i></div>
+          <div>
+            <p class="lesson-card-title">Video &amp; Source Code</p>
+            <p class="lesson-card-sub">YouTube video embed and optional GitHub lesson code</p>
+          </div>
+        </div>
+        <div class="lesson-card-body">
+          <!-- Video URL -->
+          <div class="field-group">
+            <label class="field-label" for="{{ form.video_url.id_for_label }}">
+              <i class="bi bi-youtube" style="color:#dc2626;margin-right:.35rem;"></i>
+              YouTube Video URL <span class="opt">optional</span>
+            </label>
+            {{ form.video_url }}
+            <p class="field-hint">Paste a <code>youtube.com/watch</code> or <code>youtu.be/</code> link — it will embed automatically.</p>
+            {% if form.video_url.errors %}<div class="field-error">{{ form.video_url.errors }}</div>{% endif %}
+          </div>
+
+          <!-- Video preview (React) -->
+          <div id="video-preview-mount"></div>
+
+          <!-- GitHub URL -->
+          <div class="github-box" style="margin-top:1rem;">
+            <label class="field-label" for="{{ form.github_url.id_for_label }}">
+              <i class="bi bi-github" style="margin-right:.4rem;"></i>
+              Lesson Source Code URL <span class="opt" style="background:rgba(255,255,255,0.08);border-color:rgba(255,255,255,0.15);color:#8b949e;">optional</span>
+            </label>
+            {{ form.github_url }}
+            <p class="field-hint">Link to starter code file, folder or commit on GitHub.</p>
+            {% if form.github_url.errors %}<div class="field-error">{{ form.github_url.errors }}</div>{% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- ==============================
+           CARD 4: Lesson Content
+      ============================== -->
+      <div class="lesson-card">
+        <div class="lesson-card-header">
+          <div class="lesson-card-icon icon-blue"><i class="bi bi-file-earmark-richtext-fill"></i></div>
+          <div>
+            <p class="lesson-card-title">Lesson Content &amp; Notes</p>
+            <p class="lesson-card-sub">Detailed concepts, timestamps, assignments — Markdown &amp; HTML supported</p>
+          </div>
+        </div>
+        <div class="lesson-card-body">
+          <div class="field-group">
+            <label class="field-label" for="{{ form.content.id_for_label }}">
+              Content / Notes <span class="req">*</span>
+            </label>
+            {{ form.content }}
+            <div id="content-counter-mount"></div>
+            {% if form.content.errors %}<div class="field-error">{{ form.content.errors }}</div>{% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- ==============================
+           CARD 5: Code Snippet
+      ============================== -->
+      <div class="lesson-card">
+        <div class="lesson-card-header">
+          <div class="lesson-card-icon icon-dark"><i class="bi bi-code-square"></i></div>
+          <div>
+            <p class="lesson-card-title">Code Snippet</p>
+            <p class="lesson-card-sub">Optional hands-on starter code for students to practice</p>
+          </div>
+        </div>
+        <div class="lesson-card-body">
+          <div class="field-row col-2-1">
+            <div class="field-group">
+              <label class="field-label" for="{{ form.code_snippet.id_for_label }}">
+                Starter Code <span class="opt">optional</span>
+              </label>
+              <div class="code-snippet-wrap">
+                {{ form.code_snippet }}
+                <div class="code-lang-badge" id="lang-badge">python</div>
+              </div>
+              <p class="field-hint">Copyable starter code or solution for students to practice.</p>
+            </div>
+            <div class="field-group">
+              <label class="field-label" for="{{ form.code_language.id_for_label }}">Language</label>
+              {{ form.code_language }}
+              <p class="field-hint">e.g. python, javascript, cpp, java</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==============================
+           CARD 6: Access & Publish
+      ============================== -->
+      <div class="lesson-card">
+        <div class="lesson-card-header">
+          <div class="lesson-card-icon icon-violet"><i class="bi bi-unlock-fill"></i></div>
+          <div>
+            <p class="lesson-card-title">Access Settings</p>
+            <p class="lesson-card-sub">Control who can view this lesson without enrolling</p>
+          </div>
+        </div>
+        <div class="lesson-card-body">
+          <!-- hidden original checkbox -->
+          <div style="display:none;">{{ form.is_free_preview }}</div>
+          <div id="free-preview-toggle-mount"></div>
+        </div>
+      </div>
+
+      <!-- ==============================
+           SUBMIT CARD
+      ============================== -->
+      <div class="lesson-card">
+        <div style="
+          padding: 1.25rem 1.75rem;
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          flex-wrap: wrap;
+          gap: 1rem;
+          background: #f9fafb;
+          border-top: 1px solid #f3f4f6;
+        ">
+          <a href="{% url 'dashboard:admin_dashboard' %}" style="
+            display: inline-flex; align-items: center; gap: .4rem;
+            color: #6b7280; font-size: .85rem; font-weight: 600;
+            text-decoration: none; padding: .6rem 1.25rem;
+            border: 1.5px solid #e5e7eb; border-radius: 10px;
+            background: #fff; transition: all .2s;
+          " onmouseover="this.style.borderColor='#9ca3af'" onmouseout="this.style.borderColor='#e5e7eb'">
+            <i class="bi bi-x-lg"></i> Cancel
+          </a>
+          <button type="submit" class="lesson-submit-btn" id="lesson-submit-btn">
+            <div class="spinner"></div>
+            <span class="btn-text">
+              <i class="bi bi-check-circle-fill"></i>
+              {% if is_edit %}Save Lesson Changes{% else %}Add Lesson to Course{% endif %}
+            </span>
+          </button>
+        </div>
+      </div>
+
+    </form>
+  </div>
 </div>
+
+<!-- React + Babel CDN -->
+<script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+{% verbatim %}
+<script type="text/babel">
+  const { useState, useEffect, useCallback } = React;
+
+  /* -----------------------------------------------
+     CHAR COUNTER
+  ----------------------------------------------- */
+  function CharCounter({ fieldId, max, warnAt, dangerAt, label }) {
+    const [count, setCount] = useState(0);
+    useEffect(() => {
+      const el = document.getElementById(fieldId);
+      if (!el) return;
+      setCount(el.value.length);
+      const update = () => setCount(el.value.length);
+      el.addEventListener('input', update);
+      return () => el.removeEventListener('input', update);
+    }, [fieldId]);
+    const color = count >= (dangerAt || max || 99999) ? '#ef4444'
+      : count >= (warnAt || 9999) ? '#f59e0b'
+      : '#9ca3af';
+    return (
+      <div style={{ fontSize: '.7rem', color, marginTop: '.3rem', textAlign: 'right', fontWeight: count >= (warnAt || 0) ? 600 : 400 }}>
+        {count}{max ? `/${max}` : ''} chars
+      </div>
+    );
+  }
+
+  /* -----------------------------------------------
+     DURATION BADGE
+  ----------------------------------------------- */
+  function DurationBadge() {
+    const [mins, setMins] = useState('');
+    useEffect(() => {
+      const el = document.getElementById('id_duration_minutes');
+      if (!el) return;
+      setMins(el.value);
+      const update = () => setMins(el.value);
+      el.addEventListener('input', update);
+      return () => el.removeEventListener('input', update);
+    }, []);
+    if (!mins || parseInt(mins) <= 0) return null;
+    const m = parseInt(mins);
+    const hrs = Math.floor(m / 60);
+    const rem = m % 60;
+    const display = hrs > 0 ? `${hrs}h ${rem > 0 ? rem + 'm' : ''}` : `${m}m`;
+    return (
+      <div style={{
+        display: 'inline-flex', alignItems: 'center', gap: '.4rem',
+        background: '#dbeafe', color: '#1e40af', border: '1px solid #93c5fd',
+        borderRadius: '100px', padding: '.25rem .75rem',
+        fontSize: '.78rem', fontWeight: 600, marginTop: '.5rem'
+      }}>
+        <i className="bi bi-clock"></i> {display} lesson
+      </div>
+    );
+  }
+
+  /* -----------------------------------------------
+     YOUTUBE EMBED PREVIEW
+  ----------------------------------------------- */
+  function VideoPreview() {
+    const [embedId, setEmbedId] = useState(null);
+    const [urlVal, setUrlVal] = useState('');
+
+    const extractYtId = (url) => {
+      if (!url) return null;
+      const match = url.match(/(?:v=|\/|youtu\.be\/|embed\/)([0-9A-Za-z_-]{11})/);
+      return match ? match[1] : null;
+    };
+
+    useEffect(() => {
+      const el = document.getElementById('id_video_url');
+      if (!el) return;
+      const update = () => {
+        const val = el.value.trim();
+        setUrlVal(val);
+        setEmbedId(extractYtId(val));
+      };
+      update();
+      el.addEventListener('input', update);
+      return () => el.removeEventListener('input', update);
+    }, []);
+
+    if (embedId) {
+      return (
+        <div style={{ marginTop: '.75rem', borderRadius: '12px', overflow: 'hidden', animation: 'fadeInSlide .35s ease' }}>
+          <div style={{ position: 'relative', paddingBottom: '56.25%', height: 0, background: '#000', borderRadius: '12px' }}>
+            <iframe
+              src={`https://www.youtube.com/embed/${embedId}?rel=0&modestbranding=1`}
+              title="Lesson preview"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+              style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none', borderRadius: '12px' }}
+            />
+          </div>
+          <div style={{ marginTop: '.5rem', fontSize: '.75rem', color: '#9ca3af', display: 'flex', alignItems: 'center', gap: '.4rem' }}>
+            <i className="bi bi-check-circle-fill" style={{ color: '#22c55e' }}></i>
+            Video detected — live preview loaded
+          </div>
+        </div>
+      );
+    }
+
+    if (urlVal && !embedId) {
+      return (
+        <div style={{
+          border: '2px dashed #fecaca', borderRadius: '12px',
+          padding: '1.25rem', textAlign: 'center', background: '#fef2f2', marginTop: '.75rem'
+        }}>
+          <i className="bi bi-exclamation-triangle-fill" style={{ fontSize: '1.5rem', color: '#fca5a5', display: 'block', marginBottom: '.4rem' }}></i>
+          <span style={{ fontSize: '.8rem', color: '#991b1b', fontWeight: 600 }}>Could not extract YouTube ID — check the URL format</span>
+        </div>
+      );
+    }
+
+    return (
+      <div style={{
+        border: '2px dashed #e5e7eb', borderRadius: '12px',
+        padding: '1.5rem', textAlign: 'center', background: '#fafafa', marginTop: '.75rem'
+      }}>
+        <i className="bi bi-youtube" style={{ fontSize: '2rem', color: '#fca5a5', display: 'block', marginBottom: '.5rem' }}></i>
+        <span style={{ fontSize: '.8rem', color: '#9ca3af' }}>Paste a YouTube URL above to see a live preview</span>
+      </div>
+    );
+  }
+
+  /* -----------------------------------------------
+     FREE PREVIEW TOGGLE
+  ----------------------------------------------- */
+  function FreePreviewToggle() {
+    const [checked, setChecked] = useState(false);
+    useEffect(() => {
+      const el = document.getElementById('id_is_free_preview');
+      if (el) {
+        setChecked(el.checked);
+        const sync = () => setChecked(el.checked);
+        el.addEventListener('change', sync);
+        return () => el.removeEventListener('change', sync);
+      }
+    }, []);
+    const toggle = useCallback(() => {
+      const el = document.getElementById('id_is_free_preview');
+      if (el) { el.checked = !el.checked; el.dispatchEvent(new Event('change')); }
+      setChecked(c => !c);
+    }, []);
+
+    return (
+      <div
+        onClick={toggle}
+        style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '1.1rem 1.25rem', borderRadius: '14px',
+          background: checked ? '#dcfce7' : '#f0fdf4',
+          border: `1.5px solid ${checked ? '#22c55e' : '#bbf7d0'}`,
+          cursor: 'pointer', transition: 'all .2s', userSelect: 'none'
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '.85rem' }}>
+          <div style={{
+            width: '42px', height: '42px', borderRadius: '12px',
+            background: checked ? '#dcfce7' : '#f9fafb',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontSize: '1.25rem', color: checked ? '#16a34a' : '#9ca3af',
+            border: `1px solid ${checked ? '#86efac' : '#e5e7eb'}`,
+            transition: 'all .2s', flexShrink: 0
+          }}>
+            <i className={`bi ${checked ? 'bi-unlock-fill' : 'bi-lock-fill'}`}></i>
+          </div>
+          <div>
+            <div style={{ fontSize: '.9rem', fontWeight: 700, color: '#111827' }}>
+              {checked ? '🎉 Free Preview Enabled' : 'Free Preview Disabled'}
+            </div>
+            <div style={{ fontSize: '.78rem', color: '#6b7280', marginTop: '.2rem' }}>
+              {checked
+                ? 'Students can watch this lesson before enrolling in the course'
+                : 'Enrollment required to access this lesson'}
+            </div>
+          </div>
+        </div>
+        <div style={{
+          width: '50px', height: '28px', borderRadius: '100px',
+          background: checked ? '#22c55e' : '#e5e7eb',
+          position: 'relative', transition: 'background .25s', flexShrink: 0
+        }}>
+          <div style={{
+            position: 'absolute', width: '22px', height: '22px',
+            background: '#fff', borderRadius: '50%',
+            top: '3px', left: checked ? '25px' : '3px',
+            transition: 'left .25s', boxShadow: '0 1px 4px rgba(0,0,0,0.2)'
+          }}></div>
+        </div>
+      </div>
+    );
+  }
+
+  /* -----------------------------------------------
+     MOUNT ALL
+  ----------------------------------------------- */
+  const mounts = {
+    'title-counter-mount': <CharCounter fieldId="id_title" max={200} warnAt={160} dangerAt={190} />,
+    'duration-badge-mount': <DurationBadge />,
+    'video-preview-mount': <VideoPreview />,
+    'content-counter-mount': <CharCounter fieldId="id_content" warnAt={2000} />,
+    'free-preview-toggle-mount': <FreePreviewToggle />,
+  };
+
+  Object.entries(mounts).forEach(([id, component]) => {
+    const el = document.getElementById(id);
+    if (el) ReactDOM.createRoot(el).render(component);
+  });
+</script>
+{% endverbatim %}
+
+<script>
+  /* Language badge sync */
+  (function() {
+    const langEl = document.getElementById('id_code_language');
+    const badge = document.getElementById('lang-badge');
+    if (langEl && badge) {
+      const update = () => { badge.textContent = langEl.value || 'code'; };
+      update();
+      langEl.addEventListener('change', update);
+      langEl.addEventListener('input', update);
+    }
+
+    /* Submit loading */
+    const form = document.getElementById('lesson-form');
+    const btn = document.getElementById('lesson-submit-btn');
+    form && form.addEventListener('submit', function() {
+      btn && btn.classList.add('loading');
+    });
+  })();
+</script>
 {% endblock %}

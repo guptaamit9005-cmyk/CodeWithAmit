@@ -1,229 +1,505 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}{{ course.title }} — CodeWithAmit{% endblock %}
+{% block meta_description %}{{ course.short_description }}{% endblock %}
 
 {% block content %}
-<div class="container py-4 py-md-5">
-    <!-- Admin Action Bar (Visible to Admins / Instructors) -->
+<div class="container py-4 py-md-5" style="max-width: 1240px;">
+
+    <!-- ==================================================================
+         ADMIN ACTION BAR (Admins & Instructors)
+         ================================================================== -->
     {% if request.user.is_staff or request.user.is_superuser %}
-        <div class="alert alert-primary rounded-4 d-flex flex-wrap justify-content-between align-items-center gap-2 p-3 mb-4 shadow-sm">
-            <div class="d-flex align-items-center gap-2">
-                <i class="bi bi-shield-lock-fill fs-5 text-primary"></i>
+        <div class="alert alert-primary rounded-4 d-flex flex-wrap justify-content-between align-items-center gap-3 p-3 mb-4 shadow-sm border-0" 
+             style="background: linear-gradient(90deg, #eff6ff 0%, #f0fdf4 100%); border-left: 4px solid var(--cwa-primary, #2563eb) !important;">
+            <div class="d-flex align-items-center gap-3">
+                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center shadow-xs" style="width: 40px; height: 40px;">
+                    <i class="bi bi-shield-lock-fill fs-5"></i>
+                </div>
                 <div>
-                    <strong class="small text-slate-900">Admin Control Panel:</strong>
-                    <span class="smaller text-secondary">You are viewing this course as an administrator.</span>
+                    <strong class="d-block small text-slate-900 font-heading">Course Studio &amp; Administration</strong>
+                    <span class="smaller text-secondary">Manage curriculum modules, attach GitHub repositories, and publish lessons.</span>
                 </div>
             </div>
-            <div class="d-flex flex-wrap gap-2">
-                <a href="{% url 'courses:add_lesson' %}?course={{ course.slug }}" class="btn btn-sm btn-success rounded-pill px-3 fw-semibold text-white shadow-sm">
+            <div class="d-flex flex-wrap gap-2 align-items-center">
+                <button type="button" class="btn btn-sm btn-primary rounded-pill px-3 fw-semibold shadow-xs" data-bs-toggle="modal" data-bs-target="#quickAddSectionModal">
+                    <i class="bi bi-folder-plus me-1"></i> Add Section
+                </button>
+                <a href="{% url 'courses:manage_sections' course.slug %}" class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-semibold">
+                    <i class="bi bi-diagram-3-fill me-1"></i> Manage Sections &amp; Links
+                </a>
+                <a href="{% url 'courses:add_lesson' %}?course={{ course.slug }}" class="btn btn-sm btn-success rounded-pill px-3 fw-semibold text-white shadow-xs">
                     <i class="bi bi-plus-lg me-1"></i> Add Lesson
                 </a>
-                <a href="{% url 'courses:edit_course' course.slug %}" class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-semibold">
+                <a href="{% url 'courses:edit_course' course.slug %}" class="btn btn-sm btn-outline-secondary rounded-pill px-3 fw-semibold">
                     <i class="bi bi-pencil me-1"></i> Edit Course
                 </a>
                 <a href="{% url 'courses:delete_course' course.slug %}" class="btn btn-sm btn-outline-danger rounded-pill px-3 fw-semibold">
-                    <i class="bi bi-trash3 me-1"></i> Delete Course
+                    <i class="bi bi-trash3 me-1"></i> Delete
                 </a>
             </div>
         </div>
     {% endif %}
 
-    <!-- Course Hero Banner -->
-    <div class="card flowable-card border p-4 p-md-5 rounded-4 shadow-sm mb-5 position-relative overflow-hidden bg-white">
-        <div class="row align-items-center g-4">
-            <div class="col-lg-8">
-                <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
-                    <span class="badge {% if 'Bestseller' in course.tag %}badge-bestseller{% elif 'Trending' in course.tag %}badge-trending{% else %}bg-primary text-white{% endif %}">
-                        {{ course.tag|default:'Bestseller 🔥' }}
-                    </span>
-                    <span class="badge bg-light text-dark border">{{ course.category.name }}</span>
-                    {% if course.average_rating %}
-                        <span class="text-warning small fw-bold"><i class="bi bi-star-fill"></i> {{ course.average_rating }} ({{ reviews.count }} reviews)</span>
-                    {% else %}
-                        <span class="text-secondary small"><i class="bi bi-star"></i> No reviews yet</span>
-                    {% endif %}
-                </div>
-                <h1 class="display-6 fw-bold text-slate-900 font-heading mb-3">{{ course.title }}</h1>
-                <p class="lead text-secondary mb-4" style="font-size: 1.15rem; line-height: 1.6;">{{ course.short_description }}</p>
+    <!-- ==================================================================
+         COURSE HERO BANNER (Modern Aesthetic, Deep Navy / Gradient Theme)
+         ================================================================== -->
+    <div class="card border-0 rounded-4 shadow-sm mb-5 position-relative overflow-hidden" 
+         style="background: linear-gradient(135deg, #0b1120 0%, #0f172a 45%, #1e1b4b 100%); color: #ffffff;">
+        
+        <!-- Decorative Ambient Light Orbs -->
+        <div class="position-absolute top-0 end-0 rounded-circle" style="width: 400px; height: 400px; background: radial-gradient(circle, rgba(37,99,235,0.25) 0%, transparent 70%); filter: blur(40px); pointer-events: none;"></div>
+        <div class="position-absolute bottom-0 start-0 rounded-circle" style="width: 320px; height: 320px; background: radial-gradient(circle, rgba(124,58,237,0.2) 0%, transparent 70%); filter: blur(50px); pointer-events: none;"></div>
 
-                <div class="d-flex flex-wrap align-items-center gap-3 text-secondary smaller mb-4">
-                    <span><i class="bi bi-calendar-check text-success me-1"></i> <strong>{{ course.batch_start_date|default:'Admissions Open' }}</strong></span>
-                    <span>&bull;</span>
-                    <span><i class="bi bi-translate text-info me-1"></i> <strong>{{ course.language|default:'Hinglish' }}</strong></span>
-                    <span>&bull;</span>
-                    <span><i class="bi bi-journal-code text-primary me-1"></i> <strong>{{ course.total_lessons }} Lessons</strong></span>
-                    <span>&bull;</span>
-                    <span><i class="bi bi-clock-history text-warning me-1"></i> <strong>{{ course.estimated_hours }} Hours Content</strong></span>
-                </div>
-
-                <!-- Pricing & Enrollment Action -->
-                <div class="d-flex flex-wrap align-items-baseline gap-3 mb-4">
-                    {% if course.price > 0 %}
-                        <span class="batch-price-tag">₹{{ course.price }}</span>
-                        {% if course.original_price %}
-                            <span class="batch-price-original">₹{{ course.original_price }}</span>
-                            <span class="batch-discount-badge">{{ course.discount_percent }}% OFF</span>
+        <div class="p-4 p-md-5 position-relative z-1">
+            <div class="row align-items-center g-4 g-lg-5">
+                <div class="col-lg-8">
+                    <!-- Badges Row -->
+                    <div class="d-flex flex-wrap align-items-center gap-2 mb-3">
+                        <span class="badge rounded-pill px-3 py-1.5 fw-bold" 
+                              style="background: linear-gradient(90deg, #f59e0b, #ef4444); color: #fff; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.35);">
+                            <i class="bi bi-fire me-1"></i> {{ course.tag|default:'Bestseller Batch 🔥' }}
+                        </span>
+                        <span class="badge rounded-pill px-3 py-1.5 fw-semibold" 
+                              style="background: rgba(255, 255, 255, 0.12); color: #e2e8f0; backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.15);">
+                            {{ course.category.name }}
+                        </span>
+                        <span class="badge rounded-pill px-2.5 py-1.5 fw-semibold"
+                              style="background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3);">
+                            <i class="bi bi-speedometer2 me-1"></i> {{ course.difficulty }}
+                        </span>
+                        {% if course.average_rating %}
+                            <span class="badge rounded-pill px-2.5 py-1.5 text-warning fw-bold" style="background: rgba(250, 204, 21, 0.15); border: 1px solid rgba(250, 204, 21, 0.25);">
+                                <i class="bi bi-star-fill me-1"></i> {{ course.average_rating }} ({{ reviews.count }} reviews)
+                            </span>
                         {% endif %}
-                    {% else %}
-                        <span class="batch-price-tag text-success">FREE</span>
-                        <span class="badge bg-success-subtle text-success">100% Free Community Course</span>
-                    {% endif %}
-                </div>
+                    </div>
 
-                <div class="d-flex flex-wrap gap-3 align-items-center">
-                    {% if is_enrolled %}
-                        {% with first_lesson=lessons|first %}
-                            <a href="{% url 'courses:lesson_detail' course.slug first_lesson.slug %}" class="btn btn-primary btn-lg rounded-pill px-5 fw-bold shadow-sm hover-lift">
-                                Continue Course ({{ user_progress }}%) <i class="bi bi-arrow-right ms-1"></i>
-                            </a>
-                        {% endwith %}
-                    {% else %}
-                        <a href="{% url 'courses:enroll_course' course.slug %}" class="btn btn-primary btn-lg rounded-pill px-5 fw-bold shadow-sm hover-lift">
-                            Enroll in Batch Now <i class="bi bi-mortarboard-fill ms-1"></i>
-                        </a>
-                    {% endif %}
+                    <!-- Course Title & Subtitle -->
+                    <h1 class="display-6 fw-bold font-heading mb-3 text-white" style="letter-spacing: -0.03em; line-height: 1.25;">
+                        {{ course.title }}
+                    </h1>
+                    <p class="lead mb-4 text-slate-300" style="font-size: 1.1rem; line-height: 1.6; max-width: 720px;">
+                        {{ course.short_description }}
+                    </p>
 
-                    {% if request.user.is_authenticated %}
-                        <a href="{% url 'courses:toggle_bookmark' course.slug %}" class="btn btn-outline-secondary rounded-pill px-4">
-                            {% if is_bookmarked %}
-                                <i class="bi bi-bookmark-fill text-warning me-1"></i> Bookmarked
-                            {% else %}
-                                <i class="bi bi-bookmark me-1"></i> Save Course
-                            {% endif %}
-                        </a>
-                    {% endif %}
-                </div>
-            </div>
+                    <!-- Stats Strip -->
+                    <div class="d-flex flex-wrap align-items-center gap-3 gap-md-4 text-slate-300 smaller mb-4 pb-1">
+                        <span><i class="bi bi-calendar-event text-info me-1.5"></i> <strong>{{ course.batch_start_date|default:'Self-Paced' }}</strong></span>
+                        <span class="opacity-30">•</span>
+                        <span><i class="bi bi-translate text-success me-1.5"></i> <strong>{{ course.language|default:'Hinglish' }}</strong></span>
+                        <span class="opacity-30">•</span>
+                        <span><i class="bi bi-diagram-3-fill text-warning me-1.5"></i> <strong>{{ sections.count }} Modules / Sections</strong></span>
+                        <span class="opacity-30">•</span>
+                        <span><i class="bi bi-play-btn-fill text-primary me-1.5"></i> <strong>{{ course.total_lessons }} Lessons</strong></span>
+                        <span class="opacity-30">•</span>
+                        <span><i class="bi bi-clock-history text-cyan me-1.5"></i> <strong>{{ course.estimated_hours }} Hours Content</strong></span>
+                    </div>
 
-            <!-- Thumbnail / Video Card -->
-            <div class="col-lg-4 text-center">
-                <div class="rounded-4 overflow-hidden border shadow-sm" style="max-height: 260px;">
-                    {% if course.thumbnail %}
-                        <img src="{{ course.thumbnail.url }}" alt="{{ course.title }}" class="img-fluid w-100 object-fit-cover" style="height: 240px;">
-                    {% elif course.thumbnail_url %}
-                        <img src="{{ course.thumbnail_url }}" alt="{{ course.title }}" class="img-fluid w-100 object-fit-cover" style="height: 240px;">
-                    {% else %}
-                        <div class="p-5 bg-light text-primary">
-                            <i class="bi bi-laptop-fill fs-1"></i>
+                    <!-- Direct GitHub Repository Integration Banner -->
+                    {% if course.has_github %}
+                        <div class="p-3 rounded-4 mb-4 d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-3"
+                             style="background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.15);">
+                            <div class="d-flex align-items-center gap-3 overflow-hidden">
+                                <div class="rounded-circle d-flex align-items-center justify-content-center bg-dark text-white border border-secondary" style="width: 44px; height: 44px; min-width: 44px;">
+                                    <i class="bi bi-github fs-4"></i>
+                                </div>
+                                <div class="overflow-hidden">
+                                    <div class="d-flex align-items-center gap-2">
+                                        <span class="badge bg-success-subtle text-success rounded-pill px-2 py-0.5" style="font-size: 0.68rem;">Verified Source Code</span>
+                                        <span class="smaller text-slate-300">Official Course Repo</span>
+                                    </div>
+                                    <div class="fw-bold text-white text-truncate font-monospace smaller mt-0.5">
+                                        {{ course.github_repo_name }}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex align-items-center gap-2 flex-wrap">
+                                <button type="button" class="btn btn-sm btn-outline-light rounded-pill px-3 copy-git-btn shadow-xs" 
+                                        data-clone="git clone {{ course.github_repo_url }}.git">
+                                    <i class="bi bi-clipboard me-1"></i> Copy Clone
+                                </button>
+                                <a href="{{ course.github_repo_url }}" target="_blank" rel="noopener noreferrer" 
+                                   class="btn btn-sm btn-light rounded-pill px-3 fw-semibold text-dark shadow-xs">
+                                    <i class="bi bi-github me-1"></i> Open GitHub <i class="bi bi-box-arrow-up-right ms-1 smaller"></i>
+                                </a>
+                            </div>
                         </div>
                     {% endif %}
+
+                    <!-- Pricing & CTA Row -->
+                    <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 pt-2">
+                        <div class="d-flex align-items-baseline gap-2">
+                            {% if course.price > 0 %}
+                                <span class="display-6 fw-bold text-white">₹{{ course.price }}</span>
+                                {% if course.original_price and course.original_price > course.price %}
+                                    <span class="fs-5 text-muted text-decoration-line-through">₹{{ course.original_price }}</span>
+                                    <span class="badge bg-danger rounded-pill px-2.5 py-1 smaller fw-bold">{{ course.discount_percent }}% OFF</span>
+                                {% endif %}
+                            {% else %}
+                                <span class="badge bg-success text-white rounded-pill px-3 py-1.5 fs-5 fw-bold">100% FREE</span>
+                                <span class="smaller text-slate-300">Free Open Access Course</span>
+                            {% endif %}
+                        </div>
+
+                        <div class="d-flex flex-wrap gap-2.5 align-items-center">
+                            {% if is_enrolled %}
+                                {% with first_lesson=lessons|first %}
+                                    {% if first_lesson %}
+                                        <a href="{% url 'courses:lesson_detail' course.slug first_lesson.slug %}" 
+                                           class="btn btn-primary btn-lg rounded-pill px-4 py-2.5 fw-bold shadow-lg d-inline-flex align-items-center gap-2">
+                                            <span>Continue Learning</span>
+                                            <span class="badge bg-white text-primary rounded-pill px-2 py-0.5 smaller">{{ user_progress }}%</span>
+                                            <i class="bi bi-arrow-right"></i>
+                                        </a>
+                                    {% else %}
+                                        <span class="btn btn-primary btn-lg rounded-pill px-4 py-2.5 fw-bold disabled">Enrolled (Lessons coming soon)</span>
+                                    {% endif %}
+                                {% endwith %}
+                            {% else %}
+                                <a href="{% url 'courses:enroll_course' course.slug %}" 
+                                   class="btn btn-primary btn-lg rounded-pill px-5 py-2.5 fw-bold shadow-lg d-inline-flex align-items-center gap-2">
+                                    <span>Enroll in Course</span>
+                                    <i class="bi bi-mortarboard-fill"></i>
+                                </a>
+                            {% endif %}
+
+                            {% if request.user.is_authenticated %}
+                                <a href="{% url 'courses:toggle_bookmark' course.slug %}" 
+                                   class="btn btn-outline-light rounded-pill px-3.5 py-2.5" title="Bookmark Course">
+                                    {% if is_bookmarked %}
+                                        <i class="bi bi-bookmark-fill text-warning"></i>
+                                    {% else %}
+                                        <i class="bi bi-bookmark"></i>
+                                    {% endif %}
+                                </a>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Thumbnail Media Visual -->
+                <div class="col-lg-4 text-center">
+                    <div class="rounded-4 overflow-hidden border shadow-lg position-relative" style="border-color: rgba(255, 255, 255, 0.15) !important;">
+                        {% if course.thumbnail %}
+                            <img src="{{ course.thumbnail.url }}" alt="{{ course.title }}" class="img-fluid w-100 object-fit-cover" style="height: 250px;">
+                        {% elif course.thumbnail_url %}
+                            <img src="{{ course.thumbnail_url }}" alt="{{ course.title }}" class="img-fluid w-100 object-fit-cover" style="height: 250px;">
+                        {% else %}
+                            <div class="d-flex flex-column align-items-center justify-content-center p-5 text-white" style="height: 250px; background: radial-gradient(circle at center, #1e1b4b 0%, #0c0f1d 80%);">
+                                <i class="bi bi-terminal-fill fs-1 text-primary mb-2"></i>
+                                <span class="font-heading fw-bold">{{ course.category.name }}</span>
+                            </div>
+                        {% endif %}
+
+                        {% if course.has_github %}
+                            <a href="{{ course.github_repo_url }}" target="_blank" rel="noopener noreferrer" 
+                               class="position-absolute bottom-0 end-0 m-3 badge rounded-pill px-3 py-1.5 text-white text-decoration-none shadow" 
+                               style="background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.2);">
+                                <i class="bi bi-github me-1"></i> GitHub Code Attached
+                            </a>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Main Content & Syllabus Grid -->
+    <!-- ==================================================================
+         MAIN CONTENT & SECTIONS CURRICULUM
+         ================================================================== -->
     <div class="row g-5">
         <div class="col-lg-8">
-            <!-- Course Description -->
-            <div class="card border p-4 p-md-5 rounded-4 mb-4 bg-white shadow-sm">
-                <h4 class="text-slate-900 font-heading fw-bold mb-3">About This Batch / Course</h4>
-                <div class="text-secondary small line-height-relaxed" style="white-space: pre-line;">
+
+            <!-- About Course & Objectives -->
+            <div class="card border rounded-4 p-4 p-md-5 mb-4 bg-white shadow-sm">
+                <div class="d-flex align-items-center justify-content-between mb-3">
+                    <h3 class="h4 text-slate-900 font-heading fw-bold mb-0">About This Course &amp; Curriculum</h3>
+                    {% if course.has_github %}
+                        <a href="{{ course.github_repo_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-xs btn-outline-dark rounded-pill px-3">
+                            <i class="bi bi-github me-1"></i> Repository
+                        </a>
+                    {% endif %}
+                </div>
+                
+                <div class="text-secondary small line-height-relaxed" style="white-space: pre-line; font-size: 0.95rem;">
                     {{ course.description }}
                 </div>
 
                 {% if course.prerequisites %}
-                    <div class="p-3 bg-light rounded-3 border mt-4">
-                        <h6 class="fw-bold mb-1 small text-slate-800"><i class="bi bi-info-circle text-primary me-1"></i> Prerequisites:</h6>
-                        <p class="mb-0 text-secondary smaller">{{ course.prerequisites }}</p>
+                    <div class="p-3 rounded-3 border mt-4 d-flex align-items-start gap-3" style="background: #f8fafc;">
+                        <i class="bi bi-check2-circle text-primary fs-4 mt-0.5"></i>
+                        <div>
+                            <h6 class="fw-bold mb-1 small text-slate-900">Prerequisites &amp; Equipment:</h6>
+                            <p class="mb-0 text-secondary smaller">{{ course.prerequisites }}</p>
+                        </div>
                     </div>
                 {% endif %}
             </div>
 
-            <!-- Syllabus / Lessons List -->
-            <div class="card border p-4 p-md-5 rounded-4 mb-4 bg-white shadow-sm">
-                <div class="d-flex justify-content-between align-items-center mb-3">
+            <!-- Course Curriculum with Sections & Modules Accordion -->
+            <div class="card border rounded-4 p-4 p-md-5 mb-4 bg-white shadow-sm">
+                <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center gap-2 mb-4 pb-2 border-bottom">
                     <div>
-                        <h4 class="text-slate-900 font-heading fw-bold mb-0">Course Curriculum</h4>
-                        <span class="text-muted smaller">{{ lessons|length }} structured lessons with starter code</span>
+                        <div class="d-flex align-items-center gap-2">
+                            <h3 class="h4 text-slate-900 font-heading fw-bold mb-0">Structured Course Curriculum</h3>
+                            <span class="badge bg-primary-subtle text-primary rounded-pill px-2.5 py-1 smaller fw-bold">
+                                {{ sections.count }} Modules • {{ lessons.count }} Lessons
+                            </span>
+                        </div>
+                        <span class="text-muted smaller">Step-by-step modular progression with source code and starter links</span>
                     </div>
+
                     {% if request.user.is_staff or request.user.is_superuser %}
-                        <a href="{% url 'courses:add_lesson' %}?course={{ course.slug }}" class="btn btn-sm btn-success rounded-pill px-3 text-white">
-                            <i class="bi bi-plus-lg me-1"></i> Add Lesson
-                        </a>
+                        <div class="d-flex gap-2">
+                            <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3 fw-semibold" data-bs-toggle="modal" data-bs-target="#quickAddSectionModal">
+                                <i class="bi bi-plus-lg me-1"></i> Add Section
+                            </button>
+                            <a href="{% url 'courses:manage_sections' course.slug %}" class="btn btn-sm btn-outline-secondary rounded-pill px-3 fw-semibold">
+                                <i class="bi bi-gear-fill me-1"></i> Manage
+                            </a>
+                        </div>
                     {% endif %}
                 </div>
 
-                <div class="list-group list-group-flush">
-                    {% for l in lessons %}
-                        <div class="list-group-item px-0 py-3 d-flex justify-content-between align-items-center border-bottom">
-                            <div class="d-flex align-items-center gap-3">
-                                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2.5 py-1 rounded-3 fw-bold">
-                                    {{ forloop.counter }}
-                                </span>
-                                <div>
-                                    <h6 class="mb-0 fw-semibold">
-                                        {% if is_enrolled or l.is_free_preview or request.user.is_staff %}
-                                            <a href="{% url 'courses:lesson_detail' course.slug l.slug %}" class="text-slate-900 text-decoration-none hover-primary">
-                                                {{ l.title }}
-                                            </a>
-                                        {% else %}
-                                            <span class="text-secondary">{{ l.title }}</span>
-                                        {% endif %}
-                                    </h6>
-                                    <span class="smaller text-muted"><i class="bi bi-clock me-1"></i> {{ l.duration_minutes }} mins</span>
-                                </div>
-                            </div>
-                            <div class="d-flex align-items-center gap-2">
-                                {% if l.is_free_preview %}
-                                    <span class="badge bg-success-subtle text-success rounded-pill smaller">Free Preview</span>
-                                {% endif %}
-                                {% if is_enrolled or l.is_free_preview or request.user.is_staff %}
-                                    <a href="{% url 'courses:lesson_detail' course.slug l.slug %}" class="btn btn-outline-primary btn-sm rounded-pill px-3 fw-semibold">
-                                        Watch
-                                    </a>
-                                {% else %}
-                                    <i class="bi bi-lock-fill text-muted"></i>
-                                {% endif %}
+                {% if sections %}
+                    <!-- Render Sections Accordion -->
+                    <div class="accordion curriculum-accordion d-flex flex-column gap-3" id="courseCurriculumAccordion">
+                        {% for sec in sections %}
+                            <div class="accordion-item border rounded-3 overflow-hidden shadow-xs">
+                                <h2 class="accordion-header" id="heading-sec-{{ sec.id }}">
+                                    <button class="accordion-button {% if not forloop.first %}collapsed{% endif %} p-3.5 bg-light" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-sec-{{ sec.id }}" aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}" aria-controls="collapse-sec-{{ sec.id }}">
+                                        <div class="d-flex flex-column flex-sm-row justify-content-between align-items-sm-center w-100 me-3 gap-2">
+                                            <div class="d-flex align-items-center gap-2.5">
+                                                <span class="badge bg-primary text-white rounded-pill px-2.5 py-1 smaller fw-bold">
+                                                    Module {{ sec.order }}
+                                                </span>
+                                                <span class="fw-bold text-slate-900 font-heading">{{ sec.title }}</span>
+                                            </div>
+                                            <div class="d-flex align-items-center gap-2 smaller text-muted">
+                                                <span><i class="bi bi-play-circle me-1"></i>{{ sec.total_lessons }} lessons</span>
+                                                <span>&bull;</span>
+                                                <span><i class="bi bi-clock me-1"></i>{{ sec.total_duration_minutes }}m</span>
+                                            </div>
+                                        </div>
+                                    </button>
+                                </h2>
 
-                                {% if request.user.is_staff or request.user.is_superuser %}
-                                    <a href="{% url 'courses:add_quiz_question' course.slug l.slug %}" class="btn btn-outline-warning btn-xs rounded-pill px-2 smaller text-dark" title="Add Quiz">
-                                        + Quiz
-                                    </a>
-                                    <a href="{% url 'courses:edit_lesson' course.slug l.slug %}" class="btn btn-outline-secondary btn-xs rounded-pill px-2 smaller" title="Edit">
-                                        <i class="bi bi-pencil"></i>
-                                    </a>
-                                    <a href="{% url 'courses:delete_lesson' course.slug l.slug %}" class="btn btn-outline-danger btn-xs rounded-pill px-2 smaller" title="Delete">
-                                        <i class="bi bi-trash3"></i>
-                                    </a>
-                                {% endif %}
-                            </div>
-                        </div>
-                    {% empty %}
-                        <div class="py-4 text-center text-muted small">
-                            No lessons published yet.
-                            {% if request.user.is_staff %}
-                                <div class="mt-2">
-                                    <a href="{% url 'courses:add_lesson' %}?course={{ course.slug }}" class="btn btn-sm btn-primary rounded-pill px-3">
-                                        + Add First Lesson
-                                    </a>
+                                <div id="collapse-sec-{{ sec.id }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" aria-labelledby="heading-sec-{{ sec.id }}" data-bs-parent="#courseCurriculumAccordion">
+                                    <div class="accordion-body p-3.5 bg-white">
+                                        
+                                        <!-- Section Description (if any) -->
+                                        {% if sec.description %}
+                                            <p class="smaller text-secondary mb-3">{{ sec.description }}</p>
+                                        {% endif %}
+
+                                        <!-- Section Links & GitHub Resources Strip -->
+                                        {% if sec.has_github or sec.links.all %}
+                                            <div class="p-2.5 rounded-3 mb-3 d-flex flex-wrap align-items-center gap-2" style="background: #f8fafc; border: 1px solid var(--cwa-border, #e2e8f0);">
+                                                <span class="smaller fw-bold text-slate-800 me-1">
+                                                    <i class="bi bi-paperclip text-primary me-1"></i> Section Resources:
+                                                </span>
+
+                                                {% if sec.has_github %}
+                                                    <a href="{{ sec.github_url }}" target="_blank" rel="noopener noreferrer" 
+                                                       class="badge rounded-pill px-2.5 py-1 text-decoration-none shadow-xs" 
+                                                       style="background: #24292e; color: #fff;">
+                                                        <i class="bi bi-github me-1"></i> Section GitHub Repo <i class="bi bi-box-arrow-up-right ms-0.5" style="font-size:0.6rem;"></i>
+                                                    </a>
+                                                {% endif %}
+
+                                                {% for link in sec.links.all %}
+                                                    <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" 
+                                                       class="badge rounded-pill px-2.5 py-1 text-decoration-none shadow-xs {{ link.badge_class }}">
+                                                        <i class="bi {{ link.icon_class }} me-1"></i> {{ link.title }} <i class="bi bi-box-arrow-up-right ms-0.5" style="font-size:0.6rem;"></i>
+                                                    </a>
+                                                {% endfor %}
+
+                                                {% if request.user.is_staff or request.user.is_superuser %}
+                                                    <button type="button" class="btn btn-xs btn-outline-primary rounded-pill px-2 py-0.5 ms-auto" 
+                                                            data-bs-toggle="modal" data-bs-target="#quickAddLinkModal" data-section-id="{{ sec.id }}" data-section-title="{{ sec.title }}"
+                                                            onclick="setQuickAddLinkTarget('{{ sec.id }}', '{{ sec.title|escapejs }}')">
+                                                        <i class="bi bi-plus-lg me-1"></i> Add Link
+                                                    </button>
+                                                {% endif %}
+                                            </div>
+                                        {% elif request.user.is_staff or request.user.is_superuser %}
+                                            <div class="mb-3 d-flex justify-content-end">
+                                                <button type="button" class="btn btn-xs btn-outline-primary rounded-pill px-2.5 py-0.5" 
+                                                        onclick="setQuickAddLinkTarget('{{ sec.id }}', '{{ sec.title|escapejs }}')"
+                                                        data-bs-toggle="modal" data-bs-target="#quickAddLinkModal">
+                                                    <i class="bi bi-link-45deg me-1"></i> Attach GitHub / Docs Link to this Section
+                                                </button>
+                                            </div>
+                                        {% endif %}
+
+                                        <!-- Lessons in this Section -->
+                                        {% if sec.lessons.all %}
+                                            <div class="list-group list-group-flush border rounded-3 overflow-hidden">
+                                                {% for l in sec.lessons.all %}
+                                                    <div class="list-group-item px-3 py-2.5 d-flex justify-content-between align-items-center">
+                                                        <div class="d-flex align-items-center gap-3 overflow-hidden">
+                                                            <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-0.5 rounded-3 fw-bold smaller">
+                                                                {{ l.order }}
+                                                            </span>
+                                                            <div class="overflow-hidden">
+                                                                <h6 class="mb-0 fw-semibold smaller">
+                                                                    {% if is_enrolled or l.is_free_preview or request.user.is_staff %}
+                                                                        <a href="{% url 'courses:lesson_detail' course.slug l.slug %}" class="text-slate-900 text-decoration-none hover-primary">
+                                                                            {{ l.title }}
+                                                                        </a>
+                                                                    {% else %}
+                                                                        <span class="text-secondary">{{ l.title }}</span>
+                                                                    {% endif %}
+                                                                </h6>
+                                                                <span class="smaller text-muted"><i class="bi bi-clock me-1"></i> {{ l.duration_minutes }} mins</span>
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="d-flex align-items-center gap-2">
+                                                            {% if l.has_github %}
+                                                                <a href="{{ l.github_url }}" target="_blank" rel="noopener noreferrer" 
+                                                                   class="badge bg-dark text-white rounded-pill px-2 py-1 text-decoration-none smaller" title="Direct GitHub Code">
+                                                                    <i class="bi bi-github me-1"></i> Code
+                                                                </a>
+                                                            {% endif %}
+
+                                                            {% if l.is_free_preview %}
+                                                                <span class="badge bg-success-subtle text-success rounded-pill smaller px-2">Free Preview</span>
+                                                            {% endif %}
+
+                                                            {% if is_enrolled or l.is_free_preview or request.user.is_staff %}
+                                                                <a href="{% url 'courses:lesson_detail' course.slug l.slug %}" class="btn btn-outline-primary btn-sm rounded-pill px-3 py-1 fw-semibold smaller">
+                                                                    Watch <i class="bi bi-play-fill ms-0.5"></i>
+                                                                </a>
+                                                            {% else %}
+                                                                <span class="text-muted smaller px-2"><i class="bi bi-lock-fill"></i></span>
+                                                            {% endif %}
+
+                                                            {% if request.user.is_staff or request.user.is_superuser %}
+                                                                <a href="{% url 'courses:edit_lesson' course.slug l.slug %}" class="btn btn-outline-secondary btn-xs rounded-pill px-2 smaller" title="Edit">
+                                                                    <i class="bi bi-pencil"></i>
+                                                                </a>
+                                                            {% endif %}
+                                                        </div>
+                                                    </div>
+                                                {% endfor %}
+                                            </div>
+                                        {% else %}
+                                            <div class="py-3 text-center text-muted smaller">
+                                                No lessons in this module yet.
+                                                {% if request.user.is_staff %}
+                                                    <a href="{% url 'courses:add_lesson' %}?course={{ course.slug }}&section={{ sec.id }}" class="text-primary text-decoration-none fw-semibold ms-1">
+                                                        + Add First Lesson
+                                                    </a>
+                                                {% endif %}
+                                            </div>
+                                        {% endif %}
+
+                                    </div>
                                 </div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <!-- Unsectioned Lessons (if any) -->
+                {% if unsectioned_lessons %}
+                    <div class="mt-4 pt-3 border-top">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <h5 class="fw-bold text-slate-900 font-heading mb-0 smaller">
+                                {% if sections %}Additional Lessons / Open Modules{% else %}Curriculum Lessons{% endif %}
+                            </h5>
+                            {% if request.user.is_staff and sections %}
+                                <a href="{% url 'courses:manage_sections' course.slug %}" class="smaller text-primary text-decoration-none fw-semibold">
+                                    Organize into Sections &rarr;
+                                </a>
                             {% endif %}
                         </div>
-                    {% endfor %}
-                </div>
+
+                        <div class="list-group list-group-flush border rounded-3 overflow-hidden">
+                            {% for l in unsectioned_lessons %}
+                                <div class="list-group-item px-3 py-2.5 d-flex justify-content-between align-items-center">
+                                    <div class="d-flex align-items-center gap-3 overflow-hidden">
+                                        <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-0.5 rounded-3 fw-bold smaller">
+                                            {{ l.order }}
+                                        </span>
+                                        <div>
+                                            <h6 class="mb-0 fw-semibold smaller">
+                                                {% if is_enrolled or l.is_free_preview or request.user.is_staff %}
+                                                    <a href="{% url 'courses:lesson_detail' course.slug l.slug %}" class="text-slate-900 text-decoration-none hover-primary">
+                                                        {{ l.title }}
+                                                    </a>
+                                                {% else %}
+                                                    <span class="text-secondary">{{ l.title }}</span>
+                                                {% endif %}
+                                            </h6>
+                                            <span class="smaller text-muted"><i class="bi bi-clock me-1"></i> {{ l.duration_minutes }} mins</span>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        {% if l.has_github %}
+                                            <a href="{{ l.github_url }}" target="_blank" rel="noopener noreferrer" class="badge bg-dark text-white rounded-pill px-2 py-1 text-decoration-none smaller">
+                                                <i class="bi bi-github me-1"></i> Code
+                                            </a>
+                                        {% endif %}
+                                        {% if l.is_free_preview %}
+                                            <span class="badge bg-success-subtle text-success rounded-pill smaller px-2">Free Preview</span>
+                                        {% endif %}
+                                        {% if is_enrolled or l.is_free_preview or request.user.is_staff %}
+                                            <a href="{% url 'courses:lesson_detail' course.slug l.slug %}" class="btn btn-outline-primary btn-sm rounded-pill px-3 py-1 fw-semibold smaller">
+                                                Watch <i class="bi bi-play-fill ms-0.5"></i>
+                                            </a>
+                                        {% else %}
+                                            <span class="text-muted smaller px-2"><i class="bi bi-lock-fill"></i></span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+
+                {% if not sections and not unsectioned_lessons %}
+                    <div class="py-5 text-center text-muted small">
+                        <i class="bi bi-journal-x fs-1 text-secondary opacity-50 d-block mb-2"></i>
+                        No lessons published yet.
+                        {% if request.user.is_staff %}
+                            <div class="mt-3 d-flex justify-content-center gap-2">
+                                <button type="button" class="btn btn-sm btn-primary rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#quickAddSectionModal">
+                                    <i class="bi bi-folder-plus me-1"></i> Create First Section
+                                </button>
+                                <a href="{% url 'courses:add_lesson' %}?course={{ course.slug }}" class="btn btn-sm btn-outline-primary rounded-pill px-4">
+                                    + Add Lesson
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                {% endif %}
             </div>
 
             <!-- Student Reviews -->
-            <div class="card border p-4 p-md-5 rounded-4 bg-white shadow-sm">
-                <h4 class="text-slate-900 font-heading fw-bold mb-3">Student Reviews & Feedback</h4>
+            <div class="card border rounded-4 p-4 p-md-5 bg-white shadow-sm">
+                <h4 class="text-slate-900 font-heading fw-bold mb-3">Student Reviews &amp; Feedback</h4>
                 
                 {% if request.user.is_authenticated %}
-                    <form action="{% url 'courses:add_review' course.slug %}" method="POST" class="p-3 rounded-3 bg-light border mb-4">
+                    <form action="{% url 'courses:add_review' course.slug %}" method="POST" class="p-3.5 rounded-3 bg-light border mb-4">
                         {% csrf_token %}
                         <h6 class="text-slate-900 fw-bold mb-2">Write a Review</h6>
                         <div class="d-flex align-items-center gap-2 mb-2">
                             <label class="smaller text-secondary">Rating:</label>
                             <select name="rating" class="form-select form-select-sm border text-dark rounded-pill w-auto">
-                                <option value="5">⭐⭐⭐⭐⭐ (5 Stars)</option>
-                                <option value="4">⭐⭐⭐⭐ (4 Stars)</option>
-                                <option value="3">⭐⭐⭐ (3 Stars)</option>
+                                <option value="5">⭐⭐⭐⭐⭐ (5 Stars - Outstanding)</option>
+                                <option value="4">⭐⭐⭐⭐ (4 Stars - Great)</option>
+                                <option value="3">⭐⭐⭐ (3 Stars - Good)</option>
                                 <option value="2">⭐⭐ (2 Stars)</option>
                                 <option value="1">⭐ (1 Star)</option>
                             </select>
                         </div>
-                        <textarea name="comment" required rows="3" class="form-control form-control-sm border text-dark mb-2" placeholder="Share your experience with this course..."></textarea>
-                        <button type="submit" class="btn btn-primary btn-sm rounded-pill px-4 fw-semibold">Submit Review</button>
+                        <textarea name="comment" required rows="3" class="form-control form-control-sm border text-dark mb-2" placeholder="Share your experience with this course, what you learned, and how it helped you..."></textarea>
+                        <button type="submit" class="btn btn-primary btn-sm rounded-pill px-4 fw-semibold shadow-xs">Submit Review</button>
                     </form>
                 {% endif %}
 
@@ -246,40 +522,254 @@
                     {% endfor %}
                 </div>
             </div>
+
         </div>
 
-        <!-- Right Sidebar Info -->
+        <!-- ==================================================================
+             RIGHT SIDEBAR
+             ================================================================== -->
         <div class="col-lg-4">
-            <div class="card border p-4 rounded-4 shadow-sm mb-4 bg-white">
-                <h5 class="text-slate-900 font-heading fw-bold mb-3">Batch Highlights & Perks</h5>
+
+            <!-- GitHub Source Code Card (If course has GitHub) -->
+            {% if course.has_github %}
+                <div class="card border rounded-4 p-4 shadow-sm mb-4 bg-white">
+                    <div class="d-flex align-items-center gap-2.5 mb-3">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center bg-dark text-white" style="width: 38px; height: 38px;">
+                            <i class="bi bi-github fs-5"></i>
+                        </div>
+                        <div>
+                            <h5 class="fw-bold mb-0 text-slate-900 font-heading">Course Repository</h5>
+                            <span class="smaller text-muted">Direct GitHub source code</span>
+                        </div>
+                    </div>
+                    
+                    <p class="smaller text-secondary mb-3">
+                        Clone the complete source code, starter kits, and assignments directly into your local development environment:
+                    </p>
+
+                    <!-- Terminal Clone Box -->
+                    <div class="position-relative p-2.5 rounded-3 mb-3 font-monospace smaller" style="background: #0f172a; color: #38bdf8; border: 1px solid #1e293b;">
+                        <span class="text-muted user-select-none me-1">$</span>
+                        <span class="text-truncate d-inline-block" style="max-width: 82%;">git clone {{ course.github_repo_url }}</span>
+                        <button class="btn btn-xs btn-outline-light position-absolute end-0 top-50 translate-middle-y me-2 rounded-pill copy-git-btn py-0 px-2"
+                                data-clone="git clone {{ course.github_repo_url }}.git" title="Copy clone command">
+                            <i class="bi bi-clipboard"></i>
+                        </button>
+                    </div>
+
+                    <a href="{{ course.github_repo_url }}" target="_blank" rel="noopener noreferrer" 
+                       class="btn btn-dark w-100 rounded-pill fw-semibold py-2 shadow-xs d-flex align-items-center justify-content-center gap-2">
+                        <i class="bi bi-github"></i>
+                        <span>Explore on GitHub</span>
+                        <i class="bi bi-box-arrow-up-right smaller"></i>
+                    </a>
+                </div>
+            {% endif %}
+
+            <!-- Batch Highlights & Perks -->
+            <div class="card border rounded-4 p-4 shadow-sm mb-4 bg-white">
+                <h5 class="text-slate-900 font-heading fw-bold mb-3 pb-2 border-bottom">Batch Highlights &amp; Perks</h5>
                 <ul class="list-unstyled smaller text-secondary d-flex flex-column gap-3 mb-0">
-                    <li class="d-flex align-items-center gap-2">
-                        <i class="bi bi-chat-heart-fill text-primary fs-5"></i>
-                        <span><strong>1:1 Live Doubt Assistance</strong> with dedicated teaching assistants</span>
+                    <li class="d-flex align-items-start gap-2.5">
+                        <i class="bi bi-chat-heart-fill text-primary fs-5 mt-0.5"></i>
+                        <div>
+                            <strong class="text-slate-900 d-block">1:1 Live Doubt Assistance</strong>
+                            <span>Dedicated TA mentorship and Discord/Community channel access</span>
+                        </div>
                     </li>
-                    <li class="d-flex align-items-center gap-2">
-                        <i class="bi bi-camera-reels-fill text-danger fs-5"></i>
-                        <span><strong>HD Video Lectures</strong> with instant recording archives</span>
+                    <li class="d-flex align-items-start gap-2.5">
+                        <i class="bi bi-github text-dark fs-5 mt-0.5"></i>
+                        <div>
+                            <strong class="text-slate-900 d-block">Full Source Code on GitHub</strong>
+                            <span>Modular branches, starter code templates, and production solutions</span>
+                        </div>
                     </li>
-                    <li class="d-flex align-items-center gap-2">
-                        <i class="bi bi-code-square text-success fs-5"></i>
-                        <span><strong>Copyable Starter Code</strong> & reference implementations</span>
+                    <li class="d-flex align-items-start gap-2.5">
+                        <i class="bi bi-camera-reels-fill text-danger fs-5 mt-0.5"></i>
+                        <div>
+                            <strong class="text-slate-900 d-block">Crystal-Clear HD Video Lectures</strong>
+                            <span>Step-by-step deep dives with unlimited playback recordings</span>
+                        </div>
                     </li>
-                    <li class="d-flex align-items-center gap-2">
-                        <i class="bi bi-patch-question-fill text-warning fs-5"></i>
-                        <span><strong>Interactive Quizzes</strong> with instant score feedback</span>
+                    <li class="d-flex align-items-start gap-2.5">
+                        <i class="bi bi-patch-question-fill text-warning fs-5 mt-0.5"></i>
+                        <div>
+                            <strong class="text-slate-900 d-block">Interactive Quizzes &amp; Assessments</strong>
+                            <span>Instant feedback, MCQs, and concept testing after each module</span>
+                        </div>
                     </li>
-                    <li class="d-flex align-items-center gap-2">
-                        <i class="bi bi-patch-check-fill text-info fs-5"></i>
-                        <span><strong>Verified Industry Certificate</strong> for your LinkedIn & resume</span>
+                    <li class="d-flex align-items-start gap-2.5">
+                        <i class="bi bi-patch-check-fill text-success fs-5 mt-0.5"></i>
+                        <div>
+                            <strong class="text-slate-900 d-block">Verified Industry Certificate</strong>
+                            <span>Sharable on LinkedIn, GitHub profile, and technical resumes</span>
+                        </div>
                     </li>
-                    <li class="d-flex align-items-center gap-2">
-                        <i class="bi bi-infinity text-dark fs-5"></i>
-                        <span><strong>Lifetime Access</strong> to all future updates</span>
+                    <li class="d-flex align-items-start gap-2.5">
+                        <i class="bi bi-infinity text-info fs-5 mt-0.5"></i>
+                        <div>
+                            <strong class="text-slate-900 d-block">Lifetime Course Access</strong>
+                            <span>Free access to all future revisions and updated code repositories</span>
+                        </div>
                     </li>
                 </ul>
             </div>
+
+            <!-- Instructor Card -->
+            <div class="card border rounded-4 p-4 shadow-sm bg-white">
+                <h6 class="fw-bold text-slate-900 mb-3 pb-2 border-bottom">Lead Mentor &amp; Instructor</h6>
+                <div class="d-flex align-items-center gap-3">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center text-white fw-bold shadow-xs" 
+                         style="width: 50px; height: 50px; background: linear-gradient(135deg, #2563eb, #4f46e5); font-size: 1.2rem;">
+                        {{ course.instructor.username|default:'A'|first|upper }}
+                    </div>
+                    <div>
+                        <h6 class="mb-0 fw-bold text-slate-900">{{ course.instructor.username|default:'Amit Kumar Gupta' }}</h6>
+                        <span class="smaller text-muted d-block">Senior Software Engineer &amp; Educator</span>
+                        <span class="smaller text-primary fw-semibold"><i class="bi bi-patch-check-fill me-1"></i> Verified Instructor</span>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 </div>
+
+<!-- ==================================================================
+     MODAL: QUICK ADD SECTION (For Instructors & Admins)
+     ================================================================== -->
+{% if request.user.is_staff or request.user.is_superuser %}
+<div class="modal fade" id="quickAddSectionModal" tabindex="-1" aria-labelledby="quickAddSectionModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow-lg">
+            <div class="modal-header border-bottom p-4">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center bg-primary-subtle text-primary" style="width: 36px; height: 36px;">
+                        <i class="bi bi-folder-plus fs-5"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title fw-bold text-slate-900" id="quickAddSectionModalLabel">Add Course Section / Module</h5>
+                        <span class="smaller text-muted">Create a new milestone or module in curriculum</span>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form action="{% url 'courses:add_section' course.slug %}" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="course_detail">
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label smaller fw-semibold text-slate-700">Section Title <span class="text-danger">*</span></label>
+                        {{ section_form.title }}
+                        <div class="form-text smaller text-muted">e.g. Module 1: Git &amp; GitHub Setup, React Hooks &amp; State</div>
+                    </div>
+                    <div class="row g-2 mb-3">
+                        <div class="col-4">
+                            <label class="form-label smaller fw-semibold text-slate-700">Order #</label>
+                            <input type="number" name="order" value="{{ sections.count|add:1 }}" class="form-control" min="1">
+                        </div>
+                        <div class="col-8">
+                            <label class="form-label smaller fw-semibold text-slate-700">
+                                <i class="bi bi-github me-1"></i> Section GitHub URL (Optional)
+                            </label>
+                            {{ section_form.github_url }}
+                        </div>
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label smaller fw-semibold text-slate-700">Description / Topic Highlights (Optional)</label>
+                        {{ section_form.description }}
+                    </div>
+                </div>
+                <div class="modal-footer border-top p-3 d-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4 fw-semibold shadow-xs">
+                        <i class="bi bi-plus-circle-fill me-1"></i> Create Section
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- ==================================================================
+     MODAL: QUICK ADD LINK TO SECTION
+     ================================================================== -->
+<div class="modal fade" id="quickAddLinkModal" tabindex="-1" aria-labelledby="quickAddLinkModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content rounded-4 border-0 shadow-lg">
+            <div class="modal-header border-bottom p-4">
+                <div class="d-flex align-items-center gap-2">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center bg-dark text-white" style="width: 36px; height: 36px;">
+                        <i class="bi bi-link-45deg fs-5"></i>
+                    </div>
+                    <div>
+                        <h5 class="modal-title fw-bold text-slate-900" id="quickAddLinkModalLabel">Attach Link to Section</h5>
+                        <span class="smaller text-muted" id="quickAddLinkSectionName">Select section</span>
+                    </div>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="quickAddLinkForm" action="" method="POST">
+                {% csrf_token %}
+                <input type="hidden" name="next" value="course_detail">
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="form-label smaller fw-semibold text-slate-700">Link Title <span class="text-danger">*</span></label>
+                        <input type="text" name="title" required class="form-control" placeholder="e.g. GitHub Starter Code, React Docs, Cheatsheet">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label smaller fw-semibold text-slate-700">URL Destination <span class="text-danger">*</span></label>
+                        <input type="url" name="url" required class="form-control" placeholder="https://github.com/... or https://...">
+                    </div>
+                    <div class="mb-2">
+                        <label class="form-label smaller fw-semibold text-slate-700">Link Type</label>
+                        <select name="link_type" class="form-select">
+                            <option value="github">GitHub Repository / Code</option>
+                            <option value="docs">Official Documentation</option>
+                            <option value="notes">Notes &amp; Cheat Sheet</option>
+                            <option value="download">Starter Files / Assets</option>
+                            <option value="external">Reference / Article</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer border-top p-3 d-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-outline-secondary rounded-pill px-4" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary rounded-pill px-4 fw-semibold shadow-xs">
+                        <i class="bi bi-paperclip me-1"></i> Attach Link
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // 1-Click Copy Git Clone Command
+    document.querySelectorAll('.copy-git-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const cloneText = this.getAttribute('data-clone');
+            if (navigator.clipboard && cloneText) {
+                navigator.clipboard.writeText(cloneText).then(() => {
+                    const originalHtml = this.innerHTML;
+                    this.innerHTML = '<i class="bi bi-check2 text-success me-1"></i> Copied!';
+                    setTimeout(() => {
+                        this.innerHTML = originalHtml;
+                    }, 2200);
+                });
+            }
+        });
+    });
+});
+
+function setQuickAddLinkTarget(sectionId, sectionTitle) {
+    const form = document.getElementById('quickAddLinkForm');
+    const label = document.getElementById('quickAddLinkSectionName');
+    if (form && label) {
+        form.action = `/courses/sections/${sectionId}/links/add/`;
+        label.textContent = `Target: ${sectionTitle}`;
+    }
+}
+</script>
 {% endblock %}

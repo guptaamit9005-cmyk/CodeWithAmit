@@ -8,195 +8,332 @@
 <div class="cwa-home-wrapper">
 
     <!-- ==================================================================
-         B. HERO SECTION: Confident Typography, Generous Whitespace, Code Preview
+         B. HERO SECTION: Cosmic Dark Mesh Gradient, Luminous Typography & Interactive Playground
          ================================================================== -->
-    <section class="cwa-section py-5 py-lg-6" style="background: radial-gradient(circle at 50% 0%, #f1f5f9 0%, #ffffff 75%);">
-        <div class="container px-3 px-xl-5">
+    <section class="cwa-section py-5 py-lg-6 position-relative overflow-hidden" style="background: radial-gradient(ellipse at 50% -20%, rgba(99, 102, 241, 0.22) 0%, rgba(139, 92, 246, 0.1) 40%, rgba(6, 182, 212, 0.04) 65%, transparent 80%), var(--cwa-bg);">
+        <!-- Ambient Glow Spheres -->
+        <div class="position-absolute rounded-circle" style="top: -50px; left: 5%; width: 420px; height: 420px; background: radial-gradient(circle, rgba(99, 102, 241, 0.16) 0%, transparent 70%); filter: blur(60px); pointer-events: none;"></div>
+        <div class="position-absolute rounded-circle" style="bottom: 0; right: 5%; width: 450px; height: 450px; background: radial-gradient(circle, rgba(139, 92, 246, 0.12) 0%, transparent 70%); filter: blur(70px); pointer-events: none;"></div>
+
+        <div class="container px-3 px-xl-5 position-relative" style="z-index: 2;">
             <div class="row align-items-center g-5">
                 
                 <!-- Hero Left: Typography & CTAs -->
                 <div class="col-lg-6">
-                    <div class="d-inline-flex align-items-center gap-2 mb-3">
-                        <span class="cwa-badge cwa-badge-primary">
-                            <i class="bi bi-mortarboard-fill"></i> Modern Coding Education
+                    <div class="d-inline-flex align-items-center gap-2 mb-3 flex-wrap">
+                        <span class="badge rounded-pill px-3 py-1.5 fw-semibold d-inline-flex align-items-center gap-2" style="background: rgba(99, 102, 241, 0.15); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.35); font-size: 0.82rem;">
+                            <span class="spinner-grow spinner-grow-sm text-primary" style="width: 7px; height: 7px;" role="status"></span>
+                            <span>Modern Coding Education</span>
                         </span>
-                        <span class="cwa-badge cwa-badge-emerald">
-                            <i class="bi bi-check-circle-fill"></i> 100% Student-Friendly
+                        <span class="badge rounded-pill px-3 py-1.5 fw-semibold d-inline-flex align-items-center gap-1.5" style="background: rgba(16, 185, 129, 0.12); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); font-size: 0.82rem;">
+                            <i class="bi bi-shield-check"></i>
+                            <span>100% Student-Friendly</span>
                         </span>
                     </div>
 
                     <h1 class="display-4 fw-bold cwa-heading mb-3" style="line-height: 1.15; letter-spacing: -0.04em;">
-                        Build Skills.<br>
-                        Write Code.<br>
-                        <span style="color: var(--cwa-primary);">Shape Your Future.</span>
+                        Build High-Demand Skills.<br>
+                        Write Production Code.<br>
+                        <span class="cwa-gradient-text">Shape Your Future.</span>
                     </h1>
 
                     <p class="lead mb-4" style="color: var(--cwa-text-body); font-size: 1.15rem; line-height: 1.65; max-width: 530px;">
-                        Learn programming, master problem-solving, explore AI, and turn your ideas into real-world projects with CodeWithAmit.
+                        Learn programming, master Data Structures &amp; Algorithms, construct full-stack web applications, and turn your ideas into industry-grade software.
                     </p>
 
-                    <div class="d-flex flex-wrap gap-3 mb-4 pb-2">
-                        <a href="{% url 'roadmaps:roadmap_list' %}" class="cwa-btn-primary py-2.5 px-4 shadow-sm">
+                    <div class="d-flex flex-wrap cwa-hero-btns gap-3 mb-4 pb-2">
+                        <a href="{% url 'roadmaps:roadmap_list' %}" class="cwa-btn-primary py-2.5 px-4 shadow-sm" style="box-shadow: 0 4px 20px rgba(99, 102, 241, 0.35) !important;">
                             <span>Explore Learning Paths</span>
                             <i class="bi bi-arrow-right"></i>
                         </a>
-                        <a href="{% url 'coding_practice:code_editor' %}" class="cwa-btn-secondary py-2.5 px-4 shadow-xs">
-                            <i class="bi bi-terminal-fill text-primary"></i>
-                            <span>Online Compiler</span>
-                            <span class="badge bg-success-subtle text-success py-0.5 px-1.5 rounded-pill smaller ms-1">New</span>
+                        <a href="{% url 'coding_practice:problem_list' %}" class="btn rounded-pill py-2.5 px-4 fw-semibold d-inline-flex align-items-center gap-2" style="border: 1px solid var(--cwa-border); color: var(--cwa-text-heading); background: var(--cwa-bg-card);">
+                            <i class="bi bi-collection-play-fill text-warning"></i>
+                            <span>Practice Sets &amp; DSA</span>
                         </a>
                     </div>
 
                     <!-- Instant Portal Access Dock (Student & Admin Portals) -->
-                    <div class="p-2.5 rounded-3 mb-4 d-flex align-items-center justify-content-between flex-wrap gap-2" style="background: rgba(15, 23, 42, 0.04); border: 1px solid var(--cwa-border); max-width: 530px;">
+                    <div class="p-2.5 rounded-3 mb-4 d-flex align-items-center justify-content-between flex-wrap gap-2" style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--cwa-border); max-width: 530px; backdrop-filter: blur(8px);">
                         <div class="d-flex align-items-center gap-2">
-                            <span class="badge bg-dark text-white rounded-pill px-2.5 py-1 smaller fw-bold">
+                            <span class="badge rounded-pill px-2.5 py-1 smaller fw-bold" style="background: rgba(99, 102, 241, 0.2); color: #a5b4fc; border: 1px solid rgba(99, 102, 241, 0.3);">
                                 <i class="bi bi-door-open-fill me-1 text-warning"></i> Portals
                             </span>
                             <span class="smaller text-muted d-none d-sm-inline">Quick Access:</span>
                         </div>
-                        <div class="d-flex align-items-center gap-2">
-                            <a href="{% url 'accounts:student_login' %}" class="btn btn-sm btn-outline-primary rounded-pill px-2.5 py-1 smaller fw-semibold d-inline-flex align-items-center gap-1 shadow-xs">
+                        <div class="d-flex align-items-center gap-2 flex-wrap">
+                            <a href="{% url 'accounts:student_login' %}" class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1 smaller fw-semibold d-inline-flex align-items-center gap-1 shadow-xs">
                                 <i class="bi bi-mortarboard-fill"></i> Student Portal
                             </a>
-                            <a href="{% url 'accounts:admin_login' %}" class="btn btn-sm btn-outline-warning text-dark rounded-pill px-2.5 py-1 smaller fw-bold d-inline-flex align-items-center gap-1 shadow-xs" style="background: rgba(245, 158, 11, 0.15); border-color: #f59e0b;">
-                                <i class="bi bi-shield-lock-fill text-warning"></i> Admin &amp; Dashboard
+                            <a href="{% url 'accounts:admin_login' %}" class="btn btn-sm btn-outline-warning text-warning rounded-pill px-3 py-1 smaller fw-bold d-inline-flex align-items-center gap-1 shadow-xs" style="background: rgba(245, 158, 11, 0.12); border-color: rgba(245, 158, 11, 0.4);">
+                                <i class="bi bi-shield-lock-fill"></i> Admin Portal
                             </a>
                         </div>
                     </div>
 
                     <!-- Trust Stats Bar -->
-                    <div class="row g-3 pt-3 border-top border-light-subtle" style="max-width: 520px;">
+                    <div class="row g-3 pt-3 border-top" style="border-color: var(--cwa-border) !important; max-width: 520px;">
                         <div class="col-4">
-                            <div class="fw-bold cwa-heading fs-4 mb-0">450+</div>
+                            <div class="fw-bold cwa-heading fs-4 mb-0 text-white">450+</div>
                             <div class="smaller text-muted">DSA Problems</div>
                         </div>
                         <div class="col-4">
-                            <div class="fw-bold cwa-heading fs-4 mb-0">6+</div>
+                            <div class="fw-bold cwa-heading fs-4 mb-0 text-white">6+</div>
                             <div class="smaller text-muted">Curated Tracks</div>
                         </div>
                         <div class="col-4">
-                            <div class="fw-bold cwa-heading fs-4 mb-0">Free</div>
+                            <div class="fw-bold cwa-heading fs-4 mb-0 text-white">Free</div>
                             <div class="smaller text-muted">Academic Notes</div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Hero Right: Original Visual Code Editor & Terminal Composition -->
+                <!-- Hero Right: Realistic Developer Workstation Laptop Computer Mockup -->
                 <div class="col-lg-6">
-                    <div class="cwa-hero-preview shadow-lg">
-                        <!-- Window Chrome & Language Switcher Tabs -->
-                        <div class="cwa-preview-header flex-wrap gap-2">
-                            <div class="cwa-window-dots">
-                                <span class="cwa-dot cwa-dot-red"></span>
-                                <span class="cwa-dot cwa-dot-yellow"></span>
-                                <span class="cwa-dot cwa-dot-green"></span>
+                    <div class="cwa-laptop-wrapper">
+                        <!-- Floating Holographic Developer Widgets -->
+                        <div class="cwa-floating-badge cwa-floating-badge-1">
+                            <span class="cwa-pulse-dot"></span>
+                            <div>
+                                <div class="fw-bold smaller text-white">Online Compiler Engine</div>
+                                <div class="smaller text-success">C++20 &amp; Python 3.12 Ready</div>
                             </div>
-                            <!-- Language Tabs -->
-                            <div class="d-flex align-items-center gap-1">
-                                <button type="button" class="cwa-code-tab active" onclick="switchHeroCodeTab('python', this)">
-                                    Python
+                        </div>
+
+                        <div class="cwa-floating-badge cwa-floating-badge-2">
+                            <i class="bi bi-trophy-fill text-warning fs-5"></i>
+                            <div>
+                                <div class="fw-bold smaller text-white">450 DSA Tracker</div>
+                                <div class="smaller text-muted">28 Days Active Streak 🔥</div>
+                            </div>
+                        </div>
+
+                        <!-- Laptop Screen Chassis -->
+                        <div class="cwa-laptop-bezel shadow-2xl">
+                            <!-- Laptop Camera Notch -->
+                            <div class="cwa-laptop-camera">
+                                <span class="cwa-camera-lens"></span>
+                            </div>
+
+                            <!-- Window Chrome & System Header -->
+                            <div class="cwa-preview-header flex-wrap gap-2">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="cwa-window-dots">
+                                        <span class="cwa-dot cwa-dot-red"></span>
+                                        <span class="cwa-dot cwa-dot-yellow"></span>
+                                        <span class="cwa-dot cwa-dot-green"></span>
+                                    </div>
+                                    <span class="smaller text-muted d-none d-sm-inline ms-1" style="font-family: 'Fira Code', monospace; font-size: 0.74rem;">
+                                        <i class="bi bi-cpu text-info"></i> CodeWithAmit OS &bull; Live Studio
+                                    </span>
+                                </div>
+                                <div class="d-flex align-items-center gap-1.5 ms-auto">
+                                    <span class="badge rounded-pill px-2 py-0.5 smaller fw-semibold d-inline-flex align-items-center gap-1" style="background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.3); font-size: 0.72rem;">
+                                        <span class="cwa-pulse-dot" style="width: 6px; height: 6px;"></span>
+                                        <span>5 Active Flows</span>
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!-- Interactive Feature Studio Navigation Tabs -->
+                            <div class="cwa-studio-nav" id="hero-studio-tabs">
+                                <button type="button" class="cwa-studio-tab active" data-studio="dsa" onclick="switchHeroStudioTab('dsa', this)">
+                                    <i class="bi bi-lightning-charge-fill text-warning"></i> 450 DSA Arena
                                 </button>
-                                <button type="button" class="cwa-code-tab" onclick="switchHeroCodeTab('cpp', this)">
-                                    C++
+                                <button type="button" class="cwa-studio-tab" data-studio="roadmaps" onclick="switchHeroStudioTab('roadmaps', this)">
+                                    <i class="bi bi-signpost-split-fill text-info"></i> Roadmaps
                                 </button>
-                                <button type="button" class="cwa-code-tab" onclick="switchHeroCodeTab('java', this)">
-                                    Java
+                                <button type="button" class="cwa-studio-tab" data-studio="repos" onclick="switchHeroStudioTab('repos', this)">
+                                    <i class="bi bi-github text-primary"></i> Source Repos
                                 </button>
-                                <button type="button" class="cwa-code-tab" onclick="switchHeroCodeTab('javascript', this)">
-                                    JavaScript
+                                <button type="button" class="cwa-studio-tab" data-studio="community" onclick="switchHeroStudioTab('community', this)">
+                                    <i class="bi bi-chat-dots-fill text-success"></i> Doubt Forum
+                                </button>
+                                <button type="button" class="cwa-studio-tab" data-studio="courses" onclick="switchHeroStudioTab('courses', this)">
+                                    <i class="bi bi-play-circle-fill text-danger"></i> Video Labs
                                 </button>
                             </div>
-                            <!-- Actions: Copy & Run -->
-                            <div class="d-flex align-items-center gap-2 ms-auto">
-                                <button type="button" class="btn btn-sm text-secondary p-1" onclick="copyHeroCode()" title="Copy snippet" style="font-size: 0.8rem;">
-                                    <i class="bi bi-clipboard" id="hero-copy-icon"></i>
-                                </button>
-                                <button type="button" id="hero-run-btn" class="btn btn-sm btn-primary rounded-pill px-2.5 py-0.5 fw-semibold smaller d-inline-flex align-items-center gap-1 shadow-sm" onclick="runHeroCode()">
-                                    <i class="bi bi-play-fill"></i> Run Code
+
+                            <!-- Interactive Feature Studio Body (Visual screens instead of raw code) -->
+                            <div class="cwa-studio-body">
+                                
+                                <!-- 1. Screen: 450 DSA Problem Arena -->
+                                <div class="cwa-studio-screen active" id="studio-screen-dsa">
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                        <div>
+                                            <div class="fw-bold text-white small d-flex align-items-center gap-2">
+                                                <span>Longest Palindromic Substring</span>
+                                                <span class="badge rounded-pill bg-warning-subtle text-warning border border-warning-subtle smaller px-2">Medium</span>
+                                            </div>
+                                            <div class="smaller text-muted" style="font-size: 0.72rem;">Topic: Dynamic Programming &bull; Two Pointers</div>
+                                        </div>
+                                        <span class="badge rounded-pill px-2 py-0.5 smaller fw-semibold text-info" style="background: rgba(6, 182, 212, 0.12); border: 1px solid rgba(6, 182, 212, 0.3);">
+                                            <i class="bi bi-building me-1"></i> FAANG Tagged
+                                        </span>
+                                    </div>
+
+                                    <!-- Test Vectors Matrix -->
+                                    <div class="d-flex flex-column gap-1.5 mb-2.5">
+                                        <div class="cwa-test-vector-item">
+                                            <span class="text-light">Vector 1: s = "babad" &rarr; "bab"</span>
+                                            <span class="text-success fw-bold"><i class="bi bi-check-circle-fill me-1"></i>PASS (0.02ms)</span>
+                                        </div>
+                                        <div class="cwa-test-vector-item">
+                                            <span class="text-light">Vector 2: s = "cbbd"  &rarr; "bb"</span>
+                                            <span class="text-success fw-bold"><i class="bi bi-check-circle-fill me-1"></i>PASS (0.01ms)</span>
+                                        </div>
+                                        <div class="cwa-test-vector-item">
+                                            <span class="text-light">Vector 3: 100K chars &bull; Time O(N&sup2;)</span>
+                                            <span class="text-success fw-bold"><i class="bi bi-check-circle-fill me-1"></i>PASS (0.04s)</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex align-items-center justify-content-between pt-1">
+                                        <button type="button" class="btn btn-sm btn-outline-success rounded-pill px-2.5 py-0.5 smaller fw-semibold d-inline-flex align-items-center gap-1" onclick="runStudioDsaSimulation(this)">
+                                            <i class="bi bi-play-fill"></i> Simulate Test Suite
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-primary rounded-pill px-3 py-1 smaller fw-bold shadow-xs" onclick="openFeatureFlow('dsa')">
+                                            <span>Open DSA Flow</span> <i class="bi bi-arrow-right ms-1"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- 2. Screen: Career Roadmaps -->
+                                <div class="cwa-studio-screen" id="studio-screen-roadmaps">
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                        <div class="fw-bold text-white small">Full-Stack &amp; Systems Roadmap Path</div>
+                                        <span class="badge bg-indigo-subtle text-indigo rounded-pill px-2 py-0.5 smaller">Stage 2 of 4</span>
+                                    </div>
+                                    <p class="smaller text-muted mb-2">Step-by-step career path with guided milestones and skill verifications.</p>
+                                    
+                                    <!-- Interactive Visual Roadmap Node Pipeline -->
+                                    <div class="cwa-roadmap-steps my-2">
+                                        <div class="text-center">
+                                            <div class="cwa-roadmap-node completed" title="CS Core Completed"><i class="bi bi-check-lg"></i></div>
+                                            <div class="smaller text-muted mt-1" style="font-size: 0.68rem;">CS Core</div>
+                                        </div>
+                                        <div class="text-center">
+                                            <div class="cwa-roadmap-node current" title="450 DSA Active"><i class="bi bi-lightning-fill"></i></div>
+                                            <div class="smaller text-warning mt-1 fw-bold" style="font-size: 0.68rem;">450 DSA</div>
+                                        </div>
+                                        <div class="text-center">
+                                            <div class="cwa-roadmap-node" title="Full Stack Web"><i class="bi bi-server"></i></div>
+                                            <div class="smaller text-muted mt-1" style="font-size: 0.68rem;">Full Stack</div>
+                                        </div>
+                                        <div class="text-center">
+                                            <div class="cwa-roadmap-node" title="System Design"><i class="bi bi-cloud-check"></i></div>
+                                            <div class="smaller text-muted mt-1" style="font-size: 0.68rem;">Systems</div>
+                                        </div>
+                                    </div>
+
+                                    <div class="d-flex align-items-center justify-content-between pt-2">
+                                        <span class="smaller text-muted"><i class="bi bi-clock-history me-1"></i> 12 Weeks Structured Track</span>
+                                        <button type="button" class="btn btn-sm btn-primary rounded-pill px-3 py-1 smaller fw-bold" onclick="openFeatureFlow('roadmaps')">
+                                            <span>Explore Roadmap Flow</span> <i class="bi bi-arrow-right ms-1"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- 3. Screen: Production Source Repos -->
+                                <div class="cwa-studio-screen" id="studio-screen-repos">
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                        <div class="fw-bold text-white small d-flex align-items-center gap-1.5">
+                                            <i class="bi bi-github text-info"></i>
+                                            <span>codewithamit / fullstack-starter-kit</span>
+                                        </div>
+                                        <span class="badge bg-success-subtle text-success rounded-pill px-2 py-0.5 smaller">Production Ready</span>
+                                    </div>
+                                    
+                                    <div class="rounded-3 p-2 mb-2 font-monospace smaller" style="background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.06); font-size: 0.74rem;">
+                                        <div class="text-secondary"><i class="bi bi-git me-1"></i> branch: main &bull; 14 commits &bull; license: MIT</div>
+                                        <div class="text-info mt-1">&gt; 📁 core_api &nbsp; 📁 authentication &nbsp; 📄 models.py &nbsp; 📄 wsgi.py</div>
+                                    </div>
+
+                                    <div class="p-2 rounded-2 d-flex align-items-center justify-content-between mb-2" style="background: rgba(255,255,255,0.04); border: 1px dashed rgba(255,255,255,0.15);">
+                                        <span class="smaller font-monospace text-warning text-truncate me-2" style="font-size: 0.72rem;">git clone https://github.com/CodeWithAmit/fullstack.git</span>
+                                        <button class="btn btn-xs btn-outline-secondary py-0 px-2 smaller" onclick="copyRepoCloneCmd(this)">Copy</button>
+                                    </div>
+
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <span class="smaller text-muted">100% Free Open Source</span>
+                                        <button type="button" class="btn btn-sm btn-primary rounded-pill px-3 py-1 smaller fw-bold" onclick="openFeatureFlow('repos')">
+                                            <span>Browse Repos Flow</span> <i class="bi bi-arrow-right ms-1"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- 4. Screen: Doubt Community -->
+                                <div class="cwa-studio-screen" id="studio-screen-community">
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                        <span class="badge bg-warning-subtle text-warning rounded-pill px-2 py-0.5 smaller fw-bold">
+                                            <i class="bi bi-patch-question-fill me-1"></i> Solved Doubt #104
+                                        </span>
+                                        <span class="smaller text-success"><i class="bi bi-check2-all me-1"></i> Verified by Admin</span>
+                                    </div>
+                                    <div class="fw-semibold text-white smaller mb-1.5">
+                                        "How to optimize two-sum lookup from O(N&sup2;) to O(N)?"
+                                    </div>
+                                    <div class="p-2.5 rounded-3 mb-2" style="background: rgba(245, 158, 11, 0.06); border: 1px solid rgba(245, 158, 11, 0.2);">
+                                        <div class="smaller text-warning fw-bold mb-1">
+                                            <i class="bi bi-shield-check me-1"></i> Accepted Answer by @amit:
+                                        </div>
+                                        <div class="smaller text-secondary" style="font-size: 0.78rem;">
+                                            Use a hash dictionary storing <code>seen[num] = index</code> to achieve O(1) instant complement retrieval!
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <span class="smaller text-muted"><i class="bi bi-hand-thumbs-up-fill text-primary me-1"></i> 48 Helpful Upvotes</span>
+                                        <button type="button" class="btn btn-sm btn-primary rounded-pill px-3 py-1 smaller fw-bold" onclick="openFeatureFlow('community')">
+                                            <span>Ask &amp; Solve Doubts</span> <i class="bi bi-arrow-right ms-1"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- 5. Screen: Video Courses & Labs -->
+                                <div class="cwa-studio-screen" id="studio-screen-courses">
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                        <div class="fw-bold text-white small">Graph Algorithms &amp; Dijkstra's Engine</div>
+                                        <span class="badge bg-danger-subtle text-danger rounded-pill px-2 py-0.5 smaller">Chapter 04</span>
+                                    </div>
+                                    <div class="rounded-3 p-2.5 mb-2 d-flex align-items-center gap-3" style="background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.2);">
+                                        <div class="rounded-circle bg-danger text-white d-flex align-items-center justify-content-center shadow" style="width: 36px; height: 36px; flex-shrink: 0;">
+                                            <i class="bi bi-play-fill fs-5"></i>
+                                        </div>
+                                        <div class="flex-grow-1">
+                                            <div class="smaller text-white fw-bold">Interactive Video Lesson</div>
+                                            <div class="progress my-1" style="height: 6px; background: rgba(255,255,255,0.1);">
+                                                <div class="progress-bar bg-danger" style="width: 78%;"></div>
+                                            </div>
+                                            <div class="d-flex justify-content-between smaller text-muted" style="font-size: 0.68rem;">
+                                                <span>Timestamp: 18:42 / 24:00</span>
+                                                <span class="text-danger fw-semibold">78% Watched</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex align-items-center justify-content-between">
+                                        <span class="smaller text-muted"><i class="bi bi-journal-code text-info me-1"></i> Sandbox Attached</span>
+                                        <button type="button" class="btn btn-sm btn-primary rounded-pill px-3 py-1 smaller fw-bold" onclick="openFeatureFlow('courses')">
+                                            <span>Enter Video Lab</span> <i class="bi bi-arrow-right ms-1"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <!-- Bottom Console & Flow Trigger Bar -->
+                            <div class="p-2.5 border-top d-flex align-items-center justify-content-between" style="background: #050811; border-color: rgba(255, 255, 255, 0.08) !important;">
+                                <div class="d-flex align-items-center gap-2 smaller text-muted" style="font-family: 'Fira Code', monospace; font-size: 0.72rem;">
+                                    <span class="cwa-pulse-dot" style="width: 6px; height: 6px;"></span>
+                                    <span id="hero-output-label">Interactive Developer Flow Active</span>
+                                </div>
+                                <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-2.5 py-0.5 smaller fw-bold d-inline-flex align-items-center gap-1 shadow-sm" onclick="openFeatureFlow(currentStudioTab)">
+                                    <i class="bi bi-bezier2"></i> Experience Full Flow
                                 </button>
                             </div>
                         </div>
 
-                        <!-- Code Body (Dynamic Tab Panes) -->
-                        <div id="hero-code-wrapper">
-                            <!-- Python Snippet -->
-                            <pre class="cwa-preview-code active" id="code-snippet-python"><code><span style="color: #64748b;"># CodeWithAmit — DSA &amp; AI Foundations</span>
-<span style="color: #f472b6;">def</span> <span style="color: #60a5fa;">build_future</span>(learner):
-    skills = [<span style="color: #a7f3d0;">"DSA"</span>, <span style="color: #a7f3d0;">"Web Development"</span>, <span style="color: #a7f3d0;">"AI/ML"</span>]
-    portfolio = []
-    
-    <span style="color: #f472b6;">for</span> topic <span style="color: #f472b6;">in</span> skills:
-        code = learner.solve_daily(topic)
-        portfolio.append(learner.ship_project(code))
-        
-    <span style="color: #f472b6;">return</span> {
-        <span style="color: #cbd5e1;">"status"</span>: <span style="color: #34d399;">"Interview Ready"</span>,
-        <span style="color: #cbd5e1;">"projects_built"</span>: len(portfolio),
-        <span style="color: #cbd5e1;">"confidence"</span>: <span style="color: #fbbf24;">100</span>
-    }
-
-<span style="color: #38bdf8;">print</span>(build_future(student))</code></pre>
-
-                            <!-- C++ Snippet -->
-                            <pre class="cwa-preview-code d-none" id="code-snippet-cpp"><code><span style="color: #64748b;">// CodeWithAmit — High-Performance C++</span>
-<span style="color: #38bdf8;">#include</span> <span style="color: #a7f3d0;">&lt;iostream&gt;</span>
-<span style="color: #38bdf8;">#include</span> <span style="color: #a7f3d0;">&lt;vector&gt;</span>
-
-<span style="color: #f472b6;">struct</span> <span style="color: #fbbf24;">Result</span> {
-    std::string status = <span style="color: #a7f3d0;">"Interview Ready"</span>;
-    <span style="color: #f472b6;">int</span> problems_solved = <span style="color: #fbbf24;">450</span>;
-};
-
-<span style="color: #f472b6;">int</span> <span style="color: #60a5fa;">main</span>() {
-    Result student;
-    std::cout &lt;&lt; <span style="color: #a7f3d0;">"&gt; Status: "</span> &lt;&lt; student.status 
-              &lt;&lt; <span style="color: #a7f3d0;">" | Sheet: "</span> &lt;&lt; student.problems_solved 
-              &lt;&lt; <span style="color: #a7f3d0;">" Completed\n"</span>;
-    <span style="color: #f472b6;">return</span> <span style="color: #fbbf24;">0</span>;
-}</code></pre>
-
-                            <!-- Java Snippet -->
-                            <pre class="cwa-preview-code d-none" id="code-snippet-java"><code><span style="color: #64748b;">// CodeWithAmit — Enterprise Java &amp; DSA</span>
-<span style="color: #f472b6;">public class</span> <span style="color: #fbbf24;">Solution</span> {
-    <span style="color: #f472b6;">public static void</span> <span style="color: #60a5fa;">main</span>(String[] args) {
-        String track = <span style="color: #a7f3d0;">"Full-Stack &amp; DSA"</span>;
-        <span style="color: #f472b6;">int</span> streakDays = <span style="color: #fbbf24;">45</span>;
-        
-        System.out.println(<span style="color: #a7f3d0;">"&gt; Track: "</span> + track);
-        System.out.println(<span style="color: #a7f3d0;">"&gt; Streak: "</span> + streakDays + <span style="color: #a7f3d0;">" days active!"</span>);
-    }
-}</code></pre>
-
-                            <!-- JavaScript Snippet -->
-                            <pre class="cwa-preview-code d-none" id="code-snippet-javascript"><code><span style="color: #64748b;">// CodeWithAmit — Modern Full-Stack JavaScript</span>
-<span style="color: #f472b6;">const</span> <span style="color: #60a5fa;">launchCareer</span> = <span style="color: #f472b6;">async</span> (developer) =&gt; {
-    <span style="color: #f472b6;">const</span> modules = [<span style="color: #a7f3d0;">"React"</span>, <span style="color: #a7f3d0;">"Node.js"</span>, <span style="color: #a7f3d0;">"SQL"</span>, <span style="color: #a7f3d0;">"AI APIs"</span>];
-    <span style="color: #f472b6;">const</span> deployedApp = <span style="color: #f472b6;">await</span> developer.buildProduction(modules);
-    
-    <span style="color: #f472b6;">return</span> {
-        liveUrl: <span style="color: #a7f3d0;">"https://my-app.codewithamit.dev"</span>,
-        performanceScore: <span style="color: #fbbf24;">100</span>
-    };
-};
-
-launchCareer(amit).then(console.log);</code></pre>
-                        </div>
-
-                        <!-- Terminal Output Bar with Status & Simulation -->
-                        <div class="p-3 border-top" style="background: #090d16; border-color: rgba(255, 255, 255, 0.08) !important;">
-                            <div class="d-flex justify-content-between align-items-center smaller text-muted mb-1.5" style="font-family: 'Fira Code', monospace;">
-                                <span>
-                                    <i class="bi bi-terminal text-primary me-1"></i>
-                                    <span id="hero-output-label">Interactive Console Output</span>
-                                </span>
-                                <span id="hero-output-meta" class="text-success">
-                                    <i class="bi bi-check2-circle me-1"></i> Latency: 1.4ms • Memory: 14MB
-                                </span>
-                            </div>
-                            <div id="hero-terminal-output" class="p-2.5 rounded-2 smaller" style="background: rgba(255, 255, 255, 0.04); color: #a5b4fc; font-family: 'Fira Code', monospace; line-height: 1.5;">
-                                &gt; { "status": "Interview Ready", "projects_built": 3, "confidence": 100 }
-                            </div>
+                        <!-- Laptop Keyboard Base Chassis -->
+                        <div class="cwa-laptop-base">
+                            <div class="cwa-laptop-notch"></div>
                         </div>
                     </div>
                 </div>
@@ -207,110 +344,201 @@ launchCareer(amit).then(console.log);</code></pre>
 
 
     <!-- ==================================================================
-         C. LEARNING CATEGORIES: 6 High-Clarity Structured Cards
+         TECH TICKER / ENGINEERING ECOSYSTEM FLOW STRIP
          ================================================================== -->
-    <section class="cwa-section" id="categories" style="background: var(--cwa-bg);">
+    <section class="cwa-tech-strip py-4 position-relative overflow-hidden">
         <div class="container px-3 px-xl-5">
-            <div class="cwa-section-heading">
-                <span class="cwa-badge cwa-badge-primary mb-2">Curated Curriculums</span>
-                <h2 class="h2 cwa-heading mb-2">Explore Learning Categories</h2>
-                <p class="text-secondary small">Comprehensive tracks designed to take you from foundational syntax to industry-grade engineering.</p>
+            <div class="d-flex flex-wrap align-items-center justify-content-between gap-3 mb-3">
+                <span class="smaller fw-bold text-uppercase d-flex align-items-center gap-2" style="color: #818cf8; letter-spacing: 0.08em; font-size: 0.78rem;">
+                    <i class="bi bi-cpu-fill text-warning"></i> Core Engineering &amp; Computing Stack
+                </span>
+                <span class="smaller text-muted d-none d-md-inline">From fundamental syntax to production-grade distributed architectures</span>
+            </div>
+            <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-md-between gap-2.5">
+                <div class="cwa-tech-badge"><i class="bi bi-filetype-cpp text-primary"></i> <span>C++20 &amp; STL</span></div>
+                <div class="cwa-tech-badge"><i class="bi bi-filetype-py text-warning"></i> <span>Python 3.12</span></div>
+                <div class="cwa-tech-badge"><i class="bi bi-filetype-java text-danger"></i> <span>Java Enterprise</span></div>
+                <div class="cwa-tech-badge"><i class="bi bi-filetype-js text-warning"></i> <span>JavaScript / TS</span></div>
+                <div class="cwa-tech-badge"><i class="bi bi-boxes text-info"></i> <span>React 19 Frontend</span></div>
+                <div class="cwa-tech-badge"><i class="bi bi-server text-success"></i> <span>Django &amp; REST</span></div>
+                <div class="cwa-tech-badge"><i class="bi bi-database-fill text-info"></i> <span>PostgreSQL &amp; Redis</span></div>
+                <div class="cwa-tech-badge"><i class="bi bi-terminal-fill text-light"></i> <span>Linux &amp; Docker</span></div>
+                <div class="cwa-tech-badge"><i class="bi bi-git text-danger"></i> <span>Git &amp; GitHub</span></div>
+                <div class="cwa-tech-badge"><i class="bi bi-diagram-3-fill text-primary"></i> <span>450 DSA Patterns</span></div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ==================================================================
+         C. CORE LEARNING ECOSYSTEM: Clean 6-Pillar Interactive Grid
+         ================================================================== -->
+    <section class="cwa-section py-5" id="ecosystem" style="background: var(--cwa-bg);">
+        <div class="container px-3 px-xl-5">
+            <div class="cwa-section-heading text-center mb-5">
+                <span class="cwa-badge cwa-badge-primary mb-2">
+                    <i class="bi bi-diagram-3-fill me-1"></i> Core Learning Ecosystem
+                </span>
+                <h2 class="h2 cwa-heading mb-2">Everything You Need to Succeed as an Engineer</h2>
+                <p class="text-secondary small mx-auto" style="max-width: 640px;">
+                    Select any pillar to experience its visual interactive flow, or dive directly into real problems, roadmaps, and repositories.
+                </p>
             </div>
 
             <div class="row g-4">
-                <!-- 1. Programming Fundamentals -->
-                <div class="col-md-6 col-lg-4">
-                    <div class="cwa-category-card">
-                        <div class="cwa-icon-box" style="background: var(--cwa-primary-subtle); color: var(--cwa-primary);">
-                            <i class="bi bi-code-slash"></i>
+                <!-- 1. 450 DSA Arena -->
+                <div class="col-md-6 col-lg-4 cwa-reveal cwa-stagger-1">
+                    <div class="cwa-card p-4 h-100 d-flex flex-column hover-lift" style="background: var(--cwa-bg-card); border: 1px solid var(--cwa-border); border-radius: 18px;">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="cwa-icon-box mb-0" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b; width: 46px; height: 46px; border-radius: 12px;">
+                                <i class="bi bi-lightning-charge-fill fs-5"></i>
+                            </div>
+                            <span class="badge bg-warning-subtle text-warning rounded-pill px-2.5 py-1 smaller fw-semibold">
+                                <i class="bi bi-check2-circle me-1"></i> 450 Tracker
+                            </span>
                         </div>
-                        <h3 class="h5 cwa-heading mb-2">Programming Fundamentals</h3>
+                        <h3 class="h5 fw-bold cwa-heading mb-2">450 DSA Problem Arena</h3>
                         <p class="text-secondary small flex-grow-1 mb-3">
-                            Master syntax, logical thinking, control flow, functions, and memory basics in C++, Java, or Python.
+                            Conquer top algorithmic interview patterns from Arrays to Graphs &amp; DP with real-time test cases, complexity analysis, and split-screen code runner.
                         </p>
-                        <a href="{% url 'courses:course_list' %}" class="cwa-btn-secondary btn-sm rounded-pill w-100 justify-content-center">
-                            Explore Track <i class="bi bi-arrow-right"></i>
-                        </a>
+                        <div class="pt-3 border-top d-flex align-items-center gap-2" style="border-color: var(--cwa-border) !important;">
+                            <button type="button" class="btn btn-sm btn-outline-warning text-warning rounded-pill px-3 py-1 smaller fw-semibold d-inline-flex align-items-center gap-1 shadow-xs" onclick="openFeatureFlow('dsa')">
+                                <i class="bi bi-bezier2"></i> Experience Flow
+                            </button>
+                            <a href="{% url 'coding_practice:problem_list' %}" class="cwa-btn-secondary btn-sm py-1 px-3 rounded-pill flex-grow-1 justify-content-center">
+                                Solve DSA <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
+                        </div>
                     </div>
                 </div>
 
-                <!-- 2. Data Structures & Algorithms -->
-                <div class="col-md-6 col-lg-4">
-                    <div class="cwa-category-card">
-                        <div class="cwa-icon-box" style="background: var(--cwa-indigo-subtle); color: var(--cwa-indigo);">
-                            <i class="bi bi-diagram-3-fill"></i>
+                <!-- 2. Step-by-Step Roadmaps -->
+                <div class="col-md-6 col-lg-4 cwa-reveal cwa-stagger-2">
+                    <div class="cwa-card p-4 h-100 d-flex flex-column hover-lift" style="background: var(--cwa-bg-card); border: 1px solid var(--cwa-border); border-radius: 18px;">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="cwa-icon-box mb-0" style="background: rgba(99, 102, 241, 0.15); color: var(--cwa-indigo); width: 46px; height: 46px; border-radius: 12px;">
+                                <i class="bi bi-signpost-split-fill fs-5"></i>
+                            </div>
+                            <span class="badge bg-indigo-subtle text-indigo rounded-pill px-2.5 py-1 smaller fw-semibold">
+                                <i class="bi bi-flag-fill me-1"></i> Career Tracks
+                            </span>
                         </div>
-                        <h3 class="h5 cwa-heading mb-2">Data Structures & Algorithms</h3>
+                        <h3 class="h5 fw-bold cwa-heading mb-2">Curated Career Roadmaps</h3>
                         <p class="text-secondary small flex-grow-1 mb-3">
-                            Systematically conquer Arrays, Linked Lists, Trees, Graphs, and Dynamic Programming with time-complexity analysis.
+                            Step-by-step milestones for Frontend, Backend, DevOps, and Full-Stack careers with milestone tracking, verified resources, and admin-curated guide links.
                         </p>
-                        <a href="{% url 'coding_practice:problem_list' %}" class="cwa-btn-secondary btn-sm rounded-pill w-100 justify-content-center">
-                            Explore Track <i class="bi bi-arrow-right"></i>
-                        </a>
+                        <div class="pt-3 border-top d-flex align-items-center gap-2" style="border-color: var(--cwa-border) !important;">
+                            <button type="button" class="btn btn-sm btn-outline-primary rounded-pill px-3 py-1 smaller fw-semibold d-inline-flex align-items-center gap-1 shadow-xs" onclick="openFeatureFlow('roadmaps')">
+                                <i class="bi bi-bezier2"></i> Experience Flow
+                            </button>
+                            <a href="{% url 'roadmaps:roadmap_list' %}" class="cwa-btn-secondary btn-sm py-1 px-3 rounded-pill flex-grow-1 justify-content-center">
+                                View Roadmaps <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
+                        </div>
                     </div>
                 </div>
 
-                <!-- 3. Web Development -->
-                <div class="col-md-6 col-lg-4">
-                    <div class="cwa-category-card">
-                        <div class="cwa-icon-box" style="background: var(--cwa-emerald-subtle); color: var(--cwa-emerald);">
-                            <i class="bi bi-globe"></i>
+                <!-- 3. Production Source Repos -->
+                <div class="col-md-6 col-lg-4 cwa-reveal cwa-stagger-3">
+                    <div class="cwa-card p-4 h-100 d-flex flex-column hover-lift" style="background: var(--cwa-bg-card); border: 1px solid var(--cwa-border); border-radius: 18px;">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="cwa-icon-box mb-0" style="background: rgba(239, 68, 68, 0.15); color: #ef4444; width: 46px; height: 46px; border-radius: 12px;">
+                                <i class="bi bi-git fs-5"></i>
+                            </div>
+                            <span class="badge bg-danger-subtle text-danger rounded-pill px-2.5 py-1 smaller fw-semibold">
+                                <i class="bi bi-boxes me-1"></i> Open Codebases
+                            </span>
                         </div>
-                        <h3 class="h5 cwa-heading mb-2">Web Development</h3>
+                        <h3 class="h5 fw-bold cwa-heading mb-2">Production Source Repos</h3>
                         <p class="text-secondary small flex-grow-1 mb-3">
-                            Build responsive user interfaces and robust server architectures with HTML5, CSS3, modern JavaScript, and backend frameworks.
+                            Explore full-stack architectural repositories with Docker containers, Redis caching, CI/CD pipelines, and clean domain design patterns.
                         </p>
-                        <a href="{% url 'courses:course_list' %}" class="cwa-btn-secondary btn-sm rounded-pill w-100 justify-content-center">
-                            Explore Track <i class="bi bi-arrow-right"></i>
-                        </a>
+                        <div class="pt-3 border-top d-flex align-items-center gap-2" style="border-color: var(--cwa-border) !important;">
+                            <button type="button" class="btn btn-sm btn-outline-danger text-danger rounded-pill px-3 py-1 smaller fw-semibold d-inline-flex align-items-center gap-1 shadow-xs" onclick="openFeatureFlow('repos')">
+                                <i class="bi bi-bezier2"></i> Experience Flow
+                            </button>
+                            <a href="{% url 'code_sources:list' %}" class="cwa-btn-secondary btn-sm py-1 px-3 rounded-pill flex-grow-1 justify-content-center">
+                                Browse Code <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
+                        </div>
                     </div>
                 </div>
 
-                <!-- 4. Artificial Intelligence & Machine Learning -->
-                <div class="col-md-6 col-lg-4">
-                    <div class="cwa-category-card">
-                        <div class="cwa-icon-box" style="background: var(--cwa-amber-subtle); color: var(--cwa-amber);">
-                            <i class="bi bi-cpu-fill"></i>
+                <!-- 4. Doubt Community -->
+                <div class="col-md-6 col-lg-4 cwa-reveal cwa-stagger-1">
+                    <div class="cwa-card p-4 h-100 d-flex flex-column hover-lift" style="background: var(--cwa-bg-card); border: 1px solid var(--cwa-border); border-radius: 18px;">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="cwa-icon-box mb-0" style="background: rgba(16, 185, 129, 0.15); color: #10b981; width: 46px; height: 46px; border-radius: 12px;">
+                                <i class="bi bi-chat-heart-fill fs-5"></i>
+                            </div>
+                            <span class="badge bg-success-subtle text-success rounded-pill px-2.5 py-1 smaller fw-semibold">
+                                <i class="bi bi-people-fill me-1"></i> Peer &amp; Mentor
+                            </span>
                         </div>
-                        <h3 class="h5 cwa-heading mb-2">Artificial Intelligence & ML</h3>
+                        <h3 class="h5 fw-bold cwa-heading mb-2">Active Doubt Community</h3>
                         <p class="text-secondary small flex-grow-1 mb-3">
-                            Explore supervised learning, classification, neural models, NLP concepts, and practical LLM app integrations.
+                            Get your code reviewed, squash runtime bugs with peer debugging threads, and interact directly with senior engineers and mentors.
                         </p>
-                        <a href="{% url 'courses:course_list' %}?category=ai-ml" class="cwa-btn-secondary btn-sm rounded-pill w-100 justify-content-center">
-                            Explore Track <i class="bi bi-arrow-right"></i>
-                        </a>
+                        <div class="pt-3 border-top d-flex align-items-center gap-2" style="border-color: var(--cwa-border) !important;">
+                            <button type="button" class="btn btn-sm btn-outline-success text-success rounded-pill px-3 py-1 smaller fw-semibold d-inline-flex align-items-center gap-1 shadow-xs" onclick="openFeatureFlow('community')">
+                                <i class="bi bi-bezier2"></i> Experience Flow
+                            </button>
+                            <a href="{% url 'community:doubt_list' %}" class="cwa-btn-secondary btn-sm py-1 px-3 rounded-pill flex-grow-1 justify-content-center">
+                                Ask Doubt <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
+                        </div>
                     </div>
                 </div>
 
-                <!-- 5. Python Programming -->
-                <div class="col-md-6 col-lg-4">
-                    <div class="cwa-category-card">
-                        <div class="cwa-icon-box" style="background: var(--cwa-cyan-subtle); color: var(--cwa-cyan);">
-                            <i class="bi bi-terminal-fill"></i>
+                <!-- 5. Structured Cohorts / Courses -->
+                <div class="col-md-6 col-lg-4 cwa-reveal cwa-stagger-2">
+                    <div class="cwa-card p-4 h-100 d-flex flex-column hover-lift" style="background: var(--cwa-bg-card); border: 1px solid var(--cwa-border); border-radius: 18px;">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="cwa-icon-box mb-0" style="background: rgba(14, 165, 233, 0.15); color: #0ea5e9; width: 46px; height: 46px; border-radius: 12px;">
+                                <i class="bi bi-play-circle-fill fs-5"></i>
+                            </div>
+                            <span class="badge bg-info-subtle text-info rounded-pill px-2.5 py-1 smaller fw-semibold">
+                                <i class="bi bi-award-fill me-1"></i> Certified
+                            </span>
                         </div>
-                        <h3 class="h5 cwa-heading mb-2">Python Programming</h3>
+                        <h3 class="h5 fw-bold cwa-heading mb-2">Flagship Cohort Courses</h3>
                         <p class="text-secondary small flex-grow-1 mb-3">
-                            From basic scripting to Object-Oriented design, automation, data wrangling with Pandas, and API development.
+                            In-depth full-stack engineering cohorts covering C++, Python, Django, React, and System Design with verifiable course certificates.
                         </p>
-                        <a href="{% url 'courses:course_list' %}" class="cwa-btn-secondary btn-sm rounded-pill w-100 justify-content-center">
-                            Explore Track <i class="bi bi-arrow-right"></i>
-                        </a>
+                        <div class="pt-3 border-top d-flex align-items-center gap-2" style="border-color: var(--cwa-border) !important;">
+                            <button type="button" class="btn btn-sm btn-outline-info text-info rounded-pill px-3 py-1 smaller fw-semibold d-inline-flex align-items-center gap-1 shadow-xs" onclick="openFeatureFlow('courses')">
+                                <i class="bi bi-bezier2"></i> Experience Flow
+                            </button>
+                            <a href="{% url 'courses:course_list' %}" class="cwa-btn-secondary btn-sm py-1 px-3 rounded-pill flex-grow-1 justify-content-center">
+                                Browse Batches <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
+                        </div>
                     </div>
                 </div>
 
-                <!-- 6. Projects & Portfolio -->
-                <div class="col-md-6 col-lg-4">
-                    <div class="cwa-category-card">
-                        <div class="cwa-icon-box" style="background: var(--cwa-rose-subtle); color: var(--cwa-rose);">
-                            <i class="bi bi-folder-check"></i>
+                <!-- 6. Coding Notes & Cheatsheets -->
+                <div class="col-md-6 col-lg-4 cwa-reveal cwa-stagger-3">
+                    <div class="cwa-card p-4 h-100 d-flex flex-column hover-lift" style="background: var(--cwa-bg-card); border: 1px solid var(--cwa-border); border-radius: 18px;">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div class="cwa-icon-box mb-0" style="background: rgba(168, 85, 247, 0.15); color: #a855f7; width: 46px; height: 46px; border-radius: 12px;">
+                                <i class="bi bi-file-earmark-text-fill fs-5"></i>
+                            </div>
+                            <span class="badge bg-purple-subtle text-purple rounded-pill px-2.5 py-1 smaller fw-semibold">
+                                <i class="bi bi-download me-1"></i> Free PDFs
+                            </span>
                         </div>
-                        <h3 class="h5 cwa-heading mb-2">Projects & Portfolio</h3>
+                        <h3 class="h5 fw-bold cwa-heading mb-2">Coding Notes &amp; Cheatsheets</h3>
                         <p class="text-secondary small flex-grow-1 mb-3">
-                            Transform theoretical knowledge into production-ready software systems that stand out on your resume and GitHub.
+                            Handpicked coding notes, DSA formula cheatsheets, and core CS revision materials for Python, C++, Java, OS, and DBMS.
                         </p>
-                        <a href="#projects" class="cwa-btn-secondary btn-sm rounded-pill w-100 justify-content-center">
-                            Explore Track <i class="bi bi-arrow-right"></i>
-                        </a>
+                        <div class="pt-3 border-top d-flex align-items-center gap-2" style="border-color: var(--cwa-border) !important;">
+                            <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-1 smaller fw-semibold d-inline-flex align-items-center gap-1 shadow-xs" onclick="openFeatureFlow('notes')">
+                                <i class="bi bi-bezier2"></i> Experience Flow
+                            </button>
+                            <a href="{% url 'notes:note_list' %}" class="cwa-btn-secondary btn-sm py-1 px-3 rounded-pill flex-grow-1 justify-content-center">
+                                Read Coding Notes <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -319,601 +547,83 @@ launchCareer(amit).then(console.log);</code></pre>
 
 
     <!-- ==================================================================
-         D. FEATURED COURSES: Original Cards with Titles from Specification
+         D. FEATURED COURSES: Compact 3-Card Spotlight
          ================================================================== -->
-    <section class="cwa-section py-5" style="background: var(--cwa-bg-subtle);">
+    {% if flagship_batches %}
+    <section class="cwa-section py-5" id="featured-courses" style="background: var(--cwa-bg-subtle);">
         <div class="container px-3 px-xl-5">
-            <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-end mb-4 pb-2">
+            <div class="d-flex flex-wrap align-items-end justify-content-between gap-3 mb-4">
                 <div>
-                    <span class="cwa-badge cwa-badge-primary mb-2">Structured Cohorts</span>
-                    <h2 class="h2 cwa-heading mb-1">Featured Courses &amp; Batches</h2>
-                    <p class="text-secondary small mb-0">Original curriculums built for concept clarity and practical execution.</p>
+                    <span class="cwa-badge cwa-badge-primary mb-2">
+                        <i class="bi bi-mortarboard-fill me-1"></i> Flagship Cohorts
+                    </span>
+                    <h2 class="h2 cwa-heading mb-1">Featured Video Batches</h2>
+                    <p class="text-secondary small mb-0">Learn directly with our structured cohorts and get certified.</p>
                 </div>
-                <div class="d-flex gap-2 align-items-center mt-3 mt-md-0">
-                    {% if request.user.is_staff or request.user.is_superuser %}
-                        <a href="{% url 'courses:create_course' %}" class="btn btn-outline-success btn-sm rounded-pill px-3">
-                            <i class="bi bi-plus-lg me-1"></i> Add Course
-                        </a>
-                    {% endif %}
-                    <a href="{% url 'courses:course_list' %}" class="cwa-btn-outline">
-                        <span>View All Courses</span>
-                        <i class="bi bi-arrow-right"></i>
-                    </a>
-                </div>
+                <a href="{% url 'courses:course_list' %}" class="cwa-btn-secondary btn-sm rounded-pill px-3 py-1.5">
+                    View All Batches <i class="bi bi-arrow-right ms-1"></i>
+                </a>
             </div>
 
-            {% if course_categories and flagship_batches %}
-                <!-- Course Category Filter Bar -->
-                <div class="d-flex flex-wrap gap-2 mb-4 pb-1">
-                    <a href="{% url 'courses:course_list' %}" class="cwa-filter-btn active text-decoration-none">
-                        <i class="bi bi-grid-fill"></i> All Tracks ({{ flagship_batches|length }})
-                    </a>
-                    {% for cat in course_categories %}
-                        <a href="{% url 'courses:course_list' %}?category={{ cat.slug }}" class="cwa-filter-btn text-decoration-none">
-                            <i class="bi {{ cat.icon|default:'bi-folder' }}"></i> {{ cat.name }}
-                        </a>
-                    {% endfor %}
-                </div>
-            {% endif %}
-
-            <div class="row g-4" id="cwa-courses-grid">
-                {% for course in flagship_batches %}
-                    <div class="col-lg-4 col-md-6">
-                        <div class="cwa-card h-100 d-flex flex-column">
-                            <div class="p-4" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: #ffffff; min-height: 140px; display: flex; flex-direction: column; justify-content: space-between;">
+            <div class="row g-4">
+                {% for course in flagship_batches|slice:":3" %}
+                    <div class="col-lg-4 col-md-6 cwa-reveal cwa-stagger-{{ forloop.counter }}">
+                        <div class="cwa-card h-100 d-flex flex-column hover-lift" style="background: var(--cwa-bg-card); border: 1px solid var(--cwa-border); border-radius: 18px; overflow: hidden;">
+                            <div class="p-4" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: #ffffff; min-height: 120px; display: flex; flex-direction: column; justify-content: space-between;">
                                 <div class="d-flex justify-content-between align-items-center">
-                                    <span class="cwa-badge" style="background: rgba(37, 99, 235, 0.2); color: #93c5fd; border: 1px solid rgba(147, 197, 253, 0.3);">
-                                        {{ course.category.name }}
+                                    <span class="badge rounded-pill" style="background: rgba(37, 99, 235, 0.25); color: #93c5fd; border: 1px solid rgba(147, 197, 253, 0.3); font-size: 0.75rem;">
+                                        {{ course.category.name|default:"Engineering" }}
                                     </span>
                                     {% if course.difficulty == 'Beginner' %}
-                                        <span class="cwa-badge cwa-badge-emerald">Beginner</span>
+                                        <span class="badge bg-success-subtle text-success rounded-pill px-2 py-0.5 smaller">Beginner</span>
                                     {% elif course.difficulty == 'Intermediate' %}
-                                        <span class="cwa-badge cwa-badge-amber">Intermediate</span>
+                                        <span class="badge bg-warning-subtle text-warning rounded-pill px-2 py-0.5 smaller">Intermediate</span>
                                     {% else %}
-                                        <span class="cwa-badge cwa-badge-indigo">Advanced</span>
+                                        <span class="badge bg-primary-subtle text-primary rounded-pill px-2 py-0.5 smaller">Advanced</span>
                                     {% endif %}
                                 </div>
-                                <div class="h5 fw-bold font-heading mb-0 text-white">{{ course.title }}</div>
+                                <h4 class="h5 fw-bold font-heading mb-0 text-white mt-3">{{ course.title }}</h4>
                             </div>
                             <div class="p-4 d-flex flex-column flex-grow-1">
                                 <p class="text-secondary small mb-3 flex-grow-1">
-                                    {{ course.short_description|truncatechars:120 }}
+                                    {{ course.short_description|truncatechars:110 }}
                                 </p>
-                                <div class="d-flex flex-wrap gap-1.5 mb-3">
+                                <div class="d-flex flex-wrap gap-2 mb-3">
                                     {% if course.batch_name %}
                                         <span class="badge bg-light text-primary border">{{ course.batch_name }}</span>
                                     {% endif %}
-                                    <span class="badge bg-light text-secondary border">{{ course.total_lessons }} Lessons</span>
-                                    <span class="badge bg-light text-secondary border">{{ course.estimated_hours }}h Duration</span>
+                                    <span class="badge bg-light text-secondary border"><i class="bi bi-play-circle me-1"></i>{{ course.total_lessons }} Lessons</span>
+                                    {% if course.estimated_hours %}
+                                        <span class="badge bg-light text-secondary border"><i class="bi bi-clock me-1"></i>{{ course.estimated_hours }}h</span>
+                                    {% endif %}
                                 </div>
-                                <div class="d-flex justify-content-between align-items-center pt-3 border-top border-light-subtle">
+                                <div class="d-flex justify-content-between align-items-center pt-3 border-top" style="border-color: var(--cwa-border) !important;">
                                     <div>
                                         {% if course.price == 0 %}
-                                            <span class="badge bg-success-subtle text-success fw-bold">FREE</span>
+                                            <span class="badge bg-success-subtle text-success fw-bold px-2.5 py-1">FREE</span>
                                         {% else %}
-                                            <span class="fw-bold" style="color: var(--cwa-text-heading);">₹{{ course.price }}</span>
+                                            <span class="fw-bold fs-5" style="color: var(--cwa-text-heading);">₹{{ course.price }}</span>
                                             {% if course.original_price and course.original_price > course.price %}
-                                                <span class="smaller text-muted text-decoration-line-through">₹{{ course.original_price }}</span>
+                                                <span class="smaller text-muted text-decoration-line-through ms-1">₹{{ course.original_price }}</span>
                                             {% endif %}
                                         {% endif %}
                                     </div>
-                                    <a href="{% url 'courses:course_detail' course.slug %}" class="cwa-btn-primary btn-sm py-1.5 px-3">
-                                        Explore Course
+                                    <a href="{% url 'courses:course_detail' course.slug %}" class="cwa-btn-primary btn-sm py-1.5 px-3 rounded-pill">
+                                        Explore Batch <i class="bi bi-arrow-right ms-1"></i>
                                     </a>
                                 </div>
                             </div>
                         </div>
                     </div>
                 {% empty %}
-                    <div class="col-12 text-center py-5">
-                        <div class="p-5 rounded-4 mx-auto" style="max-width: 540px; background: var(--cwa-bg-card, #ffffff); border: 1px solid var(--cwa-border, #e2e8f0); box-shadow: 0 4px 20px rgba(0,0,0,0.03);">
-                            <div class="rounded-circle d-inline-flex p-3 mb-3" style="background: rgba(99, 102, 241, 0.1); color: #6366f1;">
-                                <i class="bi bi-collection-play fs-1"></i>
-                            </div>
-                            <h4 class="fw-bold font-heading mb-2" style="color: var(--cwa-text-heading, #0f172a);">No Cohort Courses Yet</h4>
-                            <p class="text-secondary small mb-4">All dummy sample batches have been cleared. New cohorts will appear here once published.</p>
-                            <div class="d-flex justify-content-center gap-2 flex-wrap">
-                                {% if request.user.is_staff or request.user.is_superuser %}
-                                    <a href="{% url 'courses:create_course' %}" class="cwa-btn-primary btn-sm py-2 px-3">
-                                        <i class="bi bi-plus-circle me-1"></i> Create First Course
-                                    </a>
-                                {% endif %}
-                                <a href="{% url 'coding_practice:problem_list' %}" class="cwa-btn-outline btn-sm py-2 px-3">
-                                    <i class="bi bi-collection-play me-1"></i> Practice Sets
-                                </a>
-                            </div>
-                        </div>
+                    <div class="col-12 text-center py-4">
+                        <p class="text-muted small">No batches published yet. Check back soon!</p>
                     </div>
                 {% endfor %}
             </div>
         </div>
     </section>
-
-
-    <!-- ==================================================================
-         E. LEARNING ROADMAPS: Clear Connected Progressions
-         ================================================================== -->
-    <section class="cwa-section" id="roadmaps" style="background: var(--cwa-bg);">
-        <div class="container px-3 px-xl-5">
-            <div class="cwa-section-heading">
-                <span class="cwa-badge cwa-badge-indigo mb-2">Guided Progressions</span>
-                <h2 class="h2 cwa-heading mb-2">Structured Learning Roadmaps</h2>
-                <p class="text-secondary small">Follow clear, step-by-step tracks to achieve mastery without tutorial paralysis.</p>
-            </div>
-
-            {% if popular_roadmaps %}
-            <div class="row g-4">
-                {% for r in popular_roadmaps %}
-                <div class="col-lg-6">
-                    <div class="cwa-step-card h-100 d-flex flex-column justify-content-between">
-                        <div>
-                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                <div class="cwa-step-number d-flex align-items-center justify-content-center" style="width: 42px; height: 42px; border-radius: 12px; background: rgba(99, 102, 241, 0.1); color: var(--cwa-primary, #6366f1); font-size: 1.25rem;">
-                                    <i class="bi {{ r.icon|default:'bi-diagram-3' }}"></i>
-                                </div>
-                                <span class="cwa-badge cwa-badge-primary">{{ r.stages.count }} Stage{{ r.stages.count|pluralize }}</span>
-                            </div>
-                            <h3 class="h5 cwa-heading mb-1">{{ r.title }}</h3>
-                            <div class="d-flex align-items-center gap-2 text-secondary small mb-3">
-                                <span><i class="bi bi-briefcase me-1 text-primary"></i>{{ r.target_role }}</span>
-                                <span>&bull;</span>
-                                <span><i class="bi bi-clock me-1 text-primary"></i>{{ r.estimated_time }}</span>
-                            </div>
-                            <p class="text-secondary small mb-4">{{ r.short_description|default:r.description|truncatewords:22 }}</p>
-                            
-                            {% if r.stages.all %}
-                            <div class="d-flex flex-column gap-2 mb-4">
-                                {% for stage in r.stages.all|slice:":3" %}
-                                <div class="p-2.5 rounded-2 bg-light d-flex align-items-center gap-2 text-secondary small">
-                                    <i class="bi bi-check-circle-fill text-success"></i>
-                                    <span><strong>Stage {{ forloop.counter }}:</strong> {{ stage.title }}</span>
-                                </div>
-                                {% endfor %}
-                            </div>
-                            {% endif %}
-                        </div>
-
-                        <a href="{% url 'roadmaps:roadmap_detail' r.slug %}" class="cwa-btn-secondary btn-sm rounded-pill w-100 justify-content-center mt-3">
-                            View Full Roadmap <i class="bi bi-arrow-right ms-1"></i>
-                        </a>
-                    </div>
-                </div>
-                {% endfor %}
-            </div>
-            <div class="text-center mt-4">
-                <a href="{% url 'roadmaps:roadmap_list' %}" class="cwa-btn-secondary btn-sm rounded-pill px-4">
-                    Explore All Roadmaps <i class="bi bi-arrow-right ms-1"></i>
-                </a>
-            </div>
-            {% else %}
-            <div class="card border-0 text-center py-5 px-4 rounded-4 shadow-sm" style="background: var(--cwa-bg-subtle, #f8fafc); border: 1px dashed var(--cwa-border, rgba(0,0,0,0.1)) !important;">
-                <div class="mb-3">
-                    <span class="d-inline-flex align-items-center justify-content-center rounded-circle" style="width: 58px; height: 58px; background: rgba(99, 102, 241, 0.12); color: #6366f1;">
-                        <i class="bi bi-compass fs-2"></i>
-                    </span>
-                </div>
-                <h4 class="fw-bold mb-2">Curated Career Tracks Coming Soon</h4>
-                <p class="text-secondary small mx-auto mb-4" style="max-width: 520px;">
-                    Our industry mentors are designing step-by-step career path roadmaps with interactive progress tracking, milestones, and hands-on projects.
-                </p>
-                <div class="d-flex justify-content-center gap-2">
-                    {% if is_admin %}
-                    <a href="{% url 'roadmaps:create_roadmap' %}" class="btn btn-primary btn-sm rounded-pill px-4">
-                        <i class="bi bi-plus-lg me-1"></i> Create Roadmap (Admin)
-                    </a>
-                    {% endif %}
-                    <a href="{% url 'roadmaps:roadmap_list' %}" class="btn btn-outline-secondary btn-sm rounded-pill px-4">
-                        View Roadmaps Directory
-                    </a>
-                </div>
-            </div>
-            {% endif %}
-        </div>
-    </section>
-
-
-    <!-- ==================================================================
-         F. PRACTICE & CODING SECTION: Dedicated Coding Hub
-         ================================================================== -->
-    <section class="cwa-section py-5" style="background: var(--cwa-bg-subtle);">
-        <div class="container px-3 px-xl-5">
-            <div class="row align-items-center g-5">
-                
-                <div class="col-lg-6">
-                    <span class="cwa-badge cwa-badge-amber mb-2">
-                        <i class="bi bi-lightning-charge-fill"></i> Problem Solving Arena
-                    </span>
-                    <h2 class="h2 cwa-heading mb-3">Daily Coding Practice & Problem Sheets</h2>
-                    <p class="text-secondary mb-4" style="line-height: 1.65;">
-                        Consistency is the bridge between aspiring and achieving. Strengthen your logic with our handpicked problem sets, categorized from easy fundamentals to advanced graph theory.
-                    </p>
-
-                    <div class="d-flex flex-column gap-3 mb-4">
-                        <div class="d-flex align-items-start gap-3">
-                            <div class="p-2 rounded-2 bg-white border text-primary" style="border-color: var(--cwa-border);">
-                                <i class="bi bi-calendar-check-fill fs-5"></i>
-                            </div>
-                            <div>
-                                <h4 class="h6 cwa-heading mb-1">Daily Problem of the Day (POTD)</h4>
-                                <p class="smaller text-secondary mb-0">One curated challenge every morning to maintain your momentum and streak.</p>
-                            </div>
-                        </div>
-
-                        <div class="d-flex align-items-start gap-3">
-                            <div class="p-2 rounded-2 bg-white border text-warning" style="border-color: var(--cwa-border);">
-                                <i class="bi bi-list-check fs-5"></i>
-                            </div>
-                            <div>
-                                <h4 class="h6 cwa-heading mb-1">Curated Practice Sets (DSA, Python, SQL &amp; More)</h4>
-                                <p class="smaller text-secondary mb-0">Topic-by-topic course-like tracks covering all coding challenges with YouTube video solutions.</p>
-                            </div>
-                        </div>
-
-                        <div class="d-flex align-items-start gap-3">
-                            <div class="p-2 rounded-2 bg-white border text-success" style="border-color: var(--cwa-border);">
-                                <i class="bi bi-bar-chart-line-fill fs-5"></i>
-                            </div>
-                            <div>
-                                <h4 class="h6 cwa-heading mb-1">1-Click Progress Tracking</h4>
-                                <p class="smaller text-secondary mb-0">Monitor your completion rate across Easy, Medium, and Hard problem tiers.</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <a href="{% url 'coding_practice:problem_list' %}" class="cwa-btn-primary py-2.5 px-4">
-                        <span>Start Practicing Now</span>
-                        <i class="bi bi-arrow-right"></i>
-                    </a>
-                </div>
-
-                <!-- Problem Preview Component -->
-                <div class="col-lg-6">
-                    <div class="cwa-card p-4 shadow-sm">
-                        <div class="d-flex justify-content-between align-items-center mb-3 pb-2 border-bottom border-light-subtle">
-                            <div>
-                                <span class="fw-bold cwa-heading small d-block">
-                                    <i class="bi bi-trophy-fill text-warning me-1"></i> Interactive 450 Sheet Tracker
-                                </span>
-                                <span class="smaller text-muted">Click any problem to test interactive tracking</span>
-                            </div>
-                            <span class="cwa-badge cwa-badge-emerald" id="sheet-badge-status">
-                                <span id="sheet-count-solved">2</span>/4 Solved
-                            </span>
-                        </div>
-
-                        <div class="d-flex flex-column gap-2 mb-3" id="interactive-problem-list">
-                            <!-- Problem 1 (Solved) -->
-                            <div class="cwa-check-item completed d-flex align-items-center justify-content-between" onclick="toggleProblemItem(this)">
-                                <div class="d-flex align-items-center gap-2.5">
-                                    <i class="bi bi-check-circle-fill text-success fs-5 check-status-icon"></i>
-                                    <div>
-                                        <div class="fw-semibold small problem-title">Two Sum</div>
-                                        <div class="smaller text-muted">Arrays • Hash Table</div>
-                                    </div>
-                                </div>
-                                <span class="cwa-badge cwa-badge-emerald py-0.5 px-2">Easy</span>
-                            </div>
-
-                            <!-- Problem 2 (Solved) -->
-                            <div class="cwa-check-item completed d-flex align-items-center justify-content-between" onclick="toggleProblemItem(this)">
-                                <div class="d-flex align-items-center gap-2.5">
-                                    <i class="bi bi-check-circle-fill text-success fs-5 check-status-icon"></i>
-                                    <div>
-                                        <div class="fw-semibold small problem-title">Longest Substring Without Repeating Characters</div>
-                                        <div class="smaller text-muted">Strings • Sliding Window</div>
-                                    </div>
-                                </div>
-                                <span class="cwa-badge cwa-badge-amber py-0.5 px-2">Medium</span>
-                            </div>
-
-                            <!-- Problem 3 (Unsolved) -->
-                            <div class="cwa-check-item d-flex align-items-center justify-content-between" onclick="toggleProblemItem(this)">
-                                <div class="d-flex align-items-center gap-2.5">
-                                    <i class="bi bi-circle text-muted fs-5 check-status-icon"></i>
-                                    <div>
-                                        <div class="fw-semibold small problem-title">Reverse Linked List</div>
-                                        <div class="smaller text-muted">Linked Lists • Pointers</div>
-                                    </div>
-                                </div>
-                                <span class="cwa-badge cwa-badge-emerald py-0.5 px-2">Easy</span>
-                            </div>
-
-                            <!-- Problem 4 (Unsolved) -->
-                            <div class="cwa-check-item d-flex align-items-center justify-content-between" onclick="toggleProblemItem(this)">
-                                <div class="d-flex align-items-center gap-2.5">
-                                    <i class="bi bi-circle text-muted fs-5 check-status-icon"></i>
-                                    <div>
-                                        <div class="fw-semibold small problem-title">Trapping Rain Water</div>
-                                        <div class="smaller text-muted">Arrays • Two Pointers • Stack</div>
-                                    </div>
-                                </div>
-                                <span class="cwa-badge cwa-badge-rose py-0.5 px-2" style="background: var(--cwa-rose-subtle); color: var(--cwa-rose);">Hard</span>
-                            </div>
-                        </div>
-
-                        <!-- Progress Bar Preview -->
-                        <div class="pt-2">
-                            <div class="d-flex justify-content-between smaller text-muted mb-1.5">
-                                <span>Curated Sheet Completion</span>
-                                <span class="fw-bold text-success" id="sheet-progress-text">50% Completed</span>
-                            </div>
-                            <div class="progress" style="height: 10px; border-radius: 9999px; background: #e2e8f0;">
-                                <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" id="sheet-progress-bar" style="width: 50%; transition: width 0.35s ease;"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-    </section>
-
-
-    <!-- ==================================================================
-         G. PROJECT-BASED LEARNING: 4 Production-Grade Projects
-         ================================================================== -->
-    <section class="cwa-section" id="projects" style="background: var(--cwa-bg);">
-        <div class="container px-3 px-xl-5">
-            <div class="cwa-section-heading">
-                <span class="cwa-badge cwa-badge-primary mb-2">Applied Engineering</span>
-                <h2 class="h2 cwa-heading mb-2">Project-Based Learning</h2>
-                <p class="text-secondary small">Theoretical concepts solidify when you build working applications. Here is what you will create.</p>
-            </div>
-
-            <div class="row g-4">
-                <!-- Project 1: AI-Powered Applications -->
-                <div class="col-md-6 col-lg-3">
-                    <div class="cwa-project-card">
-                        <div class="cwa-project-banner" style="background: linear-gradient(135deg, #4f46e5 0%, #3730a3 100%);">
-                            <i class="bi bi-robot fs-1"></i>
-                        </div>
-                        <div class="p-3.5 d-flex flex-column flex-grow-1">
-                            <span class="cwa-badge cwa-badge-indigo mb-2" style="width: max-content;">AI Application</span>
-                            <h3 class="h6 cwa-heading mb-1.5">Intelligent Resume Matcher</h3>
-                            <p class="smaller text-secondary flex-grow-1 mb-3">
-                                Vector-embedding based similarity engine that scores resumes against job descriptions with Gemini AI explanations.
-                            </p>
-                            <div class="d-flex flex-wrap gap-1 mb-3">
-                                <span class="badge bg-light text-muted border smaller">Python</span>
-                                <span class="badge bg-light text-muted border smaller">Embeddings</span>
-                            </div>
-                            <a href="{% url 'courses:course_list' %}" class="cwa-btn-secondary btn-sm rounded-pill justify-content-center">
-                                Project Details <i class="bi bi-arrow-right"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Project 2: Full-Stack Web Application -->
-                <div class="col-md-6 col-lg-3">
-                    <div class="cwa-project-card">
-                        <div class="cwa-project-banner" style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);">
-                            <i class="bi bi-kanban-fill fs-1"></i>
-                        </div>
-                        <div class="p-3.5 d-flex flex-column flex-grow-1">
-                            <span class="cwa-badge cwa-badge-primary mb-2" style="width: max-content;">Full-Stack</span>
-                            <h3 class="h6 cwa-heading mb-1.5">Collaborative Task Studio</h3>
-                            <p class="smaller text-secondary flex-grow-1 mb-3">
-                                Realtime Kanban board with role-based auth, live WebSockets updates, and persistent relational database storage.
-                            </p>
-                            <div class="d-flex flex-wrap gap-1 mb-3">
-                                <span class="badge bg-light text-muted border smaller">React</span>
-                                <span class="badge bg-light text-muted border smaller">Django</span>
-                                <span class="badge bg-light text-muted border smaller">SQL</span>
-                            </div>
-                            <a href="{% url 'courses:course_list' %}" class="cwa-btn-secondary btn-sm rounded-pill justify-content-center">
-                                Project Details <i class="bi bi-arrow-right"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Project 3: Machine Learning Project -->
-                <div class="col-md-6 col-lg-3">
-                    <div class="cwa-project-card">
-                        <div class="cwa-project-banner" style="background: linear-gradient(135deg, #059669 0%, #047857 100%);">
-                            <i class="bi bi-graph-up-arrow fs-1"></i>
-                        </div>
-                        <div class="p-3.5 d-flex flex-column flex-grow-1">
-                            <span class="cwa-badge cwa-badge-emerald mb-2" style="width: max-content;">Machine Learning</span>
-                            <h3 class="h6 cwa-heading mb-1.5">Student Success Predictor</h3>
-                            <p class="smaller text-secondary flex-grow-1 mb-3">
-                                End-to-end classification pipeline predicting student exam outcomes using feature scaling and Random Forest models.
-                            </p>
-                            <div class="d-flex flex-wrap gap-1 mb-3">
-                                <span class="badge bg-light text-muted border smaller">Scikit-Learn</span>
-                                <span class="badge bg-light text-muted border smaller">Pandas</span>
-                            </div>
-                            <a href="{% url 'courses:course_list' %}" class="cwa-btn-secondary btn-sm rounded-pill justify-content-center">
-                                Project Details <i class="bi bi-arrow-right"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Project 4: Student Productivity Tool -->
-                <div class="col-md-6 col-lg-3">
-                    <div class="cwa-project-card">
-                        <div class="cwa-project-banner" style="background: linear-gradient(135deg, #d97706 0%, #b45309 100%);">
-                            <i class="bi bi-code-square fs-1"></i>
-                        </div>
-                        <div class="p-3.5 d-flex flex-column flex-grow-1">
-                            <span class="cwa-badge cwa-badge-amber mb-2" style="width: max-content;">Productivity Tool</span>
-                            <h3 class="h6 cwa-heading mb-1.5">In-Browser Code Runner</h3>
-                            <p class="smaller text-secondary flex-grow-1 mb-3">
-                                Fast browser-based code execution sandbox with test-case assertions, time measurement, and syntax coloring.
-                            </p>
-                            <div class="d-flex flex-wrap gap-1 mb-3">
-                                <span class="badge bg-light text-muted border smaller">JavaScript</span>
-                                <span class="badge bg-light text-muted border smaller">Monaco</span>
-                            </div>
-                            <a href="{% url 'courses:course_list' %}" class="cwa-btn-secondary btn-sm rounded-pill justify-content-center">
-                                Project Details <i class="bi bi-arrow-right"></i>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-
-    <!-- ==================================================================
-         H. WHY CODEWITHAMIT: Clean 6-Feature Grid
-         ================================================================== -->
-    <section class="cwa-section py-5" style="background: var(--cwa-bg-subtle);">
-        <div class="container px-3 px-xl-5">
-            <div class="cwa-section-heading">
-                <span class="cwa-badge cwa-badge-primary mb-2">Our Foundation</span>
-                <h2 class="h2 cwa-heading mb-2">Why Learn With CodeWithAmit?</h2>
-                <p class="text-secondary small">Honest, student-first education built around genuine skill acquisition rather than hype.</p>
-            </div>
-
-            <div class="row g-4">
-                <div class="col-md-6 col-lg-4">
-                    <div class="cwa-feature-item h-100">
-                        <div class="cwa-icon-box" style="background: var(--cwa-primary-subtle); color: var(--cwa-primary);">
-                            <i class="bi bi-signpost-split"></i>
-                        </div>
-                        <h3 class="h6 cwa-heading mb-2">Structured Learning Paths</h3>
-                        <p class="text-secondary small mb-0">Every topic follows an intentional progression from core concepts to interview-level edge cases.</p>
-                    </div>
-                </div>
-
-                <div class="col-md-6 col-lg-4">
-                    <div class="cwa-feature-item h-100">
-                        <div class="cwa-icon-box" style="background: var(--cwa-indigo-subtle); color: var(--cwa-indigo);">
-                            <i class="bi bi-code"></i>
-                        </div>
-                        <h3 class="h6 cwa-heading mb-2">Practical Coding Exercises</h3>
-                        <p class="text-secondary small mb-0">Learn by typing code, fixing compilation bugs, and analyzing test runner output firsthand.</p>
-                    </div>
-                </div>
-
-                <div class="col-md-6 col-lg-4">
-                    <div class="cwa-feature-item h-100">
-                        <div class="cwa-icon-box" style="background: var(--cwa-emerald-subtle); color: var(--cwa-emerald);">
-                            <i class="bi bi-laptop"></i>
-                        </div>
-                        <h3 class="h6 cwa-heading mb-2">Project-Based Learning</h3>
-                        <p class="text-secondary small mb-0">Every module concludes with a portfolio project demonstrating your real-world development skill.</p>
-                    </div>
-                </div>
-
-                <div class="col-md-6 col-lg-4">
-                    <div class="cwa-feature-item h-100">
-                        <div class="cwa-icon-box" style="background: var(--cwa-amber-subtle); color: var(--cwa-amber);">
-                            <i class="bi bi-lightbulb-fill"></i>
-                        </div>
-                        <h3 class="h6 cwa-heading mb-2">Beginner-Friendly Explanations</h3>
-                        <p class="text-secondary small mb-0">Complex algorithms explained with simple visual diagrams and dry-run walkthroughs.</p>
-                    </div>
-                </div>
-
-                <div class="col-md-6 col-lg-4">
-                    <div class="cwa-feature-item h-100">
-                        <div class="cwa-icon-box" style="background: var(--cwa-cyan-subtle); color: var(--cwa-cyan);">
-                            <i class="bi bi-briefcase-fill"></i>
-                        </div>
-                        <h3 class="h6 cwa-heading mb-2">Career-Oriented Skills</h3>
-                        <p class="text-secondary small mb-0">Curriculums aligned directly with modern hiring benchmarks, system design, and coding rounds.</p>
-                    </div>
-                </div>
-
-                <div class="col-md-6 col-lg-4">
-                    <div class="cwa-feature-item h-100">
-                        <div class="cwa-icon-box" style="background: var(--cwa-rose-subtle); color: var(--cwa-rose);">
-                            <i class="bi bi-fire"></i>
-                        </div>
-                        <h3 class="h6 cwa-heading mb-2">Consistent Practice</h3>
-                        <p class="text-secondary small mb-0">Built-in streak counters and daily challenges that foster durable problem-solving discipline.</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-
-    <!-- ==================================================================
-         I. LEARNING EXPERIENCE (Clearly Labeled Demo Placeholders)
-         ================================================================== -->
-    <section class="cwa-section" style="background: var(--cwa-bg);">
-        <div class="container px-3 px-xl-5">
-            <div class="cwa-section-heading">
-                <span class="cwa-badge cwa-badge-primary mb-2">Student Experience</span>
-                <h2 class="h2 cwa-heading mb-2">What Learners Experience</h2>
-                <p class="text-secondary small">Demo student perspectives illustrating platform workflows (sample placeholders).</p>
-            </div>
-
-            <div class="row g-4">
-                <div class="col-md-4">
-                    <div class="cwa-testimonial-card">
-                        <div>
-                            <div class="d-flex align-items-center gap-1 text-warning mb-2" style="font-size: 0.85rem;">
-                                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                            </div>
-                            <p class="small text-secondary mb-3" style="line-height: 1.6;">
-                                "The step-by-step breakdown of dynamic programming and recursion made topics that felt intimidating finally click."
-                            </p>
-                        </div>
-                        <div class="d-flex align-items-center gap-2.5 pt-3 border-top border-light-subtle">
-                            <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold text-white small" style="width: 36px; height: 36px; background: var(--cwa-primary);">
-                                S
-                            </div>
-                            <div>
-                                <div class="fw-bold small" style="color: var(--cwa-text-heading);">Sample Learner (Demo)</div>
-                                <div class="smaller text-muted">B.Tech CS Student</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-4">
-                    <div class="cwa-testimonial-card">
-                        <div>
-                            <div class="d-flex align-items-center gap-1 text-warning mb-2" style="font-size: 0.85rem;">
-                                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                            </div>
-                            <p class="small text-secondary mb-3" style="line-height: 1.6;">
-                                "Having the practice sets organized by topic and company tags with YouTube solution links saved me weeks of scattered searching."
-                            </p>
-                        </div>
-                        <div class="d-flex align-items-center gap-2.5 pt-3 border-top border-light-subtle">
-                            <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold text-white small" style="width: 36px; height: 36px; background: var(--cwa-indigo);">
-                                A
-                            </div>
-                            <div>
-                                <div class="fw-bold small" style="color: var(--cwa-text-heading);">Aspiring SDE (Demo)</div>
-                                <div class="smaller text-muted">DSA Prep Learner</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-4">
-                    <div class="cwa-testimonial-card">
-                        <div>
-                            <div class="d-flex align-items-center gap-1 text-warning mb-2" style="font-size: 0.85rem;">
-                                <i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i><i class="bi bi-star-fill"></i>
-                            </div>
-                            <p class="small text-secondary mb-3" style="line-height: 1.6;">
-                                "The full-stack projects are structured like real software products with clean architecture rather than toy examples."
-                            </p>
-                        </div>
-                        <div class="d-flex align-items-center gap-2.5 pt-3 border-top border-light-subtle">
-                            <div class="rounded-circle d-flex align-items-center justify-content-center fw-bold text-white small" style="width: 36px; height: 36px; background: var(--cwa-emerald);">
-                                R
-                            </div>
-                            <div>
-                                <div class="fw-bold small" style="color: var(--cwa-text-heading);">Web Developer (Demo)</div>
-                                <div class="smaller text-muted">Frontend & Backend Explorer</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    {% endif %}
 
 
     <!-- ==================================================================
@@ -978,12 +688,12 @@ launchCareer(amit).then(console.log);</code></pre>
                     <h2 class="accordion-header" id="headingFour">
                         <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
                             <i class="bi bi-briefcase text-success me-2.5"></i>
-                            What kind of projects will I have built by the end of the full-stack and AI tracks?
+                            What kind of projects will I have built by the end of the full-stack and systems tracks?
                         </button>
                     </h2>
                     <div id="collapseFour" class="accordion-collapse collapse" aria-labelledby="headingFour" data-bs-parent="#cwaFaqAccordion">
                         <div class="accordion-body">
-                            You will build production-caliber applications like the <strong>Intelligent Resume Matcher</strong> (leveraging vector embeddings and Gemini API), a <strong>Collaborative Task Studio</strong> (with WebSockets and SQL transactions), and an <strong>In-Browser Code Runner</strong> sandbox.
+                            You will build production-caliber applications like the <strong>Distributed Cache Engine</strong> (with LRU eviction and socket networking), a <strong>Collaborative Task Studio</strong> (with WebSockets and SQL transactions), and complete database-backed web platforms.
                         </div>
                     </div>
                 </div>
@@ -998,7 +708,7 @@ launchCareer(amit).then(console.log);</code></pre>
                     </h2>
                     <div id="collapseFive" class="accordion-collapse collapse" aria-labelledby="headingFive" data-bs-parent="#cwaFaqAccordion">
                         <div class="accordion-body">
-                            Yes. The platform is responsive across smartphones, tablets, laptops, and ultra-wide desktop monitors, allowing you to review notes, solve daily quizzes, and track problem streaks wherever you are.
+                            Yes. The platform is responsive across smartphones, tablets, laptops, and ultra-wide desktop monitors, allowing you to review notes, solve daily challenges, and track problem streaks wherever you are.
                         </div>
                     </div>
                 </div>
@@ -1010,28 +720,90 @@ launchCareer(amit).then(console.log);</code></pre>
     <!-- ==================================================================
          J. FINAL CALL TO ACTION: High-Impact Original Headline
          ================================================================== -->
-    <section class="py-5 text-center" style="background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: #ffffff;">
-        <div class="container px-3 px-xl-5 py-4" style="max-width: 760px;">
-            <span class="cwa-badge mb-3" style="background: rgba(37, 99, 235, 0.25); color: #93c5fd; border: 1px solid rgba(147, 197, 253, 0.3);">
-                Start Today
-            </span>
+    <section class="py-5 py-lg-6 text-center position-relative overflow-hidden" style="background: radial-gradient(ellipse at 50% 0%, rgba(99, 102, 241, 0.28) 0%, rgba(139, 92, 246, 0.12) 45%, #090c15 85%); border-top: 1px solid var(--cwa-border);">
+        <div class="position-absolute rounded-circle" style="top: -100px; left: 50%; transform: translateX(-50%); width: 650px; height: 350px; background: radial-gradient(circle, rgba(99, 102, 241, 0.22) 0%, transparent 70%); filter: blur(60px); pointer-events: none;"></div>
+        <div class="container px-3 px-xl-5 py-4 position-relative" style="max-width: 800px; z-index: 2;">
+
             <h2 class="display-5 fw-bold mb-3 font-heading text-white" style="letter-spacing: -0.03em;">
-                Your Next Chapter Starts With One Line of Code.
+                Your Next Chapter Starts With <span class="cwa-gradient-text">One Line of Code.</span>
             </h2>
-            <p class="lead mb-4 text-slate-300" style="color: #cbd5e1; font-size: 1.1rem; line-height: 1.65;">
-                Join students and aspiring software engineers mastering Data Structures, modern Web Development, and AI with CodeWithAmit.
+            <p class="lead mb-4" style="color: #cbd5e1; font-size: 1.15rem; line-height: 1.65;">
+                Join thousands of students and aspiring software engineers mastering Data Structures, modern Web Development, and Core Engineering with CodeWithAmit.
             </p>
             <div class="d-flex flex-wrap justify-content-center gap-3">
-                <a href="{% url 'roadmaps:roadmap_list' %}" class="cwa-btn-primary py-2.5 px-4 shadow-sm">
+                <a href="{% url 'roadmaps:roadmap_list' %}" class="cwa-btn-primary py-2.5 px-4 shadow-sm" style="box-shadow: 0 4px 20px rgba(99, 102, 241, 0.4) !important;">
                     <span>Explore Learning Paths</span>
                     <i class="bi bi-arrow-right"></i>
                 </a>
-                <a href="{% url 'courses:course_list' %}" class="cwa-btn-secondary py-2.5 px-4" style="background: #ffffff; color: var(--cwa-text-heading) !important;">
+                <a href="{% url 'courses:course_list' %}" class="btn rounded-pill py-2.5 px-4 fw-semibold" style="background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.15); color: #ffffff;">
                     <span>Browse All Courses</span>
                 </a>
             </div>
         </div>
     </section>
+
+    <!-- ==================================================================
+         INTERACTIVE FEATURE FLOW MODAL (Dynamic Visual Workflow Stage)
+         ================================================================== -->
+    <div class="cwa-flow-overlay" id="cwaFeatureFlowModal" onclick="handleFlowOverlayClick(event)">
+        <div class="cwa-flow-dialog">
+            <!-- Modal Header -->
+            <div class="cwa-flow-header">
+                <div class="d-flex align-items-center gap-2.5">
+                    <div class="cwa-flow-point-dot" id="flowModalIcon" style="position: static; width: 36px; height: 36px; font-size: 1.1rem; border-color: rgba(99, 102, 241, 0.6); color: #818cf8;">
+                        <i class="bi bi-stars"></i>
+                    </div>
+                    <div>
+                        <h3 class="h6 cwa-heading fw-bold mb-0 text-white" id="flowModalTitle">Interactive Feature Flow</h3>
+                        <span class="smaller text-muted" id="flowModalSubtitle">Step-by-step interactive workflow</span>
+                    </div>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline-secondary rounded-circle" onclick="closeFeatureFlow()" style="width: 32px; height: 32px; padding: 0;">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+
+            <!-- Flow Quick Switcher Tabs -->
+            <div class="d-flex align-items-center gap-1.5 px-3 py-2 border-bottom overflow-x-auto" style="background: rgba(0,0,0,0.3); border-color: rgba(255,255,255,0.06) !important;">
+                <button type="button" class="cwa-studio-tab active" data-flow="dsa" onclick="switchModalFlow('dsa')">
+                    <i class="bi bi-lightning-charge-fill text-warning"></i> DSA Arena
+                </button>
+                <button type="button" class="cwa-studio-tab" data-flow="roadmaps" onclick="switchModalFlow('roadmaps')">
+                    <i class="bi bi-signpost-split-fill text-info"></i> Roadmaps
+                </button>
+                <button type="button" class="cwa-studio-tab" data-flow="courses" onclick="switchModalFlow('courses')">
+                    <i class="bi bi-play-circle-fill text-danger"></i> Video Labs
+                </button>
+                <button type="button" class="cwa-studio-tab" data-flow="repos" onclick="switchModalFlow('repos')">
+                    <i class="bi bi-github text-primary"></i> Source Repos
+                </button>
+                <button type="button" class="cwa-studio-tab" data-flow="community" onclick="switchModalFlow('community')">
+                    <i class="bi bi-chat-dots-fill text-success"></i> Doubt Forum
+                </button>
+                <button type="button" class="cwa-studio-tab" data-flow="notes" onclick="switchModalFlow('notes')">
+                    <i class="bi bi-file-earmark-pdf-fill text-warning"></i> Academic Notes
+                </button>
+            </div>
+
+            <!-- Flow Body with 3-Stage Connected Timeline -->
+            <div class="cwa-flow-body" id="flowModalContent">
+                <!-- Injected via JavaScript -->
+            </div>
+
+            <!-- Flow Footer -->
+            <div class="cwa-flow-footer">
+                <span class="smaller text-muted d-none d-sm-inline">
+                    <i class="bi bi-shield-check text-success me-1"></i> Official CodeWithAmit Platform Feature
+                </span>
+                <div class="d-flex align-items-center gap-2 ms-auto">
+                    <button type="button" class="btn btn-sm btn-outline-secondary rounded-pill px-3" onclick="closeFeatureFlow()">Close</button>
+                    <a href="#" id="flowModalLaunchBtn" class="cwa-btn-primary btn-sm rounded-pill py-1.5 px-4 shadow-sm">
+                        <span>Launch Feature Now</span> <i class="bi bi-arrow-right ms-1"></i>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 
 </div>
 {% endblock %}
@@ -1039,96 +811,332 @@ launchCareer(amit).then(console.log);</code></pre>
 {% block extra_js %}
 <script>
     // =========================================================================
-    // 1. HERO CODE PLAYGROUND: Interactive Language Tabs, Copy, & Simulated Runner
+    // 1. HERO FEATURE STUDIO: Interactive Tab Switching & Simulations
     // =========================================================================
-    const languageOutputs = {
-        python: {
-            output: '> { "status": "Interview Ready", "projects_built": 3, "confidence": 100 }',
-            latency: '1.2ms',
-            memory: '14MB'
+    let currentStudioTab = 'dsa';
+
+    function switchHeroStudioTab(tabKey, tabBtn) {
+        currentStudioTab = tabKey;
+        
+        // Update studio tabs
+        document.querySelectorAll('#hero-studio-tabs .cwa-studio-tab').forEach(b => b.classList.remove('active'));
+        if (tabBtn) tabBtn.classList.add('active');
+
+        // Switch screen
+        document.querySelectorAll('.cwa-studio-screen').forEach(scr => scr.classList.remove('active'));
+        const targetScreen = document.getElementById('studio-screen-' + tabKey);
+        if (targetScreen) targetScreen.classList.add('active');
+
+        // Update output label
+        const labelMap = {
+            dsa: '450 DSA Arena Engine • GCC 14.2 Active',
+            roadmaps: 'Career Pipeline Engine • 4 Guided Milestones',
+            repos: 'Open Source Git Vault • 100% Free Repositories',
+            community: '24/7 Doubt Resolution Engine • Admin Verified',
+            courses: 'Video Courses & Sandbox Labs • Active Player'
+        };
+        const labelEl = document.getElementById('hero-output-label');
+        if (labelEl && labelMap[tabKey]) {
+            labelEl.textContent = labelMap[tabKey];
+        }
+    }
+
+    function runStudioDsaSimulation(btn) {
+        const originalHtml = btn.innerHTML;
+        btn.disabled = true;
+        btn.innerHTML = `<span class="spinner-border spinner-border-sm me-1" role="status"></span> Validating...`;
+
+        setTimeout(() => {
+            btn.disabled = false;
+            btn.innerHTML = `<i class="bi bi-check2-all text-success"></i> All 3 Test Vectors Verified!`;
+            setTimeout(() => { btn.innerHTML = originalHtml; }, 2400);
+        }, 600);
+    }
+
+    function copyRepoCloneCmd(btn) {
+        const text = 'git clone https://github.com/CodeWithAmit/fullstack.git';
+        navigator.clipboard.writeText(text).then(() => {
+            const originalText = btn.textContent;
+            btn.textContent = 'Copied!';
+            btn.className = 'btn btn-xs btn-success py-0 px-2 smaller';
+            setTimeout(() => {
+                btn.textContent = originalText;
+                btn.className = 'btn btn-xs btn-outline-secondary py-0 px-2 smaller';
+            }, 1800);
+        }).catch(() => {});
+    }
+
+    // =========================================================================
+    // 2. DEDICATED INTERACTIVE FEATURE FLOW MODAL
+    // =========================================================================
+    const featureFlows = {
+        dsa: {
+            title: '450 Curated DSA Problem Arena',
+            subtitle: 'Conquer interviews with pattern-based algorithmic mastery',
+            icon: 'bi-lightning-charge-fill',
+            color: '#f59e0b',
+            url: "{% url 'coding_practice:problem_list' %}",
+            steps: [
+                {
+                    badge: 'Step 1: Pattern Classification',
+                    title: 'Grouped by 15 High-Frequency Interview Patterns',
+                    desc: 'Instead of memorizing random LeetCode questions, master Sliding Window, Two Pointers, Monotonic Queue, Binary Trees, and 0/1 Knapsack.'
+                },
+                {
+                    badge: 'Step 2: In-Browser Practice & Sandbox',
+                    title: 'Interactive Test Vector Matrix & Multi-Language Execution',
+                    desc: 'Run your solution against 100K test vectors with real-time runtime complexity and memory diagnostics in Python, C++, Java, and JS.'
+                },
+                {
+                    badge: 'Step 3: Progress & Leaderboard',
+                    title: 'Track Streaks, Earn XP, and Benchmark Your Speed',
+                    desc: 'Earn verified achievement badges, track your 450 Sheet completion percentage, and climb the student leaderboard.'
+                }
+            ]
         },
-        cpp: {
-            output: '> Status: Interview Ready | Sheet: 450 Completed',
-            latency: '0.4ms',
-            memory: '4.2MB'
+        roadmaps: {
+            title: 'Interactive Career Roadmaps & Learning Paths',
+            subtitle: 'Step-by-step verified engineering paths with milestone checkpoints',
+            icon: 'bi-signpost-split-fill',
+            color: '#6366f1',
+            url: "{% url 'roadmaps:roadmap_list' %}",
+            steps: [
+                {
+                    badge: 'Step 1: Path Selection',
+                    title: 'Tailored Tracks for Frontend, Backend, Full-Stack & Systems',
+                    desc: 'Choose your desired specialization. Each roadmap starts from foundational prerequisites and guides you to production level.'
+                },
+                {
+                    badge: 'Step 2: Stage-by-Stage Milestones',
+                    title: 'Structured Topics with Video Links, Docs & Practical Exercises',
+                    desc: 'Every milestone is broken down into digestible concepts with verified free resources, academic notes, and code repositories.'
+                },
+                {
+                    badge: 'Step 3: Industry Portfolio Unlock',
+                    title: 'Capstone Projects and Placement Checklists',
+                    desc: 'Complete the track to build resume-ready projects with live deployment instructions and interview question banks.'
+                }
+            ]
         },
-        java: {
-            output: '> Track: Full-Stack & DSA\n> Streak: 45 days active!',
-            latency: '2.1ms',
-            memory: '22MB'
+        courses: {
+            title: 'Video Courses & Hands-On Engineering Batches',
+            subtitle: 'Comprehensive curriculum with attached code sandboxes and quizzes',
+            icon: 'bi-play-circle-fill',
+            color: '#ef4444',
+            url: "{% url 'courses:course_list' %}",
+            steps: [
+                {
+                    badge: 'Step 1: Concept Breakdown',
+                    title: 'High-Definition Video Lessons with Real Visualizations',
+                    desc: 'Clear, concise explanations from instructors that simplify complex topics like memory pointers, async architectures, and recursion.'
+                },
+                {
+                    badge: 'Step 2: Hands-On Code Labs',
+                    title: 'Practice Alongside the Instructor in Live Sandboxes',
+                    desc: 'No complicated local setup required. Every video lesson includes an integrated browser sandbox to verify your code on the fly.'
+                },
+                {
+                    badge: 'Step 3: Verified Certification',
+                    title: 'Course Completion Certificates and Project Reviews',
+                    desc: 'Pass module assessments and project submissions to receive verified certificates of completion.'
+                }
+            ]
         },
-        javascript: {
-            output: '> { liveUrl: "https://my-app.codewithamit.dev", performanceScore: 100 }',
-            latency: '1.0ms',
-            memory: '18MB'
+        repos: {
+            title: 'Production Code Sources & GitHub Repositories',
+            subtitle: 'Real-world architectures, microservices, and reusable component libraries',
+            icon: 'bi-github',
+            color: '#38bdf8',
+            url: "{% url 'code_sources:list' %}",
+            steps: [
+                {
+                    badge: 'Step 1: Topic-Wise Exploration',
+                    title: 'Filtered by Language, Framework, and Industry Use Case',
+                    desc: 'Browse verified source codes across Django, React, FastAPI, Node.js, and Algorithmic solutions.'
+                },
+                {
+                    badge: 'Step 2: 1-Click Code & Clone Commands',
+                    title: 'Clean, Documented Code with Complete README Guides',
+                    desc: 'Instant 1-click clipboard copy for terminal clone commands, configuration setups, and Docker files.'
+                },
+                {
+                    badge: 'Step 3: Production Deployment Ready',
+                    title: 'Architectures Engineered for Production Standards',
+                    desc: 'Every repository includes production best practices: environment variables, unit tests, and security hardening.'
+                }
+            ]
+        },
+        community: {
+            title: '24/7 Doubt Community & Admin Solutions',
+            subtitle: 'Never get stuck — verified fixes by administrators and mentors',
+            icon: 'bi-chat-dots-fill',
+            color: '#10b981',
+            url: "{% url 'community:doubt_list' %}",
+            steps: [
+                {
+                    badge: 'Step 1: Post Your Doubt with Logs',
+                    title: 'Rich Editor Supporting Code Snippets & Error Logs',
+                    desc: 'Paste your code, compiler traceback, and questions. Tag your doubt with topics like C++, Django, or Dynamic Programming.'
+                },
+                {
+                    badge: 'Step 2: Official Admin Verification',
+                    title: 'Verified Solutions Pinned to the Top with Syntax Highlighting',
+                    desc: 'Platform admins and experienced peers provide verified answers, point out edge cases, and provide corrected code.'
+                },
+                {
+                    badge: 'Step 3: Earn Community XP & Badges',
+                    title: 'Get Rewarded for Asking & Answering Questions',
+                    desc: 'Earn +15 XP for asking thoughtful questions, and up to +50 XP when your solution gets marked as accepted.'
+                }
+            ]
+        },
+        notes: {
+            title: 'Curated Coding Notes & Cheatsheets',
+            subtitle: 'Topic-wise coding notes, formula sheets, DSA summaries, and PDFs',
+            icon: 'bi-file-earmark-pdf-fill',
+            color: '#f59e0b',
+            url: "{% url 'notes:note_list' %}",
+            steps: [
+                {
+                    badge: 'Step 1: Topic & Language Mapping',
+                    title: 'Organized by Language and Computer Science Subject',
+                    desc: 'Quickly find curated coding notes for C++, Java, Python, Data Structures, Operating Systems, and DBMS.'
+                },
+                {
+                    badge: 'Step 2: Clean Formula & Algorithm Cheatsheets',
+                    title: 'Concise Revision Summaries Designed for Coding Success',
+                    desc: 'High-yield algorithmic patterns, complexity summary tables, and diagrammatic explanations for rapid revision.'
+                },
+                {
+                    badge: 'Step 3: Instant Free PDF Downloads',
+                    title: '100% Free Access for Students with No Paywalls',
+                    desc: 'Read online in our responsive viewer or download clean PDFs to study offline on any device.'
+                }
+            ]
         }
     };
 
-    let currentHeroLang = 'python';
+    function openFeatureFlow(featureKey) {
+        if (!featureKey || !featureFlows[featureKey]) {
+            featureKey = 'dsa';
+        }
+        
+        const modal = document.getElementById('cwaFeatureFlowModal');
+        if (!modal) return;
 
-    function switchHeroCodeTab(lang, tabBtn) {
-        currentHeroLang = lang;
-        // Update tab buttons
-        document.querySelectorAll('.cwa-code-tab').forEach(btn => btn.classList.remove('active'));
-        if (tabBtn) tabBtn.classList.add('active');
+        renderModalFlowContent(featureKey);
+        modal.classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
 
-        // Hide all code snippets, show selected
-        ['python', 'cpp', 'java', 'javascript'].forEach(l => {
-            const el = document.getElementById('code-snippet-' + l);
-            if (el) {
-                if (l === lang) {
-                    el.classList.remove('d-none');
-                    el.classList.add('active');
-                } else {
-                    el.classList.add('d-none');
-                    el.classList.remove('active');
-                }
+    function switchModalFlow(featureKey) {
+        // Update tabs inside modal
+        document.querySelectorAll('#cwaFeatureFlowModal .cwa-studio-tab').forEach(t => {
+            if (t.getAttribute('data-flow') === featureKey) {
+                t.classList.add('active');
+            } else {
+                t.classList.remove('active');
             }
         });
 
-        // Update output preview
-        const data = languageOutputs[lang];
-        if (data) {
-            document.getElementById('hero-terminal-output').textContent = data.output;
-            document.getElementById('hero-output-meta').innerHTML = `<i class="bi bi-check2-circle me-1"></i> Latency: ${data.latency} • Memory: ${data.memory}`;
-        }
+        renderModalFlowContent(featureKey);
     }
 
-    function runHeroCode() {
-        const runBtn = document.getElementById('hero-run-btn');
-        const outputEl = document.getElementById('hero-terminal-output');
-        const metaEl = document.getElementById('hero-output-meta');
+    function renderModalFlowContent(featureKey) {
+        const data = featureFlows[featureKey] || featureFlows['dsa'];
         
-        runBtn.disabled = true;
-        runBtn.innerHTML = `<span class="spinner-border spinner-border-sm me-1" role="status"></span> Executing...`;
-        outputEl.style.opacity = '0.5';
+        // Update header
+        const titleEl = document.getElementById('flowModalTitle');
+        const subEl = document.getElementById('flowModalSubtitle');
+        const iconEl = document.getElementById('flowModalIcon');
+        const launchBtn = document.getElementById('flowModalLaunchBtn');
+        const contentEl = document.getElementById('flowModalContent');
 
-        setTimeout(() => {
-            runBtn.disabled = false;
-            runBtn.innerHTML = `<i class="bi bi-play-fill"></i> Run Code`;
-            outputEl.style.opacity = '1';
-            
-            const data = languageOutputs[currentHeroLang];
-            outputEl.textContent = data.output;
-            metaEl.innerHTML = `<i class="bi bi-check2-circle me-1"></i> Latency: ${data.latency} • Memory: ${data.memory} • (Ran just now)`;
-        }, 500);
+        if (titleEl) titleEl.textContent = data.title;
+        if (subEl) subEl.textContent = data.subtitle;
+        if (iconEl) {
+            iconEl.innerHTML = `<i class="bi ${data.icon}"></i>`;
+            iconEl.style.color = data.color;
+            iconEl.style.borderColor = data.color;
+        }
+        if (launchBtn) {
+            launchBtn.href = data.url;
+            launchBtn.innerHTML = `<span>Launch ${data.title.split(' ')[0]} Now</span> <i class="bi bi-arrow-right ms-1"></i>`;
+        }
+
+        // Generate timeline content
+        let html = `
+            <div class="cwa-flow-timeline">
+        `;
+
+        data.steps.forEach((step, idx) => {
+            html += `
+                <div class="cwa-flow-point">
+                    <div class="cwa-flow-point-dot">${idx + 1}</div>
+                    <div class="cwa-studio-card">
+                        <span class="badge rounded-pill px-2.5 py-0.5 smaller fw-semibold mb-2" style="background: rgba(99,102,241,0.15); color: #818cf8; border: 1px solid rgba(99,102,241,0.3);">
+                            ${step.badge}
+                        </span>
+                        <h4 class="h6 cwa-heading fw-bold mb-1.5 text-white">${step.title}</h4>
+                        <p class="smaller text-secondary mb-0" style="line-height: 1.6;">${step.desc}</p>
+                    </div>
+                </div>
+            `;
+        });
+
+        html += `</div>`;
+        if (contentEl) contentEl.innerHTML = html;
     }
 
-    function copyHeroCode() {
-        const activeSnippet = document.querySelector('.cwa-preview-code.active');
-        if (activeSnippet) {
-            navigator.clipboard.writeText(activeSnippet.innerText).then(() => {
-                const icon = document.getElementById('hero-copy-icon');
-                if (icon) {
-                    icon.className = 'bi bi-check text-success';
-                    setTimeout(() => { icon.className = 'bi bi-clipboard'; }, 1800);
-                }
-            }).catch(() => {});
+    function closeFeatureFlow() {
+        const modal = document.getElementById('cwaFeatureFlowModal');
+        if (modal) {
+            modal.classList.remove('active');
+            document.body.style.overflow = '';
         }
     }
+
+    function handleFlowOverlayClick(event) {
+        if (event.target.id === 'cwaFeatureFlowModal') {
+            closeFeatureFlow();
+        }
+    }
+
+    // Keyboard shortcut (ESC to close)
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            closeFeatureFlow();
+        }
+    });
 
     // =========================================================================
-    // 2. FEATURED COURSES: Instant Client-Side Category Filtering
+    // 3. PROGRESSIVE SCROLL-REVEAL OBSERVER (Features Reveal Smoothly)
+    // =========================================================================
+    document.addEventListener('DOMContentLoaded', () => {
+        const revealElements = document.querySelectorAll('.cwa-reveal');
+        
+        if ('IntersectionObserver' in window) {
+            const revealObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: '0px 0px -40px 0px'
+            });
+
+            revealElements.forEach(el => revealObserver.observe(el));
+        } else {
+            // Fallback for older browsers
+            revealElements.forEach(el => el.classList.add('is-visible'));
+        }
+    });
+
+    // =========================================================================
+    // 4. FEATURED COURSES: Instant Client-Side Category Filtering
     // =========================================================================
     function filterCourses(category, btn) {
         document.querySelectorAll('.cwa-filter-btn').forEach(b => b.classList.remove('active'));
@@ -1145,7 +1153,7 @@ launchCareer(amit).then(console.log);</code></pre>
     }
 
     // =========================================================================
-    // 3. SAMPLE PROBLEM CHECKLIST: Click to Toggle, Live Progress Calculation
+    // 5. SAMPLE PROBLEM CHECKLIST: Click to Toggle, Live Progress Calculation
     // =========================================================================
     function toggleProblemItem(itemEl) {
         itemEl.classList.toggle('completed');
@@ -1191,4 +1199,5 @@ launchCareer(amit).then(console.log);</code></pre>
     }
 </script>
 {% endblock %}
+
 

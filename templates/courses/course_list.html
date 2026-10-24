@@ -61,6 +61,12 @@
                         <i class="bi bi-x-lg me-1"></i> Reset
                     </a>
                 {% endif %}
+
+                {% if request.user.is_staff or request.user.is_superuser %}
+                    <a href="{% url 'courses:create_course' %}" class="btn btn-primary btn-sm rounded-pill px-3 py-1.5 fw-semibold shadow-xs">
+                        <i class="bi bi-plus-lg me-1"></i> Create Course
+                    </a>
+                {% endif %}
             </form>
         </div>
 
@@ -126,13 +132,21 @@
                                 {% endif %}
                             </div>
 
-                            {% if course.batch_name %}
-                                <div class="position-absolute bottom-0 start-0 m-3">
-                                    <span class="badge rounded-pill px-2.5 py-1 smaller fw-semibold" style="background: rgba(13, 16, 27, 0.85); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.1); color: var(--text-primary);">
+                            <div class="position-absolute bottom-0 start-0 m-3 d-flex align-items-center gap-1.5 flex-wrap">
+                                {% if course.batch_name %}
+                                    <span class="badge rounded-pill px-2.5 py-1 smaller fw-semibold" style="background: rgba(13, 16, 27, 0.85); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.1); color: #fff;">
                                         <i class="bi bi-lightning-fill text-warning me-1"></i> {{ course.batch_name }}
                                     </span>
-                                </div>
-                            {% endif %}
+                                {% endif %}
+                                {% if course.has_github %}
+                                    <a href="{{ course.github_repo_url }}" target="_blank" rel="noopener noreferrer" 
+                                       class="badge rounded-pill px-2 py-1 smaller fw-semibold text-white text-decoration-none shadow-xs" 
+                                       style="background: #24292e; border: 1px solid rgba(255, 255, 255, 0.25);"
+                                       title="GitHub Source Code Repo">
+                                        <i class="bi bi-github me-1"></i> GitHub
+                                    </a>
+                                {% endif %}
+                            </div>
                         </div>
 
                         <!-- Card Body -->
@@ -168,6 +182,11 @@
                                 <span class="smaller px-2 py-0.5 rounded-2 text-secondary" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color);">
                                     <i class="bi bi-clock text-primary me-1"></i> {{ course.estimated_hours }}h total
                                 </span>
+                                {% if course.total_sections %}
+                                    <span class="smaller px-2 py-0.5 rounded-2 text-secondary" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color);">
+                                        <i class="bi bi-diagram-3-fill text-warning me-1"></i> {{ course.total_sections }} modules
+                                    </span>
+                                {% endif %}
                                 <span class="smaller px-2 py-0.5 rounded-2 text-secondary" style="background: var(--bg-surface-subtle); border: 1px solid var(--border-color);">
                                     <i class="bi bi-journal-code text-info me-1"></i> {{ course.total_lessons }} lessons
                                 </span>

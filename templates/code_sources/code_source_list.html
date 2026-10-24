@@ -1,0 +1,217 @@
+{% extends 'base.html' %}
+
+{% block title %}Code Sources & GitHub Repositories — CodeWithAmit{% endblock %}
+
+{% block content %}
+<div class="container py-4 py-md-5">
+
+    <!-- ==================================================================
+         HERO SECTION: Open Source & Code Repository Hub
+         ================================================================== -->
+    <div class="cwa-glass-card p-4 p-md-5 rounded-4 mb-4 position-relative overflow-hidden" style="background: radial-gradient(circle at 85% 20%, rgba(56, 189, 248, 0.12) 0%, transparent 50%), var(--cwa-bg-card); border: 1px solid var(--cwa-border);">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-8">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="badge rounded-pill px-3 py-1 fw-semibold d-inline-flex align-items-center gap-1.5" style="background: rgba(14, 165, 233, 0.12); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.25);">
+                        <i class="bi bi-github fs-6"></i> Official GitHub Code Hub
+                    </span>
+                    <span class="badge rounded-pill px-3 py-1 fw-semibold" style="background: rgba(16, 185, 129, 0.12); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.25);">
+                        <i class="bi bi-check-circle-fill me-1"></i> Topic-Wise Solutions
+                    </span>
+                </div>
+                <h1 class="h2 fw-bold font-heading mb-2" style="color: var(--cwa-text-heading);">
+                    Code Sources &amp; GitHub Repositories
+                </h1>
+                <p class="text-secondary mb-3 mb-lg-0" style="font-size: 0.95rem; max-width: 680px;">
+                    Explore topic-wise algorithms, production microservices, full-stack templates, and data engineering scripts. View complete source code, copy snippets instantly, and clone directly from official GitHub repos.
+                </p>
+            </div>
+            <div class="col-lg-4 text-lg-end d-flex flex-wrap gap-2 justify-content-lg-end">
+                {% if is_admin %}
+                    <a href="{% url 'code_sources:add' %}" class="cwa-btn-primary py-2 px-3.5 shadow-sm">
+                        <i class="bi bi-plus-circle-fill"></i> Add Code &amp; GitHub Repo
+                    </a>
+                {% endif %}
+                <a href="{% url 'community:doubt_list' %}" class="cwa-btn-secondary py-2 px-3">
+                    <i class="bi bi-chat-square-dots-fill text-warning"></i> Doubt Community
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================================================================
+         SEARCH, SORT & FILTERS BAR
+         ================================================================== -->
+    <div class="card p-3 rounded-4 mb-4" style="background: var(--cwa-bg-card); border: 1px solid var(--cwa-border);">
+        <form method="GET" action="{% url 'code_sources:list' %}" class="row g-2 align-items-center">
+            <!-- Search -->
+            <div class="col-md-5 col-lg-5">
+                <div class="input-group input-group-sm rounded-pill overflow-hidden" style="border: 1px solid var(--cwa-border); background: var(--cwa-bg-subtle);">
+                    <span class="input-group-text bg-transparent border-0 text-muted ps-3"><i class="bi bi-search"></i></span>
+                    <input type="text" name="q" class="form-control bg-transparent border-0 py-2" placeholder="Search by topic, keyword, language..." value="{{ query }}">
+                    {% if query %}
+                        <a href="{% url 'code_sources:list' %}" class="input-group-text bg-transparent border-0 text-muted pe-3"><i class="bi bi-x-circle"></i></a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Topic Dropdown Filter -->
+            <div class="col-sm-6 col-md-3 col-lg-3">
+                <select name="topic" class="form-select form-select-sm rounded-pill py-2" onchange="this.form.submit()" style="background: var(--cwa-bg-subtle); border-color: var(--cwa-border); color: var(--cwa-text-heading);">
+                    <option value="">All Topics ({{ total_count }})</option>
+                    {% for top in all_topics %}
+                        <option value="{{ top.topic }}" {% if selected_topic == top.topic %}selected{% endif %}>
+                            {{ top.topic }} ({{ top.count }})
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Language Dropdown Filter -->
+            <div class="col-sm-6 col-md-2 col-lg-2">
+                <select name="lang" class="form-select form-select-sm rounded-pill py-2" onchange="this.form.submit()" style="background: var(--cwa-bg-subtle); border-color: var(--cwa-border); color: var(--cwa-text-heading);">
+                    <option value="">All Languages</option>
+                    {% for lang in all_languages %}
+                        <option value="{{ lang.language }}" {% if selected_lang == lang.language %}selected{% endif %}>
+                            {{ lang.language|title }} ({{ lang.count }})
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Sort -->
+            <div class="col-md-2 col-lg-2">
+                <select name="sort" class="form-select form-select-sm rounded-pill py-2" onchange="this.form.submit()" style="background: var(--cwa-bg-subtle); border-color: var(--cwa-border); color: var(--cwa-text-heading);">
+                    <option value="latest" {% if sort_by == 'latest' %}selected{% endif %}>Latest</option>
+                    <option value="popular" {% if sort_by == 'popular' %}selected{% endif %}>Most Viewed</option>
+                    <option value="copies" {% if sort_by == 'copies' %}selected{% endif %}>Most Copied</option>
+                </select>
+            </div>
+        </form>
+
+        <!-- Topic Pills Bar (Swipeable on Mobile) -->
+        <div class="cwa-filter-scroll pt-3 mt-2 border-top align-items-center mb-0" style="border-color: var(--cwa-border) !important;">
+            <span class="smaller fw-bold text-muted me-1 flex-shrink-0"><i class="bi bi-tag-fill me-1"></i>Topics:</span>
+            <a href="{% url 'code_sources:list' %}" class="cwa-filter-btn text-decoration-none flex-shrink-0 {% if not selected_topic %}active{% endif %}">
+                All ({{ total_count }})
+            </a>
+            {% for top in all_topics %}
+                <a href="{% url 'code_sources:list' %}?topic={{ top.topic|urlencode }}{% if query %}&q={{ query }}{% endif %}" class="cwa-filter-btn text-decoration-none {% if selected_topic == top.topic %}active{% endif %}">
+                    {{ top.topic }} <span class="badge rounded-pill bg-dark-subtle text-muted ms-1" style="font-size: 0.7rem;">{{ top.count }}</span>
+                </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- ==================================================================
+         CODE SOURCES GRID
+         ================================================================== -->
+    <div class="row g-4">
+        {% for item in code_sources %}
+            <div class="col-lg-6">
+                <div class="cwa-card h-100 d-flex flex-column p-4 position-relative hover-lift" style="border-radius: var(--cwa-radius-lg);">
+                    
+                    <!-- Card Top Header -->
+                    <div class="d-flex justify-content-between align-items-start gap-2 mb-2">
+                        <div class="d-flex flex-wrap align-items-center gap-1.5">
+                            <span class="badge rounded-pill px-2.5 py-1 fw-bold" style="background: rgba(37, 99, 235, 0.15); color: #60a5fa; border: 1px solid rgba(96, 165, 250, 0.25); font-size: 0.72rem;">
+                                {{ item.topic }}
+                            </span>
+                            {% if item.difficulty == 'Beginner' %}
+                                <span class="cwa-badge cwa-badge-emerald">Beginner</span>
+                            {% elif item.difficulty == 'Intermediate' %}
+                                <span class="cwa-badge cwa-badge-amber">Intermediate</span>
+                            {% else %}
+                                <span class="cwa-badge cwa-badge-indigo">Advanced</span>
+                            {% endif %}
+                            <span class="badge rounded-pill px-2 py-0.5 font-monospace text-uppercase" style="background: var(--cwa-bg-subtle); color: var(--cwa-text-muted); border: 1px solid var(--cwa-border); font-size: 0.68rem;">
+                                {{ item.language }}
+                            </span>
+                        </div>
+                        {% if is_admin %}
+                            <div class="dropdown">
+                                <button class="btn btn-sm btn-link text-muted p-0" type="button" data-bs-toggle="dropdown">
+                                    <i class="bi bi-three-dots-vertical"></i>
+                                </button>
+                                <ul class="dropdown-menu dropdown-menu-end shadow border p-1" style="border-color: var(--cwa-border); background: var(--cwa-bg-card);">
+                                    <li><a class="dropdown-item py-1.5 px-3 rounded-2 small" href="{% url 'code_sources:edit' item.slug %}"><i class="bi bi-pencil me-2 text-warning"></i> Edit Code &amp; Repo</a></li>
+                                    <li><a class="dropdown-item py-1.5 px-3 rounded-2 small text-danger" href="{% url 'code_sources:delete' item.slug %}"><i class="bi bi-trash me-2"></i> Delete</a></li>
+                                </ul>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Title -->
+                    <h3 class="h5 fw-bold mb-2">
+                        <a href="{% url 'code_sources:detail' item.slug %}" class="text-decoration-none text-light-heading" style="color: var(--cwa-text-heading);">
+                            {{ item.title }}
+                        </a>
+                    </h3>
+
+                    <!-- Summary -->
+                    <p class="text-secondary small mb-3 flex-grow-1" style="line-height: 1.55;">
+                        {{ item.summary|truncatechars:180 }}
+                    </p>
+
+                    <!-- Code Preview Box (Syntax look with File Name header) -->
+                    <div class="rounded-3 overflow-hidden mb-3" style="border: 1px solid rgba(255, 255, 255, 0.08); background: #0b0f19;">
+                        <div class="d-flex justify-content-between align-items-center px-3 py-1.5 border-bottom" style="border-color: rgba(255, 255, 255, 0.08) !important; background: rgba(255, 255, 255, 0.03);">
+                            <span class="smaller font-monospace text-muted d-flex align-items-center gap-1.5">
+                                <i class="bi bi-file-earmark-code text-info"></i> {{ item.file_name|default:'code.py' }}
+                            </span>
+                            <span class="smaller text-muted" style="font-size: 0.72rem;">{{ item.line_count }} lines</span>
+                        </div>
+                        <pre class="m-0 p-3 font-monospace text-light overflow-hidden position-relative" style="font-size: 0.78rem; max-height: 110px; line-height: 1.45; opacity: 0.9;"><code>{{ item.code_content|truncatechars:260 }}</code>
+<div class="position-absolute bottom-0 start-0 w-100" style="height: 45px; background: linear-gradient(transparent, #0b0f19);"></div>
+</pre>
+                    </div>
+
+                    <!-- Bottom Action Bar: GitHub Link + View Code + Copy -->
+                    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 pt-3 border-top" style="border-color: var(--cwa-border) !important;">
+                        <div class="d-flex align-items-center gap-3 smaller text-muted">
+                            <span title="Total views"><i class="bi bi-eye me-1"></i>{{ item.views_count }}</span>
+                            <span title="Total copies" id="copies-badge-{{ item.id }}"><i class="bi bi-clipboard-check me-1"></i>{{ item.copies_count }}</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2">
+                            <!-- Direct GitHub Repo Link requested by user -->
+                            {% if item.github_repo_url %}
+                                <a href="{{ item.github_repo_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-1 d-inline-flex align-items-center gap-1.5 fw-semibold" title="Open GitHub Repository" style="font-size: 0.8rem;">
+                                    <i class="bi bi-github"></i>
+                                    <span>GitHub Repo</span>
+                                    <i class="bi bi-box-arrow-up-right" style="font-size: 0.7rem;"></i>
+                                </a>
+                            {% endif %}
+                            <!-- View Code Detail Button -->
+                            <a href="{% url 'code_sources:detail' item.slug %}" class="cwa-btn-primary btn-sm py-1 px-3 d-inline-flex align-items-center gap-1" style="font-size: 0.82rem;">
+                                <span>Get Code</span>
+                                <i class="bi bi-arrow-right"></i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12 text-center py-5">
+                <div class="p-5 rounded-4 mx-auto" style="max-width: 520px; background: var(--cwa-bg-card); border: 1px solid var(--cwa-border);">
+                    <div class="rounded-circle d-inline-flex p-3 mb-3" style="background: rgba(56, 189, 248, 0.1); color: #38bdf8;">
+                        <i class="bi bi-github fs-1"></i>
+                    </div>
+                    <h4 class="fw-bold font-heading mb-2" style="color: var(--cwa-text-heading);">No Code Sources Found</h4>
+                    <p class="text-secondary small mb-4">No code snippets or repositories match your current filter criteria.</p>
+                    <div class="d-flex justify-content-center gap-2">
+                        <a href="{% url 'code_sources:list' %}" class="cwa-btn-secondary btn-sm py-2 px-3">
+                            <i class="bi bi-arrow-repeat me-1"></i> Reset Filters
+                        </a>
+                        {% if is_admin %}
+                            <a href="{% url 'code_sources:add' %}" class="cwa-btn-primary btn-sm py-2 px-3">
+                                <i class="bi bi-plus-circle me-1"></i> Add Code Source
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+
+</div>
+{% endblock %}

@@ -57,6 +57,11 @@
                     <span class="badge rounded-pill px-2.5 py-1.5 smaller" style="background: #fef3c7; color: #b45309; border: 1px solid #fde68a;">
                         <i class="bi bi-check2-square me-1"></i> {{ roadmap.total_topics }} Topics
                     </span>
+                    {% if roadmap.website_url %}
+                        <a href="{{ roadmap.website_url }}" target="_blank" rel="noopener noreferrer" class="badge rounded-pill px-2.5 py-1.5 smaller fw-semibold text-decoration-none d-inline-flex align-items-center gap-1" style="background: rgba(14, 165, 233, 0.15); color: #0284c7; border: 1px solid rgba(14, 165, 233, 0.35);" title="Visit official roadmap website">
+                            <i class="bi bi-globe2"></i> {{ roadmap.website_link_label|default:'Official Website Link' }} <i class="bi bi-arrow-up-right smaller"></i>
+                        </a>
+                    {% endif %}
                 </div>
 
                 <h1 class="display-6 fw-bold font-heading mb-3" style="color: var(--text-primary, #0f172a); letter-spacing: -0.03em;">
@@ -94,6 +99,13 @@
                             <i class="bi bi-check2-circle me-1.5"></i> Enrolled &amp; Tracking
                         </span>
                     {% endif %}
+
+                    {% if roadmap.website_url %}
+                        <a href="{{ roadmap.website_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-info rounded-pill px-4 py-2.5 fw-bold text-white shadow-xs hover-lift d-inline-flex align-items-center gap-1.5" style="background: #0284c7; border-color: #0284c7;">
+                            <i class="bi bi-box-arrow-up-right"></i>
+                            <span>{{ roadmap.website_link_label|default:'Open Roadmap Website' }}</span>
+                        </a>
+                    {% endif %}
                     
                     {% if request.user.is_staff or request.user.is_superuser %}
                         <a href="{% url 'roadmaps:add_stage' %}?roadmap={{ roadmap.slug }}" class="btn btn-outline-primary rounded-pill px-4 py-2 fw-semibold">
@@ -109,6 +121,13 @@
                 </div>
                 <div class="smaller fw-semibold text-dark mt-3">{{ roadmap.target_role }}</div>
                 <div class="smaller text-muted">Complete Self-Paced Curriculum</div>
+                {% if roadmap.website_url %}
+                    <div class="mt-3">
+                        <a href="{{ roadmap.website_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-secondary rounded-pill px-3 py-1.5 smaller fw-semibold d-inline-flex align-items-center gap-1">
+                            <i class="bi bi-globe"></i> {{ roadmap.website_link_label|default:'Visit Roadmap Link' }} <i class="bi bi-arrow-up-right"></i>
+                        </a>
+                    </div>
+                {% endif %}
             </div>
         </div>
     </div>

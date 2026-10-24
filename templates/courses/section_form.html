@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Section: {{ section.title }} — CodeWithAmit Studio{% endblock %}
+
+{% block extra_css %}
+<style>
+/* React component styles */
+.section-react-root { margin-top: 1rem; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="max-width: 720px;">
+    <!-- Breadcrumb -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb smaller mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'courses:course_list' %}" class="text-decoration-none">Courses</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'courses:course_detail' course.slug %}" class="text-decoration-none">{{ course.title|truncatechars:30 }}</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'courses:manage_sections' course.slug %}" class="text-decoration-none">Sections</a></li>
+            <li class="breadcrumb-item active text-muted" aria-current="page">Edit Section</li>
+        </ol>
+    </nav>
+
+    <div class="card border p-4 p-md-5 rounded-4 shadow-sm bg-white">
+        <div class="d-flex align-items-center justify-content-between pb-3 mb-4 border-bottom">
+            <div>
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-1 rounded-pill mb-2">
+                    <i class="bi bi-folder2-open me-1"></i> Section Settings
+                </span>
+                <h1 class="h3 fw-bold mb-1 text-slate-900 font-heading">Edit Section: {{ section.title }}</h1>
+                <p class="text-secondary small mb-0">Course: <strong>{{ course.title }}</strong></p>
+            </div>
+            <a href="{% url 'courses:manage_sections' course.slug %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                <i class="bi bi-arrow-left me-1"></i> Cancel
+            </a>
+        </div>
+
+        <form method="POST">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                <div class="alert alert-danger py-2 small rounded-3 mb-3">{{ form.non_field_errors }}</div>
+            {% endif %}
+
+            <div class="mb-3">
+                <label class="form-label fw-semibold small text-slate-700">Section Title <span class="text-danger">*</span></label>
+                {{ form.title }}
+                {% if form.title.errors %}<div class="text-danger smaller mt-1">{{ form.title.errors }}</div>{% endif %}
+            </div>
+
+            <div class="row g-3 mb-3">
+                <div class="col-md-4">
+                    <label class="form-label fw-semibold small text-slate-700">Order / Sequence #</label>
+                    {{ form.order }}
+                    {% if form.order.errors %}<div class="text-danger smaller mt-1">{{ form.order.errors }}</div>{% endif %}
+                </div>
+                <div class="col-md-8">
+                    <label class="form-label fw-semibold small text-slate-700">
+                        <i class="bi bi-github me-1"></i> Section-Specific GitHub Folder / URL
+                    </label>
+                    {{ form.github_url }}
+                    {% if form.github_url.errors %}<div class="text-danger smaller mt-1">{{ form.github_url.errors }}</div>{% endif %}
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label fw-semibold small text-slate-700">Description / Objectives (Optional)</label>
+                {{ form.description }}
+                {% if form.description.errors %}<div class="text-danger smaller mt-1">{{ form.description.errors }}</div>{% endif %}
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 pt-2 border-top">
+                <a href="{% url 'courses:manage_sections' course.slug %}" class="btn btn-outline-secondary rounded-pill px-4">Cancel</a>
+                <button type="submit" class="btn btn-primary rounded-pill px-5 fw-semibold shadow-sm">
+                    <i class="bi bi-check-circle-fill me-1"></i> Save Changes
+                </button>
+            </div>
+        </form>
+    </div>
+    <div id="section-react-root" class="section-react-root"></div>
+</div>
+{% endblock %}
+{% block extra_js %}
+<script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script>
+const { useState, useEffect } = React;
+function SectionForm() {
+  const [title, setTitle] = useState('');
+  const [order, setOrder] = useState('');
+  useEffect(() => {
+    const titleInput = document.querySelector('input[name="title"]');
+    const orderInput = document.querySelector('input[name="order"]');
+    if (titleInput) titleInput.addEventListener('input', e => setTitle(e.target.value));
+    if (orderInput) orderInput.addEventListener('input', e => setOrder(e.target.value));
+  }, []);
+  return React.createElement('div', {className: 'card p-3 mt-3'},
+    React.createElement('h5', null, 'Live Preview'),
+    React.createElement('p', null, `Title: ${title}`),
+    React.createElement('p', null, `Order: ${order}`)
+  );
+}
+ReactDOM.createRoot(document.getElementById('section-react-root')).render(React.createElement(SectionForm));
+</script>
+{% endblock %}

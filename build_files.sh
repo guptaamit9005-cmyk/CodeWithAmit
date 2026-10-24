@@ -13,10 +13,15 @@ if command -v uv &> /dev/null; then
     uv pip install -r requirements.txt --system
 else
     echo "Using pip to install dependencies..."
-    $PY_BIN -m pip install -r requirements.txt --break-system-packages
+    $PY_BIN -m pip install -r requirements.txt --break-system-packages 2>/dev/null || $PY_BIN -m pip install -r requirements.txt
 fi
 
 echo "=== Collecting static files ==="
 $PY_BIN manage.py collectstatic --no-input --clear
+
+if [ -n "$DATABASE_URL" ]; then
+    echo "=== Running database migrations ==="
+    $PY_BIN manage.py migrate --no-input || true
+fi
 
 echo "=== Build finished successfully ==="

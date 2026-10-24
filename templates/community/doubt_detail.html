@@ -1,9 +1,10 @@
 {% extends 'base.html' %}
 
-{% block title %}{{ question.title }} — Doubt Community{% endblock %}
+{% block title %}{{ question.title }} — Doubt Community | CodeWithAmit{% endblock %}
 
 {% block content %}
-<div class="container py-4">
+<div class="container py-4 py-md-5">
+
     <!-- Back Link -->
     <a href="{% url 'community:doubt_list' %}" class="small text-secondary text-decoration-none mb-3 d-inline-block">
         <i class="bi bi-arrow-left me-1"></i> Back to all doubts
@@ -12,8 +13,9 @@
     <div class="row g-4">
         <!-- Main Column: Question & Answers -->
         <div class="col-lg-8">
+            
             <!-- Question Card -->
-            <div class="card bg-surface border-0 rounded-4 shadow-sm p-4 mb-4">
+            <div class="card p-4 rounded-4 mb-4" style="background: var(--cwa-bg-card); border: 1px solid var(--cwa-border);">
                 <div class="d-flex gap-3">
                     <!-- Upvote Column -->
                     <div class="d-flex flex-column align-items-center gap-1 flex-shrink-0">
@@ -22,73 +24,112 @@
                                 <i class="bi bi-chevron-up fs-5"></i>
                             </button>
                         {% else %}
-                            <a href="{% url 'accounts:login' %}" class="btn btn-outline-secondary btn-sm rounded-circle p-2" title="Log in to upvote">
+                            <a href="{% url 'accounts:student_login' %}" class="btn btn-outline-secondary btn-sm rounded-circle p-2" title="Log in to upvote">
                                 <i class="bi bi-chevron-up fs-5"></i>
                             </a>
                         {% endif %}
-                        <span class="fw-bold fs-5 text-dark" id="qUpvoteCount">{{ question.total_upvotes }}</span>
+                        <span class="fw-bold fs-5" id="qUpvoteCount" style="color: var(--cwa-text-heading);">{{ question.total_upvotes }}</span>
                     </div>
 
                     <!-- Question Body -->
                     <div class="flex-grow-1 overflow-hidden">
-                        <h2 class="fw-bold h4 mb-2 text-dark">{{ question.title }}</h2>
                         
-                        <div class="d-flex align-items-center gap-2 smaller text-muted mb-3 flex-wrap">
-                            <span>Asked {{ question.created_at|timesince }} ago</span>
-                            <span>•</span>
-                            <span>{{ question.views_count }} Views</span>
-                            <span>•</span>
-                            <span class="text-primary fw-semibold">{{ question.answers.count }} Answers</span>
+                        <div class="d-flex flex-wrap align-items-center gap-2 mb-2">
+                            {% if question.has_admin_solution %}
+                                <span class="badge rounded-pill fw-bold px-2.5 py-0.5 d-inline-flex align-items-center gap-1" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); font-size: 0.72rem;">
+                                    <i class="bi bi-patch-check-fill"></i> Admin Verified Solution Inside
+                                </span>
+                            {% elif question.has_accepted_answer %}
+                                <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2.5 py-0.5 smaller fw-semibold">
+                                    <i class="bi bi-check2-circle me-1"></i> Solved
+                                </span>
+                            {% endif %}
+                            <span class="smaller text-muted">Asked {{ question.created_at|timesince }} ago</span>
+                            <span class="smaller text-muted">• {{ question.views_count }} Views</span>
+                            <span class="smaller text-muted">• {{ question.answers.count }} Answers</span>
                         </div>
 
-                        <div class="text-dark line-height-relaxed mb-3" style="white-space: pre-line;">
+                        <h1 class="h4 fw-bold mb-3 font-heading" style="color: var(--cwa-text-heading);">
+                            {{ question.title }}
+                        </h1>
+
+                        <div class="text-secondary line-height-relaxed mb-4" style="white-space: pre-line; font-size: 0.95rem;">
                             {{ question.body }}
                         </div>
 
                         {% if question.code_snippet %}
-                            <div class="code-container rounded-3 border border-light-subtle overflow-hidden mb-3">
-                                <div class="bg-surface-dark px-3 py-1.5 border-bottom border-light-subtle d-flex justify-content-between align-items-center">
-                                    <span class="smaller font-monospace text-muted">{{ question.language }} snippet</span>
-                                    <button class="btn btn-sm btn-outline-secondary copy-btn py-0 px-2 smaller" type="button">Copy</button>
+                            <div class="rounded-3 overflow-hidden mb-4" style="background: #0b0f19; border: 1px solid rgba(255, 255, 255, 0.1);">
+                                <div class="px-3 py-1.5 border-bottom d-flex justify-content-between align-items-center" style="background: #111827; border-color: rgba(255, 255, 255, 0.08) !important;">
+                                    <span class="smaller font-monospace text-info">{{ question.language }} code context</span>
+                                    <button class="btn btn-sm btn-outline-light py-0 px-2 smaller rounded-pill" type="button" onclick="navigator.clipboard.writeText(document.getElementById('qCodeSnippet').innerText); this.innerText='Copied!'; setTimeout(()=>this.innerText='Copy', 2000);">Copy</button>
                                 </div>
-                                <pre class="m-0 p-3 bg-surface-dark font-monospace text-dark smaller overflow-auto"><code>{{ question.code_snippet }}</code></pre>
+                                <pre class="m-0 p-3 font-monospace text-light smaller overflow-auto" style="line-height: 1.55;"><code id="qCodeSnippet">{{ question.code_snippet }}</code></pre>
                             </div>
                         {% endif %}
 
-                        <div class="d-flex flex-wrap justify-content-between align-items-center pt-3 border-top border-light-subtle gap-2">
+                        <div class="d-flex flex-wrap justify-content-between align-items-center pt-3 border-top gap-2" style="border-color: var(--cwa-border) !important;">
                             <div class="d-flex flex-wrap gap-1">
                                 {% for tag in question.get_tag_list %}
-                                    <a href="{% url 'community:doubt_list' %}?tag={{ tag|slugify }}" class="badge bg-secondary-subtle text-secondary rounded-pill text-decoration-none smaller">
+                                    <a href="{% url 'community:doubt_list' %}?tag={{ tag|slugify }}" class="badge rounded-pill text-decoration-none smaller" style="background: var(--cwa-bg-subtle); color: var(--cwa-text-muted); border: 1px solid var(--cwa-border);">
                                         #{{ tag }}
                                     </a>
                                 {% endfor %}
                             </div>
 
-                            <div class="d-flex align-items-center gap-2 bg-surface-dark p-2 rounded-3 border border-light-subtle">
-                                <div class="avatar-circle-sm bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 32px; height: 32px;">
+                            <div class="d-flex align-items-center gap-2 p-1.5 px-3 rounded-pill" style="background: var(--cwa-bg-subtle); border: 1px solid var(--cwa-border);">
+                                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold" style="width: 26px; height: 26px; font-size: 11px;">
                                     {{ question.author.username|first|upper }}
                                 </div>
                                 <div>
-                                    <div class="fw-bold smaller text-dark">{{ question.author.username }}</div>
-                                    <div class="text-muted smaller">{{ question.author.profile.headline|default:"Student Coder" }}</div>
+                                    <div class="fw-bold smaller" style="color: var(--cwa-text-heading);">@{{ question.author.username }}</div>
                                 </div>
                             </div>
                         </div>
+
                     </div>
                 </div>
             </div>
 
-            <!-- Answers Section -->
+            <!-- Answers Section Heading -->
             <div class="d-flex justify-content-between align-items-center mb-3">
-                <h4 class="fw-bold mb-0 text-dark">
-                    {{ answers.count }} Answers
-                </h4>
+                <h3 class="h5 fw-bold mb-0 font-heading" style="color: var(--cwa-text-heading);">
+                    {{ answers.count }} Solutions &amp; Answers
+                </h3>
+                <span class="smaller text-muted">Sorted by verified admin solutions</span>
             </div>
 
             <!-- Answers List -->
             <div class="d-flex flex-column gap-3 mb-5">
                 {% for ans in answers %}
-                    <div class="card bg-surface border-0 rounded-4 shadow-sm p-4 {% if ans.is_accepted %}border-start border-4 border-success{% endif %}">
+                    <div class="card p-4 rounded-4 shadow-sm position-relative {% if ans.is_by_admin %}border-warning{% endif %}" 
+                         style="background: var(--cwa-bg-card); {% if ans.is_by_admin %}border: 1.5px solid rgba(245, 158, 11, 0.45); background: linear-gradient(180deg, rgba(245, 158, 11, 0.04), var(--cwa-bg-card)); box-shadow: 0 4px 20px rgba(245, 158, 11, 0.08);{% else %}border: 1px solid var(--cwa-border);{% endif %}">
+                        
+                        <!-- Top Official Admin Solution Banner (Requested by User) -->
+                        {% if ans.is_by_admin %}
+                            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3 pb-2.5 border-bottom" style="border-color: rgba(245, 158, 11, 0.25) !important;">
+                                <div class="d-flex align-items-center gap-2">
+                                    <span class="badge rounded-pill fw-bold px-3 py-1.5 d-inline-flex align-items-center gap-1.5" style="background: linear-gradient(135deg, #f59e0b, #d97706); color: #000; font-size: 0.8rem; letter-spacing: 0.02em;">
+                                        <i class="bi bi-shield-fill-check fs-6"></i>
+                                        <span>👑 {{ ans.admin_badge_title|default:'Official Admin Solution' }}</span>
+                                    </span>
+                                    <span class="text-warning smaller fw-semibold d-none d-sm-inline">
+                                        <i class="bi bi-star-fill me-1"></i>Verified by CodeWithAmit Mentors
+                                    </span>
+                                </div>
+                                {% if ans.is_accepted %}
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2.5 py-1 smaller fw-semibold">
+                                        <i class="bi bi-check2-circle me-1"></i> Accepted by Author
+                                    </span>
+                                {% endif %}
+                            </div>
+                        {% elif ans.is_accepted %}
+                            <div class="mb-3 pb-2 border-bottom d-flex align-items-center gap-2" style="border-color: var(--cwa-border) !important;">
+                                <span class="badge bg-success text-white fw-bold px-3 py-1 rounded-pill smaller">
+                                    <i class="bi bi-check2-circle me-1"></i> Accepted Community Solution
+                                </span>
+                            </div>
+                        {% endif %}
+
                         <div class="d-flex gap-3">
                             <!-- Answer Upvotes Column -->
                             <div class="d-flex flex-column align-items-center gap-1 flex-shrink-0">
@@ -97,14 +138,18 @@
                                         <i class="bi bi-chevron-up fs-6"></i>
                                     </button>
                                 {% endif %}
-                                <span class="fw-bold text-dark ans-upvote-count-{{ ans.id }}">{{ ans.total_upvotes }}</span>
+                                <span class="fw-bold ans-upvote-count-{{ ans.id }}" style="color: var(--cwa-text-heading);">{{ ans.total_upvotes }}</span>
 
-                                {% if ans.is_accepted %}
-                                    <div class="text-success mt-2" title="Accepted Solution by Question Author">
-                                        <i class="bi bi-check-circle-fill fs-3"></i>
-                                    </div>
-                                {% elif is_author %}
-                                    <a href="{% url 'community:accept_answer' ans.id %}" class="btn btn-outline-success btn-sm rounded-circle p-1.5 mt-2" title="Accept this answer as correct solution">
+                                <!-- Admin Solution Toggle Button for Staff/Admin -->
+                                {% if user.is_staff or user.is_superuser or user.profile.role == 'admin' %}
+                                    <a href="{% url 'community:toggle_admin_solution' ans.id %}" class="btn btn-sm rounded-circle p-1.5 mt-2 {% if ans.is_admin_solution %}btn-warning text-dark{% else %}btn-outline-warning{% endif %}" title="{% if ans.is_admin_solution %}Remove Admin Verified Badge{% else %}Mark as Official Admin Solution{% endif %}">
+                                        <i class="bi bi-shield-fill-check"></i>
+                                    </a>
+                                {% endif %}
+
+                                <!-- Author Accept Solution Button -->
+                                {% if is_author and not ans.is_accepted %}
+                                    <a href="{% url 'community:accept_answer' ans.id %}" class="btn btn-outline-success btn-sm rounded-circle p-1.5 mt-1" title="Accept this answer as correct solution">
                                         <i class="bi bi-check-lg"></i>
                                     </a>
                                 {% endif %}
@@ -112,129 +157,218 @@
 
                             <!-- Answer Body -->
                             <div class="flex-grow-1 overflow-hidden">
-                                {% if ans.is_accepted %}
-                                    <div class="badge bg-success-subtle text-success fw-bold px-2.5 py-1 rounded-pill mb-2">
-                                        <i class="bi bi-check2-circle me-1"></i> Accepted Solution
-                                    </div>
-                                {% endif %}
-
-                                <div class="text-dark line-height-relaxed mb-3" style="white-space: pre-line;">
+                                
+                                <div class="text-secondary line-height-relaxed mb-3" style="white-space: pre-line; font-size: 0.95rem;">
                                     {{ ans.body }}
                                 </div>
 
                                 {% if ans.code_snippet %}
-                                    <div class="code-container rounded-3 border border-light-subtle overflow-hidden mb-3">
-                                        <pre class="m-0 p-3 bg-surface-dark font-monospace text-dark smaller overflow-auto"><code>{{ ans.code_snippet }}</code></pre>
+                                    <div class="rounded-3 overflow-hidden mb-3" style="background: #0b0f19; border: 1px solid rgba(255, 255, 255, 0.1);">
+                                        <div class="px-3 py-1.5 border-bottom d-flex justify-content-between align-items-center" style="background: #111827; border-color: rgba(255, 255, 255, 0.08) !important;">
+                                            <span class="smaller font-monospace text-info">Solution Code</span>
+                                            <button class="btn btn-sm btn-outline-light py-0 px-2 smaller rounded-pill" type="button" onclick="navigator.clipboard.writeText(document.getElementById('ansCode-{{ ans.id }}').innerText); this.innerText='Copied!'; setTimeout(()=>this.innerText='Copy', 2000);">Copy</button>
+                                        </div>
+                                        <pre class="m-0 p-3 font-monospace text-light smaller overflow-auto" style="line-height: 1.55;"><code id="ansCode-{{ ans.id }}">{{ ans.code_snippet }}</code></pre>
                                     </div>
                                 {% endif %}
 
-                                <div class="d-flex justify-content-between align-items-center pt-2 border-top border-light-subtle">
+                                <div class="d-flex flex-wrap justify-content-between align-items-center pt-2.5 border-top gap-2" style="border-color: var(--cwa-border) !important;">
                                     <span class="smaller text-muted">Answered {{ ans.created_at|timesince }} ago</span>
+                                    
                                     <div class="d-flex align-items-center gap-2">
-                                        <div class="avatar-circle-sm bg-success text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 28px; height: 28px; font-size: 11px;">
+                                        {% if ans.is_by_admin %}
+                                            <span class="badge bg-warning text-dark fw-bold rounded-pill smaller px-2 py-0.5">
+                                                <i class="bi bi-shield-fill me-1"></i> Admin
+                                            </span>
+                                        {% endif %}
+                                        <div class="rounded-circle {% if ans.is_by_admin %}bg-warning text-dark{% else %}bg-success text-white{% endif %} d-flex align-items-center justify-content-center fw-bold" style="width: 26px; height: 26px; font-size: 11px;">
                                             {{ ans.author.username|first|upper }}
                                         </div>
-                                        <span class="smaller fw-bold text-dark">{{ ans.author.username }}</span>
+                                        <span class="smaller fw-bold" style="color: var(--cwa-text-heading);">@{{ ans.author.username }}</span>
                                     </div>
                                 </div>
+
                             </div>
                         </div>
                     </div>
                 {% empty %}
-                    <div class="card bg-surface border-0 rounded-4 shadow-sm p-4 text-center">
-                        <i class="bi bi-chat-left-dots text-muted fs-2 d-block mb-2"></i>
-                        <h6 class="text-dark fw-bold">No answers yet</h6>
-                        <p class="text-secondary smaller mb-0">Know how to solve this? Write the first answer below!</p>
+                    <div class="card p-5 rounded-4 text-center" style="background: var(--cwa-bg-card); border: 1px solid var(--cwa-border);">
+                        <i class="bi bi-chat-left-dots text-muted fs-1 d-block mb-2"></i>
+                        <h5 class="fw-bold font-heading mb-1" style="color: var(--cwa-text-heading);">No solutions posted yet</h5>
+                        <p class="text-secondary smaller mb-0">Be the first to provide a solution below, or wait for an administrator to review this question.</p>
                     </div>
                 {% endfor %}
             </div>
 
-            <!-- Post Your Answer Card -->
-            <div class="card bg-surface border-0 rounded-4 shadow-sm p-4">
-                <h5 class="fw-bold mb-3 text-dark">
-                    <i class="bi bi-reply-fill text-primary me-2"></i>Your Answer
-                </h5>
+            <!-- ==========================================================
+                 POST YOUR ANSWER SECTION: Special Admin Solution Mode
+                 ========================================================== -->
+            <div class="card p-4 p-md-5 rounded-4 shadow-sm" style="background: var(--cwa-bg-card); border: 1.5px solid {% if user.is_staff or user.is_superuser or user.profile.role == 'admin' %}rgba(245, 158, 11, 0.45){% else %}var(--cwa-border){% endif %};">
+                
+                {% if user.is_staff or user.is_superuser or user.profile.role == 'admin' %}
+                    <div class="d-flex align-items-center gap-2.5 mb-3 p-3 rounded-3" style="background: rgba(245, 158, 11, 0.1); border: 1px solid rgba(245, 158, 11, 0.25);">
+                        <div class="rounded-circle p-2 text-warning d-flex align-items-center justify-content-center" style="background: rgba(245, 158, 11, 0.2); width: 34px; height: 34px;">
+                            <i class="bi bi-shield-lock-fill fs-5"></i>
+                        </div>
+                        <div>
+                            <div class="fw-bold small text-warning font-heading">
+                                👑 Admin Solution Mode Active
+                            </div>
+                            <div class="smaller text-secondary">
+                                You are answering as an Administrator / Instructor. Your solution will be immediately verified and pinned with the official verified badge!
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+
+                <h4 class="h5 fw-bold mb-3 font-heading" style="color: var(--cwa-text-heading);">
+                    <i class="bi bi-reply-fill text-primary me-2"></i>
+                    {% if user.is_staff or user.is_superuser or user.profile.role == 'admin' %}
+                        Provide Official Admin Solution
+                    {% else %}
+                        Your Answer
+                    {% endif %}
+                </h4>
 
                 {% if user.is_authenticated %}
                     <form action="{% url 'community:post_answer' question.slug %}" method="POST">
                         {% csrf_token %}
                         <div class="mb-3">
-                            <label class="form-label smaller fw-semibold text-secondary">Detailed Solution & Explanation</label>
+                            <label class="form-label smaller fw-semibold text-secondary">
+                                Detailed Solution &amp; Explanation <span class="text-danger">*</span>
+                            </label>
                             {{ answer_form.body }}
                         </div>
-                        <div class="mb-3">
-                            <label class="form-label smaller fw-semibold text-secondary">Code Snippet (Optional)</label>
+                        <div class="mb-4">
+                            <label class="form-label smaller fw-semibold text-secondary">
+                                Corrected Code Snippet (Optional)
+                            </label>
                             {{ answer_form.code_snippet }}
                         </div>
-                        <button type="submit" class="btn btn-primary rounded-pill px-5 fw-bold shadow-sm">
-                            <i class="bi bi-send-fill me-1"></i> Post Your Answer (+25 XP)
+                        <button type="submit" class="{% if user.is_staff or user.is_superuser or user.profile.role == 'admin' %}btn btn-warning text-dark fw-bold px-5{% else %}cwa-btn-primary px-5{% endif %} py-2.5 rounded-pill shadow-sm">
+                            <i class="bi bi-send-fill me-1"></i>
+                            {% if user.is_staff or user.is_superuser or user.profile.role == 'admin' %}
+                                Publish Official Admin Solution (+50 XP)
+                            {% else %}
+                                Post Your Answer (+25 XP)
+                            {% endif %}
                         </button>
                     </form>
                 {% else %}
-                    <div class="p-4 bg-surface-dark rounded-3 text-center">
-                        <p class="text-secondary mb-2">You must be logged in to post an answer and earn XP.</p>
-                        <a href="{% url 'accounts:login' %}?next={{ request.get_full_path|urlencode }}" class="btn btn-primary rounded-pill px-4">
+                    <div class="text-center py-4">
+                        <p class="text-secondary small mb-3">You must be logged in to post a solution to this doubt.</p>
+                        <a href="{% url 'accounts:student_login' %}?next={{ request.path }}" class="cwa-btn-primary py-2 px-4">
                             Log In to Answer
                         </a>
                     </div>
                 {% endif %}
+
             </div>
+
         </div>
 
         <!-- Right Column: Sidebar Guidelines & Help -->
         <div class="col-lg-4">
-            <div class="card bg-surface border-0 rounded-4 shadow-sm p-4 mb-4">
-                <h6 class="fw-bold mb-2 text-dark">How to write a great answer:</h6>
-                <ul class="text-secondary smaller mb-0 ps-3 d-flex flex-column gap-1">
-                    <li>Directly address the core doubt or error stack trace.</li>
-                    <li>Provide clear intuition before sharing code.</li>
-                    <li>Include time and space complexity ($O(N)$) analysis.</li>
-                    <li>Be polite and supportive to fellow learners!</li>
-                </ul>
+            
+            <!-- Question Author Card -->
+            <div class="card p-4 rounded-4 mb-4" style="background: var(--cwa-bg-card); border: 1px solid var(--cwa-border);">
+                <span class="smaller fw-bold text-muted text-uppercase mb-2 d-block" style="letter-spacing: 0.05em;">Asked By</span>
+                <div class="d-flex align-items-center gap-3 mb-3">
+                    <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold fs-5 shadow-xs" style="width: 44px; height: 44px;">
+                        {{ question.author.username|first|upper }}
+                    </div>
+                    <div>
+                        <div class="fw-bold" style="color: var(--cwa-text-heading);">@{{ question.author.username }}</div>
+                        <div class="smaller text-muted">{{ question.author.profile.headline|default:"Student Coder" }}</div>
+                    </div>
+                </div>
+                <div class="pt-2 border-top smaller text-secondary" style="border-color: var(--cwa-border) !important;">
+                    <div class="d-flex justify-content-between mb-1">
+                        <span>Member Since:</span>
+                        <span class="fw-semibold text-muted">{{ question.author.date_joined|date:"M Y" }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span>Community Points:</span>
+                        <span class="fw-bold text-warning">{{ question.author.profile.points|default:0 }} XP</span>
+                    </div>
+                </div>
             </div>
+
+            <!-- Admin Solution Notice -->
+            <div class="card p-4 rounded-4 mb-4" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(245, 158, 11, 0.02)), var(--cwa-bg-card); border: 1.5px solid rgba(245, 158, 11, 0.25);">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <i class="bi bi-patch-check-fill text-warning fs-5"></i>
+                    <h5 class="fw-bold font-heading mb-0" style="color: var(--cwa-text-heading);">Admin Support SLA</h5>
+                </div>
+                <p class="smaller text-secondary mb-0" style="line-height: 1.55;">
+                    Platform administrators review unanswered questions within 24 hours. Once solved by admin, the solution is verified and marked with the golden crown badge.
+                </p>
+            </div>
+
+            <!-- Need Code Sources? -->
+            <div class="card p-4 rounded-4" style="background: var(--cwa-bg-card); border: 1px solid var(--cwa-border);">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <i class="bi bi-github text-primary fs-5"></i>
+                    <h5 class="fw-bold font-heading mb-0" style="color: var(--cwa-text-heading);">Explore Code Sources</h5>
+                </div>
+                <p class="smaller text-secondary mb-3">
+                    Looking for full working code or boilerplates? Check out our Code Sources section with direct GitHub repository links.
+                </p>
+                <a href="{% url 'code_sources:list' %}" class="cwa-btn-secondary btn-sm rounded-pill w-100 justify-content-center">
+                    View Code Sources <i class="bi bi-arrow-right"></i>
+                </a>
+            </div>
+
         </div>
     </div>
+
 </div>
 
+<!-- Upvote AJAX Script -->
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        // Upvote question
-        const qBtn = document.getElementById('questionUpvoteBtn');
-        if (qBtn) {
-            qBtn.addEventListener('click', () => {
-                const id = qBtn.getAttribute('data-id');
-                fetch(`/community/question/${id}/upvote/`, {
-                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                })
-                .then(r => r.json())
-                .then(data => {
-                    if (data.success) {
-                        document.getElementById('qUpvoteCount').innerText = data.total_upvotes;
-                        qBtn.classList.toggle('btn-primary', data.upvoted);
-                        qBtn.classList.toggle('btn-outline-primary', !data.upvoted);
+document.addEventListener('DOMContentLoaded', () => {
+    // Question upvote
+    const qBtn = document.getElementById('questionUpvoteBtn');
+    if (qBtn) {
+        qBtn.addEventListener('click', () => {
+            const qId = qBtn.getAttribute('data-id');
+            fetch(`/community/question/${qId}/upvote/`, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            }).then(r => r.json()).then(data => {
+                if (data.success) {
+                    document.getElementById('qUpvoteCount').innerText = data.total_upvotes;
+                    if (data.upvoted) {
+                        qBtn.classList.remove('btn-outline-primary');
+                        qBtn.classList.add('btn-primary');
+                    } else {
+                        qBtn.classList.remove('btn-primary');
+                        qBtn.classList.add('btn-outline-primary');
                     }
-                });
+                }
             });
-        }
+        });
+    }
 
-        // Upvote answers
-        document.querySelectorAll('.upvote-ans-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const id = btn.getAttribute('data-id');
-                fetch(`/community/answer/${id}/upvote/`, {
-                    headers: { 'X-Requested-With': 'XMLHttpRequest' }
-                })
-                .then(r => r.json())
-                .then(data => {
-                    if (data.success) {
-                        const countEl = document.querySelector(`.ans-upvote-count-${id}`);
-                        if (countEl) countEl.innerText = data.total_upvotes;
-                        btn.classList.toggle('btn-primary', data.upvoted);
-                        btn.classList.toggle('btn-outline-primary', !data.upvoted);
+    // Answer upvotes
+    document.querySelectorAll('.upvote-ans-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const ansId = btn.getAttribute('data-id');
+            fetch(`/community/answer/${ansId}/upvote/`, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            }).then(r => r.json()).then(data => {
+                if (data.success) {
+                    document.querySelector(`.ans-upvote-count-${ansId}`).innerText = data.total_upvotes;
+                    if (data.upvoted) {
+                        btn.classList.remove('btn-outline-primary');
+                        btn.classList.add('btn-primary');
+                    } else {
+                        btn.classList.remove('btn-primary');
+                        btn.classList.add('btn-outline-primary');
                     }
-                });
+                }
             });
         });
     });
+});
 </script>
 {% endblock %}

@@ -1,0 +1,171 @@
+{% extends 'base.html' %}
+
+{% block title %}{% if is_edit %}Edit Code Source — {{ code_source.title }}{% else %}Add Code Source & GitHub Repo{% endif %} — CodeWithAmit{% endblock %}
+
+{% block content %}
+<div class="container py-4 py-md-5">
+
+    <div class="d-flex align-items-center justify-content-between mb-4">
+        <a href="{% url 'code_sources:list' %}" class="small text-secondary text-decoration-none">
+            <i class="bi bi-arrow-left me-1"></i> Back to Code Sources
+        </a>
+        <span class="badge rounded-pill px-3 py-1 fw-semibold" style="background: rgba(245, 158, 11, 0.12); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.25);">
+            <i class="bi bi-shield-lock-fill me-1"></i> Admin Creator Studio
+        </span>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card p-4 p-md-5 rounded-4 shadow-sm" style="background: var(--cwa-bg-card); border: 1px solid var(--cwa-border);">
+                
+                <!-- Card Header -->
+                <div class="mb-4 pb-3 border-bottom" style="border-color: var(--cwa-border) !important;">
+                    <div class="d-flex align-items-center gap-2 mb-2">
+                        <span class="cwa-brand-icon" style="width: 38px; height: 38px; font-size: 1.1rem;">
+                            <i class="bi bi-github"></i>
+                        </span>
+                        <div>
+                            <h2 class="h3 fw-bold font-heading mb-0" style="color: var(--cwa-text-heading);">
+                                {% if is_edit %}Edit Code Source &amp; GitHub Repo{% else %}Publish Code Source &amp; GitHub Repo{% endif %}
+                            </h2>
+                            <p class="text-secondary smaller mb-0">Add topic-wise code snippets and link official GitHub repositories for students to clone and inspect.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <form method="POST">
+                    {% csrf_token %}
+
+                    {% if form.errors %}
+                        <div class="alert alert-danger rounded-3 mb-4">
+                            <h6 class="fw-bold mb-1"><i class="bi bi-exclamation-triangle-fill me-1"></i> Please correct the following errors:</h6>
+                            <ul class="mb-0 smaller">
+                                {% for field, errors in form.errors.items %}
+                                    <li><strong>{{ field|title }}:</strong> {{ errors|join:", " }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    {% endif %}
+
+                    <!-- Row 1: Title -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small" style="color: var(--cwa-text-heading);">
+                            Code Source Title <span class="text-danger">*</span>
+                        </label>
+                        {{ form.title }}
+                        <div class="form-text smaller text-muted">A clear, descriptive title e.g. "Distributed LRU Cache with O(1) Ops"</div>
+                    </div>
+
+                    <!-- Row 2: Topic, Language, Difficulty -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-5">
+                            <label class="form-label fw-bold small" style="color: var(--cwa-text-heading);">
+                                Topic / Domain Category <span class="text-danger">*</span>
+                            </label>
+                            {{ form.topic }}
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold small" style="color: var(--cwa-text-heading);">
+                                Language <span class="text-danger">*</span>
+                            </label>
+                            {{ form.language }}
+                        </div>
+                        <div class="col-md-3">
+                            <label class="form-label fw-bold small" style="color: var(--cwa-text-heading);">
+                                Difficulty Tier
+                            </label>
+                            {{ form.difficulty }}
+                        </div>
+                    </div>
+
+                    <!-- Row 3: GitHub Repo URL & Live Demo -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-7">
+                            <label class="form-label fw-bold small d-flex align-items-center gap-1.5" style="color: var(--cwa-text-heading);">
+                                <i class="bi bi-github text-primary"></i> GitHub Repository URL <span class="text-danger">*</span>
+                            </label>
+                            {{ form.github_repo_url }}
+                            <div class="form-text smaller text-muted">Direct URL to repository or folder (e.g. <code>https://github.com/username/project</code>)</div>
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label fw-bold small d-flex align-items-center gap-1.5" style="color: var(--cwa-text-heading);">
+                                <i class="bi bi-globe"></i> Live Demo URL (Optional)
+                            </label>
+                            {{ form.demo_url }}
+                        </div>
+                    </div>
+
+                    <!-- Row 4: File Name & Tags -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4">
+                            <label class="form-label fw-bold small" style="color: var(--cwa-text-heading);">
+                                File Name
+                            </label>
+                            {{ form.file_name }}
+                            <div class="form-text smaller text-muted">e.g. <code>lru_cache.py</code>, <code>App.jsx</code></div>
+                        </div>
+                        <div class="col-md-8">
+                            <label class="form-label fw-bold small" style="color: var(--cwa-text-heading);">
+                                Tags (Comma-separated)
+                            </label>
+                            {{ form.tags }}
+                            <div class="form-text smaller text-muted">e.g. <code>python, dsa, cache, algorithms</code></div>
+                        </div>
+                    </div>
+
+                    <!-- Row 5: Summary -->
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small" style="color: var(--cwa-text-heading);">
+                            Short Summary <span class="text-danger">*</span>
+                        </label>
+                        {{ form.summary }}
+                        <div class="form-text smaller text-muted">Displayed on list cards to give learners an instant preview.</div>
+                    </div>
+
+                    <!-- Row 6: Full Source Code (Highlighted monospace) -->
+                    <div class="mb-4">
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <label class="form-label fw-bold small mb-0" style="color: var(--cwa-text-heading);">
+                                <i class="bi bi-code-square text-success me-1"></i> Full Source Code <span class="text-danger">*</span>
+                            </label>
+                            <span class="smaller text-muted">Supports full code snippets, classes, scripts</span>
+                        </div>
+                        {{ form.code_content }}
+                    </div>
+
+                    <!-- Row 7: Description & Instructions -->
+                    <div class="mb-4">
+                        <label class="form-label fw-bold small" style="color: var(--cwa-text-heading);">
+                            Explanation &amp; Setup Instructions <span class="text-danger">*</span>
+                        </label>
+                        {{ form.description }}
+                        <div class="form-text smaller text-muted">Explain what the code does, architectural decisions, dependencies, and execution steps.</div>
+                    </div>
+
+                    <!-- Featured Checkbox -->
+                    <div class="form-check form-switch mb-4">
+                        {{ form.is_featured }}
+                        <label class="form-check-label fw-semibold small" for="{{ form.is_featured.id_for_label }}" style="color: var(--cwa-text-heading);">
+                            Feature this code source on top of list &amp; homepage
+                        </label>
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="d-flex align-items-center gap-3 pt-3 border-top" style="border-color: var(--cwa-border) !important;">
+                        <button type="submit" class="cwa-btn-primary py-2.5 px-4 shadow-sm">
+                            <i class="bi bi-cloud-arrow-up-fill me-1"></i>
+                            {% if is_edit %}Save Changes{% else %}Publish Code &amp; GitHub Repo{% endif %}
+                        </button>
+                        <a href="{% url 'code_sources:list' %}" class="btn btn-outline-secondary rounded-pill px-4 py-2 small">
+                            Cancel
+                        </a>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

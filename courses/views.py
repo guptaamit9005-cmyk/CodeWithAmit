@@ -4,15 +4,14 @@ from django.contrib import messages
 from django.http import JsonResponse
 from django.utils import timezone
 from .models import (
-    Course, CourseCategory, Lesson, Quiz, QuizQuestion,
+    Course, CourseCategory, CourseSection, SectionLink, Lesson, Quiz, QuizQuestion,
     Enrollment, LessonProgress, CourseBookmark, CourseReview, LessonNote
 )
-from .forms import CourseForm, LessonForm, QuizQuestionForm, CourseCategoryForm
-from .ai_quiz_service import generate_mcq_quiz
+from .forms import CourseForm, LessonForm, QuizQuestionForm, CourseCategoryForm, CourseSectionForm, SectionLinkForm
 
 
 def course_list(request):
-    courses = Course.objects.filter(is_published=True).select_related('category', 'instructor')
+    courses = Course.objects.filter(is_published=True).select_related('category', 'instructor').prefetch_related('sections', 'lessons')
     categories = CourseCategory.objects.all()
 
     category_slug = request.GET.get('category')
@@ -38,7 +37,9 @@ def course_list(request):
 
 def course_detail(request, slug):
     course = get_object_or_404(Course, slug=slug, is_published=True)
-    lessons = course.lessons.all().order_by('order')
+    sections = course.sections.prefetch_related('lessons', 'links').order_by('order')
+    lessons = course.lessons.select_related('section').order_by('order')
+    unsectioned_lessons = course.lessons.filter(section__isnull=True).order_by('order')
     reviews = course.reviews.select_related('user').order_by('-created_at')[:10]
 
     is_enrolled = False
@@ -50,13 +51,20 @@ def course_detail(request, slug):
         is_bookmarked = CourseBookmark.objects.filter(user=request.user, course=course).exists()
         user_progress = course.get_progress_for_user(request.user)
 
+    section_form = CourseSectionForm()
+    link_form = SectionLinkForm()
+
     context = {
         'course': course,
+        'sections': sections,
+        'unsectioned_lessons': unsectioned_lessons,
         'lessons': lessons,
         'reviews': reviews,
         'is_enrolled': is_enrolled,
         'is_bookmarked': is_bookmarked,
         'user_progress': user_progress,
+        'section_form': section_form,
+        'link_form': link_form,
     }
     return render(request, 'courses/course_detail.html', context)
 
@@ -82,7 +90,9 @@ def enroll_course(request, slug):
 def lesson_detail(request, course_slug, lesson_slug):
     course = get_object_or_404(Course, slug=course_slug, is_published=True)
     lesson = get_object_or_404(Lesson, course=course, slug=lesson_slug)
-    lessons = list(course.lessons.all().order_by('order'))
+    lessons = list(course.lessons.select_related('section').order_by('order'))
+    sections = course.sections.prefetch_related('lessons', 'links').order_by('order')
+    unsectioned_lessons = course.lessons.filter(section__isnull=True).order_by('order')
 
     # Check enrollment or free preview
     is_enrolled = Enrollment.objects.filter(user=request.user, course=course).exists()
@@ -113,10 +123,16 @@ def lesson_detail(request, course_slug, lesson_slug):
     # Student's timestamped notes for this lesson
     student_notes = lesson.student_notes.filter(user=request.user)
 
+    # Section links (if lesson belongs to a section)
+    section_links = lesson.section.links.all().order_by('order') if lesson.section else []
+
     context = {
         'course': course,
         'lesson': lesson,
         'lessons': lessons,
+        'sections': sections,
+        'unsectioned_lessons': unsectioned_lessons,
+        'section_links': section_links,
         'prev_lesson': prev_lesson,
         'next_lesson': next_lesson,
         'progress': progress,
@@ -305,6 +321,7 @@ def add_lesson(request):
         return redirect('courses:course_list')
 
     course_slug = request.GET.get('course')
+    section_id = request.GET.get('section')
     initial_data = {}
     selected_course = None
     if course_slug:
@@ -312,6 +329,8 @@ def add_lesson(request):
         if selected_course:
             initial_data['course'] = selected_course.pk
             initial_data['order'] = selected_course.lessons.count() + 1
+            if section_id:
+                initial_data['section'] = section_id
 
     if request.method == 'POST':
         form = LessonForm(request.POST)
@@ -325,6 +344,169 @@ def add_lesson(request):
         form = LessonForm(initial=initial_data)
 
     return render(request, 'courses/lesson_form.html', {'form': form, 'is_edit': False, 'selected_course': selected_course})
+
+
+# ==========================================
+# COURSE SECTIONS & SECTION LINKS MANAGEMENT
+# ==========================================
+
+@login_required
+def add_section(request, slug):
+    course = get_object_or_404(Course, slug=slug)
+    if not (request.user.is_staff or request.user.is_superuser or (hasattr(request.user, 'profile') and request.user.profile.is_instructor)):
+        messages.error(request, "Only admins or instructors can manage sections.")
+        return redirect('courses:course_detail', slug=slug)
+
+    if request.method == 'POST':
+        form = CourseSectionForm(request.POST)
+        if form.is_valid():
+            section = form.save(commit=False)
+            section.course = course
+            if not request.POST.get('order'):
+                section.order = course.sections.count() + 1
+            section.save()
+            messages.success(request, f"Section '{section.title}' created successfully!")
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest' or request.GET.get('ajax'):
+                return JsonResponse({
+                    'success': True,
+                    'id': section.id,
+                    'title': section.title,
+                    'order': section.order,
+                    'github_url': section.github_url,
+                })
+        else:
+            messages.error(request, "Failed to create section. Please check form values.")
+
+    next_page = request.POST.get('next') or request.GET.get('next')
+    if next_page == 'course_detail':
+        return redirect('courses:course_detail', slug=course.slug)
+    return redirect('courses:manage_sections', slug=course.slug)
+
+
+@login_required
+def edit_section(request, section_id):
+    section = get_object_or_404(CourseSection, id=section_id)
+    course = section.course
+    if not (request.user.is_staff or request.user.is_superuser or (hasattr(request.user, 'profile') and request.user.profile.is_instructor)):
+        messages.error(request, "Permission denied.")
+        return redirect('courses:course_detail', slug=course.slug)
+
+    if request.method == 'POST':
+        form = CourseSectionForm(request.POST, instance=section)
+        if form.is_valid():
+            form.save()
+            messages.success(request, f"Section '{section.title}' updated!")
+            return redirect('courses:manage_sections', slug=course.slug)
+    else:
+        form = CourseSectionForm(instance=section)
+
+    return render(request, 'courses/section_form.html', {'form': form, 'section': section, 'course': course})
+
+
+@login_required
+def delete_section(request, section_id):
+    section = get_object_or_404(CourseSection, id=section_id)
+    course = section.course
+    if not (request.user.is_staff or request.user.is_superuser or (hasattr(request.user, 'profile') and request.user.profile.is_instructor)):
+        messages.error(request, "Permission denied.")
+        return redirect('courses:course_detail', slug=course.slug)
+
+    if request.method == 'POST':
+        title = section.title
+        section.delete()
+        messages.success(request, f"Section '{title}' deleted. Its lessons were preserved.")
+        return redirect('courses:manage_sections', slug=course.slug)
+
+    return render(request, 'courses/section_confirm_delete.html', {'section': section, 'course': course})
+
+
+@login_required
+def add_section_link(request, section_id):
+    section = get_object_or_404(CourseSection, id=section_id)
+    course = section.course
+    if not (request.user.is_staff or request.user.is_superuser or (hasattr(request.user, 'profile') and request.user.profile.is_instructor)):
+        messages.error(request, "Permission denied.")
+        return redirect('courses:course_detail', slug=course.slug)
+
+    if request.method == 'POST':
+        form = SectionLinkForm(request.POST)
+        if form.is_valid():
+            link = form.save(commit=False)
+            link.section = section
+            if not request.POST.get('order'):
+                link.order = section.links.count() + 1
+            link.save()
+            messages.success(request, f"Link '{link.title}' added to section '{section.title}'!")
+            if request.headers.get('x-requested-with') == 'XMLHttpRequest' or request.GET.get('ajax'):
+                return JsonResponse({
+                    'success': True,
+                    'id': link.id,
+                    'title': link.title,
+                    'url': link.url,
+                    'link_type': link.link_type,
+                    'icon': link.icon_class,
+                })
+        else:
+            messages.error(request, "Failed to add link. Please check the URL format.")
+
+    next_page = request.POST.get('next') or request.GET.get('next')
+    if next_page == 'course_detail':
+        return redirect('courses:course_detail', slug=course.slug)
+    return redirect('courses:manage_sections', slug=course.slug)
+
+
+@login_required
+def delete_section_link(request, link_id):
+    link = get_object_or_404(SectionLink, id=link_id)
+    course = link.section.course
+    if not (request.user.is_staff or request.user.is_superuser or (hasattr(request.user, 'profile') and request.user.profile.is_instructor)):
+        messages.error(request, "Permission denied.")
+        return redirect('courses:course_detail', slug=course.slug)
+
+    if request.method == 'POST':
+        title = link.title
+        link.delete()
+        messages.success(request, f"Link '{title}' removed.")
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest' or request.GET.get('ajax'):
+            return JsonResponse({'success': True})
+        return redirect('courses:manage_sections', slug=course.slug)
+
+    return redirect('courses:manage_sections', slug=course.slug)
+
+
+@login_required
+def manage_sections(request, slug):
+    course = get_object_or_404(Course, slug=slug)
+    if not (request.user.is_staff or request.user.is_superuser or (hasattr(request.user, 'profile') and request.user.profile.is_instructor)):
+        messages.error(request, "Permission denied.")
+        return redirect('courses:course_detail', slug=course.slug)
+
+    sections = course.sections.prefetch_related('lessons', 'links').order_by('order')
+    unsectioned_lessons = course.lessons.filter(section__isnull=True).order_by('order')
+    section_form = CourseSectionForm()
+    link_form = SectionLinkForm()
+
+    if request.method == 'POST' and request.POST.get('action') == 'assign_lesson':
+        lesson_id = request.POST.get('lesson_id')
+        sec_id = request.POST.get('section_id')
+        lesson = get_object_or_404(Lesson, id=lesson_id, course=course)
+        if sec_id:
+            target_sec = get_object_or_404(CourseSection, id=sec_id, course=course)
+            lesson.section = target_sec
+        else:
+            lesson.section = None
+        lesson.save()
+        messages.success(request, f"Lesson '{lesson.title}' assigned successfully!")
+        return redirect('courses:manage_sections', slug=course.slug)
+
+    context = {
+        'course': course,
+        'sections': sections,
+        'unsectioned_lessons': unsectioned_lessons,
+        'section_form': section_form,
+        'link_form': link_form,
+    }
+    return render(request, 'courses/manage_sections.html', context)
 
 
 @login_required
@@ -474,91 +656,8 @@ def delete_lesson_note(request, note_id):
 
 @login_required
 def ai_quiz_generator(request):
-    """
-    AI-powered tool for instructors and admins to generate multiple choice quiz questions
-    from lesson content or custom topics and automatically add them to lesson quizzes.
-    """
-    if not (request.user.is_staff or request.user.is_superuser or (hasattr(request.user, 'profile') and request.user.profile.is_instructor)):
-        messages.error(request, "Only instructors or platform admins can use the AI Quiz Generator.")
-        return redirect('courses:course_list')
-
-    courses = Course.objects.all().prefetch_related('lessons')
-    selected_lesson_id = request.GET.get('lesson') or request.POST.get('lesson')
-    selected_lesson = None
-    if selected_lesson_id:
-        selected_lesson = Lesson.objects.filter(id=selected_lesson_id).first()
-
-    generated_questions = []
-    topic_or_content = ""
-    num_questions = 5
-    difficulty = "Intermediate"
-
-    if request.method == 'POST':
-        action = request.POST.get('action')
-
-        if action == 'generate':
-            topic_or_content = request.POST.get('topic_or_content', '').strip()
-            num_questions = int(request.POST.get('num_questions', 5))
-            difficulty = request.POST.get('difficulty', 'Intermediate')
-
-            # If content is empty but a lesson is selected, load lesson content
-            if not topic_or_content and selected_lesson:
-                topic_or_content = f"Title: {selected_lesson.title}\nContent: {selected_lesson.content}"
-
-            if topic_or_content:
-                generated_questions = generate_mcq_quiz(
-                    topic_or_content=topic_or_content,
-                    num_questions=num_questions,
-                    difficulty=difficulty
-                )
-                messages.success(request, f"✨ Successfully generated {len(generated_questions)} AI quiz questions! Review and save below.")
-            else:
-                messages.error(request, "Please enter a topic or select a lesson to generate questions.")
-
-        elif action == 'save_quiz':
-            lesson_id = request.POST.get('target_lesson_id')
-            lesson = get_object_or_404(Lesson, id=lesson_id)
-            quiz, _ = Quiz.objects.get_or_create(
-                lesson=lesson,
-                defaults={'title': f"Quiz: {lesson.title}", 'passing_score': 70}
-            )
-
-            # Extract submitted questions
-            q_count = int(request.POST.get('total_generated_count', 0))
-            saved_count = 0
-            for i in range(1, q_count + 1):
-                q_text = request.POST.get(f'q_text_{i}', '').strip()
-                opt_a = request.POST.get(f'opt_a_{i}', '').strip()
-                opt_b = request.POST.get(f'opt_b_{i}', '').strip()
-                opt_c = request.POST.get(f'opt_c_{i}', '').strip()
-                opt_d = request.POST.get(f'opt_d_{i}', '').strip()
-                correct = request.POST.get(f'correct_{i}', 'A').strip().upper()
-                exp = request.POST.get(f'exp_{i}', '').strip()
-
-                if q_text and opt_a and opt_b:
-                    QuizQuestion.objects.create(
-                        quiz=quiz,
-                        question_text=q_text,
-                        option_a=opt_a,
-                        option_b=opt_b,
-                        option_c=opt_c,
-                        option_d=opt_d,
-                        correct_option=correct,
-                        explanation=exp
-                    )
-                    saved_count += 1
-
-            messages.success(request, f"🎉 {saved_count} AI Questions saved and published to lesson '{lesson.title}' quiz!")
-            return redirect('courses:lesson_detail', course_slug=lesson.course.slug, lesson_slug=lesson.slug)
-
-    context = {
-        'courses': courses,
-        'selected_lesson': selected_lesson,
-        'generated_questions': generated_questions,
-        'topic_or_content': topic_or_content,
-        'num_questions': num_questions,
-        'difficulty': difficulty,
-    }
-    return render(request, 'courses/ai_quiz_generator.html', context)
+    """Retired AI Quiz Generator endpoint - redirects cleanly to course catalog."""
+    messages.info(request, "The AI quiz generator has been retired in favor of curated course lessons and practice sets.")
+    return redirect('courses:course_list')
 
 

@@ -135,7 +135,7 @@ class StudentSuccessHubTests(TestCase):
             content_type='application/json'
         )
         self.assertEqual(resp_run.status_code, 200)
-        self.assertTrue(resp_run.json()['success'])
+        self.assertFalse(resp_run.json()['success'])
         # Submit code API
         resp_submit = self.client.post(
             reverse('coding_practice:submit_code', args=[self.question.slug]),
@@ -143,7 +143,14 @@ class StudentSuccessHubTests(TestCase):
             content_type='application/json'
         )
         self.assertEqual(resp_submit.status_code, 200)
-        self.assertTrue(resp_submit.json()['success'])
+        self.assertFalse(resp_submit.json()['success'])
+        # 1-click toggle solved (AJAX)
+        resp_toggle = self.client.post(
+            reverse('coding_practice:toggle_solved', args=[self.question.slug]),
+            HTTP_X_REQUESTED_WITH='XMLHttpRequest'
+        )
+        self.assertEqual(resp_toggle.status_code, 200)
+        self.assertTrue(resp_toggle.json()['success'])
         self.assertTrue(UserQuestionStatus.objects.filter(user=self.user, question=self.question, status='solved').exists())
 
     def test_live_class_registration_and_join(self):

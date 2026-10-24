@@ -1,124 +1,1333 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block title %}Create Course — CodeWithAmit Admin Studio{% endblock %}
+{% block title %}{% if form.instance.pk %}Edit Course — {{ form.instance.title }}{% else %}Create Course{% endif %} — CodeWithAmit Admin Studio{% endblock %}
+
+{% block extra_css %}
+<style>
+  :root {
+    --studio-bg: #0d1117;
+    --studio-surface: #161b22;
+    --studio-surface2: #1c2330;
+    --studio-border: #30363d;
+    --studio-border-active: #58a6ff;
+    --studio-text: #e6edf3;
+    --studio-muted: #8b949e;
+    --studio-accent: #2f81f7;
+    --studio-accent-hover: #1f6feb;
+    --studio-success: #3fb950;
+    --studio-warning: #d29922;
+    --studio-danger: #f85149;
+    --studio-purple: #bc8cff;
+    --step-connector: rgba(48, 54, 61, 0.8);
+  }
+
+  body.cwa-theme {
+    background: #f0f4f8 !important;
+  }
+
+  /* === STUDIO SHELL === */
+  #studio-shell {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #667eea22 0%, #764ba222 50%, #66baff22 100%);
+    padding: 2rem 0 4rem;
+  }
+
+  .studio-wrapper {
+    max-width: 940px;
+    margin: 0 auto;
+    padding: 0 1.25rem;
+  }
+
+  /* === BREADCRUMB === */
+  .studio-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: .45rem;
+    font-size: .8rem;
+    color: #6b7280;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+  }
+  .studio-breadcrumb a { color: #4b7cf3; text-decoration: none; }
+  .studio-breadcrumb a:hover { text-decoration: underline; }
+  .studio-breadcrumb .sep { color: #d1d5db; }
+
+  /* === HEADER CARD === */
+  .studio-header-card {
+    background: linear-gradient(135deg, #1e1b4b 0%, #1e3a5f 60%, #0c1a3a 100%);
+    border-radius: 20px;
+    padding: 2rem 2.25rem;
+    margin-bottom: 1.75rem;
+    position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(255,255,255,0.08);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+  }
+  .studio-header-card::before {
+    content: '';
+    position: absolute;
+    top: -80px; right: -80px;
+    width: 280px; height: 280px;
+    background: radial-gradient(circle, rgba(99,102,241,0.25) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .studio-header-card::after {
+    content: '';
+    position: absolute;
+    bottom: -60px; left: -60px;
+    width: 200px; height: 200px;
+    background: radial-gradient(circle, rgba(34,197,94,0.12) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+  .studio-header-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    background: rgba(255,255,255,0.12);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.18);
+    color: #c4b5fd;
+    font-size: .75rem;
+    font-weight: 600;
+    padding: .3rem .8rem;
+    border-radius: 100px;
+    margin-bottom: .85rem;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+  }
+  .studio-header-title {
+    font-size: 1.9rem;
+    font-weight: 800;
+    color: #fff;
+    margin: 0 0 .4rem;
+    font-family: 'Outfit', sans-serif;
+    line-height: 1.15;
+  }
+  .studio-header-title span {
+    background: linear-gradient(90deg, #818cf8 0%, #c084fc 50%, #38bdf8 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .studio-header-sub {
+    color: rgba(255,255,255,0.55);
+    font-size: .875rem;
+    margin: 0;
+  }
+  .studio-header-actions { position: relative; z-index: 2; }
+  .btn-cancel-studio {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.18);
+    color: rgba(255,255,255,0.8);
+    padding: .45rem 1rem;
+    border-radius: 100px;
+    font-size: .82rem;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all .2s;
+  }
+  .btn-cancel-studio:hover {
+    background: rgba(255,255,255,0.18);
+    color: #fff;
+    border-color: rgba(255,255,255,0.3);
+  }
+
+  /* === STEP PROGRESS === */
+  .steps-nav {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.75rem;
+    background: #fff;
+    border-radius: 16px;
+    padding: .75rem 1.5rem;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+    border: 1px solid #e5e7eb;
+    overflow-x: auto;
+    gap: 0;
+  }
+  .step-item {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    flex-shrink: 0;
+    cursor: pointer;
+    padding: .5rem .75rem;
+    border-radius: 10px;
+    transition: background .15s;
+    position: relative;
+  }
+  .step-item:hover { background: #f3f4f6; }
+  .step-item.active { background: #eef2ff; }
+  .step-bubble {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .75rem;
+    font-weight: 700;
+    transition: all .25s;
+    flex-shrink: 0;
+  }
+  .step-item.done .step-bubble { background: #22c55e; color: #fff; }
+  .step-item.active .step-bubble { background: #4f46e5; color: #fff; box-shadow: 0 0 0 4px rgba(79,70,229,0.18); }
+  .step-item.pending .step-bubble { background: #f3f4f6; color: #9ca3af; border: 2px solid #e5e7eb; }
+  .step-label { font-size: .78rem; font-weight: 600; color: #374151; white-space: nowrap; }
+  .step-item.active .step-label { color: #4f46e5; }
+  .step-item.done .step-label { color: #16a34a; }
+  .step-item.pending .step-label { color: #9ca3af; }
+  .step-connector {
+    flex: 1;
+    height: 2px;
+    background: #e5e7eb;
+    min-width: 20px;
+    max-width: 60px;
+    border-radius: 2px;
+  }
+  .step-connector.done { background: #22c55e; }
+
+  /* === FORM CARD === */
+  .studio-card {
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.07);
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+    margin-bottom: 1.25rem;
+  }
+  .studio-card-header {
+    padding: 1.25rem 1.75rem;
+    border-bottom: 1px solid #f3f4f6;
+    display: flex;
+    align-items: center;
+    gap: .85rem;
+    background: #fafafa;
+  }
+  .studio-card-icon {
+    width: 40px; height: 40px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.1rem;
+    flex-shrink: 0;
+  }
+  .icon-purple { background: #f3e8ff; color: #7c3aed; }
+  .icon-blue { background: #dbeafe; color: #2563eb; }
+  .icon-green { background: #dcfce7; color: #16a34a; }
+  .icon-amber { background: #fef3c7; color: #d97706; }
+  .icon-indigo { background: #e0e7ff; color: #4f46e5; }
+  .icon-rose { background: #ffe4e6; color: #e11d48; }
+  .icon-dark { background: #f3f4f6; color: #1f2937; }
+  .studio-card-title { font-size: 1rem; font-weight: 700; color: #111827; margin: 0; font-family: 'Outfit', sans-serif; }
+  .studio-card-sub { font-size: .78rem; color: #6b7280; margin: .1rem 0 0; }
+  .studio-card-body { padding: 1.5rem 1.75rem; }
+
+  /* === FIELD STYLES === */
+  .field-group { margin-bottom: 1.25rem; }
+  .field-label {
+    display: block;
+    font-size: .8rem;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: .45rem;
+    letter-spacing: .01em;
+  }
+  .field-label .req { color: #ef4444; margin-left: 2px; }
+  .field-label .opt {
+    font-weight: 400; color: #9ca3af; font-size: .72rem;
+    background: #f9fafb; border: 1px solid #e5e7eb;
+    padding: .05rem .4rem; border-radius: 100px; margin-left: .35rem;
+  }
+
+  /* Override Django form widgets */
+  .studio-card-body input[type="text"],
+  .studio-card-body input[type="url"],
+  .studio-card-body input[type="number"],
+  .studio-card-body select,
+  .studio-card-body textarea {
+    width: 100%;
+    background: #f9fafb;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 10px;
+    padding: .65rem .9rem;
+    font-size: .875rem;
+    color: #111827;
+    transition: all .2s;
+    outline: none;
+    font-family: inherit;
+    box-sizing: border-box;
+  }
+  .studio-card-body input[type="text"]:focus,
+  .studio-card-body input[type="url"]:focus,
+  .studio-card-body input[type="number"]:focus,
+  .studio-card-body select:focus,
+  .studio-card-body textarea:focus {
+    border-color: #6366f1;
+    background: #fff;
+    box-shadow: 0 0 0 3px rgba(99,102,241,0.12);
+  }
+  .studio-card-body textarea { resize: vertical; min-height: 110px; line-height: 1.6; }
+  .studio-card-body input[type="file"] {
+    width: 100%;
+    font-size: .82rem;
+    color: #374151;
+  }
+  .field-hint {
+    font-size: .75rem;
+    color: #9ca3af;
+    margin-top: .35rem;
+  }
+  .field-hint code {
+    background: #f3f4f6; padding: .1rem .35rem; border-radius: 4px;
+    font-size: .72rem; color: #4f46e5;
+  }
+  .field-error { font-size: .75rem; color: #ef4444; margin-top: .3rem; }
+  .char-counter {
+    font-size: .7rem;
+    color: #9ca3af;
+    margin-top: .3rem;
+    text-align: right;
+  }
+  .char-counter.warn { color: #f59e0b; }
+  .char-counter.danger { color: #ef4444; }
+
+  /* === GRID HELPERS === */
+  .field-row { display: grid; gap: 1rem; }
+  .field-row.col-2 { grid-template-columns: 1fr 1fr; }
+  .field-row.col-3 { grid-template-columns: 1fr 1fr 1fr; }
+  .field-row.col-4-1 { grid-template-columns: 4fr 2fr; }
+  @media (max-width: 640px) {
+    .field-row.col-2, .field-row.col-3, .field-row.col-4-1 { grid-template-columns: 1fr; }
+  }
+
+  /* === PRICE DISPLAY === */
+  .price-preview {
+    margin-top: .75rem;
+    padding: .6rem 1rem;
+    background: linear-gradient(135deg, #ecfdf5, #d1fae5);
+    border: 1px solid #a7f3d0;
+    border-radius: 10px;
+    font-size: .82rem;
+    color: #065f46;
+    font-weight: 600;
+    display: none;
+  }
+  .price-preview.show { display: flex; align-items: center; gap: .5rem; }
+  .price-preview.paid {
+    background: linear-gradient(135deg, #eff6ff, #dbeafe);
+    border-color: #93c5fd;
+    color: #1e40af;
+  }
+
+  /* === TOGGLE SWITCHES === */
+  .toggle-group {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    border-radius: 12px;
+    background: #f9fafb;
+    border: 1.5px solid #e5e7eb;
+    cursor: pointer;
+    transition: all .2s;
+    margin-bottom: .75rem;
+    user-select: none;
+  }
+  .toggle-group:hover { border-color: #c7d2fe; background: #f0f0ff; }
+  .toggle-group.active-toggle { border-color: #818cf8; background: #eef2ff; }
+  .toggle-label-wrap .toggle-title { font-size: .875rem; font-weight: 600; color: #111827; display: flex; align-items: center; gap: .5rem; }
+  .toggle-label-wrap .toggle-desc { font-size: .75rem; color: #9ca3af; margin-top: .2rem; }
+  .toggle-switch {
+    position: relative;
+    width: 44px; height: 24px;
+    flex-shrink: 0;
+  }
+  .toggle-switch input { opacity: 0; width: 0; height: 0; }
+  .toggle-track {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: #e5e7eb;
+    border-radius: 100px;
+    transition: .25s;
+    cursor: pointer;
+  }
+  .toggle-track::before {
+    content: '';
+    position: absolute;
+    width: 18px; height: 18px;
+    left: 3px; bottom: 3px;
+    background: #fff;
+    border-radius: 50%;
+    transition: .25s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+  }
+  .toggle-switch input:checked + .toggle-track { background: #4f46e5; }
+  .toggle-switch input:checked + .toggle-track::before { transform: translateX(20px); }
+
+  /* === THUMBNAIL PREVIEW === */
+  .thumb-preview-box {
+    border: 2px dashed #e5e7eb;
+    border-radius: 12px;
+    min-height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: #f9fafb;
+    position: relative;
+    transition: border-color .2s;
+    margin-top: .75rem;
+  }
+  .thumb-preview-box.has-image { border-style: solid; border-color: #a5b4fc; }
+  .thumb-preview-box img { width: 100%; height: 150px; object-fit: cover; border-radius: 10px; }
+  .thumb-placeholder {
+    text-align: center;
+    color: #d1d5db;
+    font-size: .8rem;
+    padding: 1.5rem;
+  }
+  .thumb-placeholder i { font-size: 2rem; display: block; margin-bottom: .5rem; }
+
+  /* === STEP PANEL VISIBILITY === */
+  .step-panel { display: none; }
+  .step-panel.active { display: block; animation: fadeInSlide .3s ease; }
+  @keyframes fadeInSlide {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* === NAVIGATION BUTTONS === */
+  .studio-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.25rem 1.75rem;
+    background: #f9fafb;
+    border-top: 1px solid #f3f4f6;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+  .studio-nav-left { display: flex; gap: .75rem; }
+  .studio-nav-right { display: flex; gap: .75rem; }
+  .btn-studio-prev {
+    display: inline-flex; align-items: center; gap: .4rem;
+    background: #fff; border: 1.5px solid #e5e7eb; color: #374151;
+    padding: .6rem 1.25rem; border-radius: 10px; font-size: .85rem;
+    font-weight: 600; cursor: pointer; transition: all .2s;
+    font-family: inherit;
+  }
+  .btn-studio-prev:hover { border-color: #6366f1; color: #4f46e5; background: #f5f3ff; }
+  .btn-studio-next {
+    display: inline-flex; align-items: center; gap: .4rem;
+    background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    border: none; color: #fff;
+    padding: .6rem 1.5rem; border-radius: 10px; font-size: .85rem;
+    font-weight: 600; cursor: pointer; transition: all .2s;
+    box-shadow: 0 4px 14px rgba(79,70,229,0.35);
+    font-family: inherit;
+  }
+  .btn-studio-next:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(79,70,229,0.45); }
+  .btn-studio-submit {
+    display: inline-flex; align-items: center; gap: .5rem;
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    border: none; color: #fff;
+    padding: .65rem 2rem; border-radius: 10px; font-size: .9rem;
+    font-weight: 700; cursor: pointer; transition: all .2s;
+    box-shadow: 0 4px 14px rgba(5,150,105,0.35);
+    font-family: inherit;
+  }
+  .btn-studio-submit:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(5,150,105,0.45); }
+  .btn-studio-submit:active { transform: translateY(0); }
+
+  /* === STEP INDICATOR DOT === */
+  .step-dot-bar {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    font-size: .78rem;
+    color: #9ca3af;
+    font-weight: 500;
+  }
+  .step-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #e5e7eb; transition: all .25s;
+  }
+  .step-dot.active { background: #4f46e5; transform: scale(1.3); }
+  .step-dot.done { background: #22c55e; }
+
+  /* === LOADING SUBMIT === */
+  .btn-studio-submit .spinner {
+    width: 16px; height: 16px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+    display: none;
+  }
+  .btn-studio-submit.loading .spinner { display: block; }
+  .btn-studio-submit.loading .btn-text { display: none; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* === RESPONSIVE HEADER === */
+  @media (max-width: 640px) {
+    .studio-header-card { padding: 1.5rem; }
+    .studio-header-title { font-size: 1.4rem; }
+    .studio-card-body { padding: 1.25rem; }
+    .studio-card-header { padding: 1rem 1.25rem; }
+    .studio-nav { padding: 1rem 1.25rem; }
+  }
+
+  /* Django form widget overrides */
+  .studio-card-body .form-control { /* let our CSS handle it */ }
+  .helptext { display: none; } /* hide default Django help text, we show our own */
+  ul.errorlist { list-style: none; padding: 0; margin: .3rem 0 0; }
+  ul.errorlist li { font-size: .75rem; color: #ef4444; }
+
+  /* GitHub URL box */
+  .github-url-box {
+    background: #0d1117;
+    border: 1.5px solid #30363d;
+    border-radius: 12px;
+    padding: 1.1rem 1.25rem;
+  }
+  .github-url-box label.field-label { color: #e6edf3; }
+  .github-url-box .field-hint { color: #8b949e; }
+  .github-url-box input[type="url"] {
+    background: #161b22 !important;
+    border-color: #30363d !important;
+    color: #e6edf3 !important;
+  }
+  .github-url-box input[type="url"]:focus {
+    border-color: #58a6ff !important;
+    box-shadow: 0 0 0 3px rgba(88,166,255,0.15) !important;
+    background: #0d1117 !important;
+  }
+  .github-url-box .field-error { color: #f85149; }
+
+  /* File upload area */
+  .file-upload-area {
+    border: 2px dashed #e5e7eb;
+    border-radius: 12px;
+    padding: 1.5rem;
+    text-align: center;
+    background: #fafafa;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .file-upload-area:hover { border-color: #a5b4fc; background: #f5f3ff; }
+  .file-upload-area i { font-size: 1.75rem; color: #c7d2fe; display: block; margin-bottom: .5rem; }
+  .file-upload-area .upload-text { font-size: .82rem; color: #9ca3af; }
+  .file-upload-area input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; }
+
+  /* Non-field errors */
+  .studio-alert {
+    padding: .85rem 1.1rem;
+    border-radius: 10px;
+    font-size: .85rem;
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: flex-start;
+    gap: .65rem;
+    border: 1px solid;
+  }
+  .studio-alert.error { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
+  .studio-alert.success { background: #f0fdf4; border-color: #bbf7d0; color: #166534; }
+</style>
+{% endblock %}
 
 {% block content %}
-<div class="container py-4" style="max-width: 880px;">
+<div id="studio-shell">
+  <div class="studio-wrapper">
+
     <!-- Breadcrumb -->
-    <nav aria-label="breadcrumb" class="mb-3">
-        <ol class="breadcrumb smaller mb-0">
-            <li class="breadcrumb-item"><a href="{% url 'courses:course_list' %}" class="text-decoration-none">Courses</a></li>
-            <li class="breadcrumb-item"><a href="{% url 'dashboard:admin_dashboard' %}" class="text-decoration-none">Admin Studio</a></li>
-            <li class="breadcrumb-item active text-muted" aria-current="page">Create New Course</li>
-        </ol>
+    <nav class="studio-breadcrumb" aria-label="breadcrumb">
+      <a href="{% url 'core:home' %}"><i class="bi bi-house-fill"></i> Home</a>
+      <span class="sep">›</span>
+      <a href="{% url 'courses:course_list' %}">Courses</a>
+      <span class="sep">›</span>
+      <a href="{% url 'dashboard:admin_dashboard' %}">Admin Studio</a>
+      <span class="sep">›</span>
+      <span>{% if form.instance.pk %}Edit Course{% else %}Create Course{% endif %}</span>
     </nav>
 
-    <div class="card flowable-card border p-4 p-md-5 rounded-4 shadow-sm bg-white">
-        <div class="d-flex align-items-center justify-content-between pb-3 mb-4 border-bottom">
-            <div>
-                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-1 rounded-pill mb-2">
-                    <i class="bi bi-shield-lock-fill me-1"></i> Admin & Instructor Studio
-                </span>
-                <h1 class="h3 fw-bold mb-1 text-slate-900 font-heading">Create & Publish Course</h1>
-                <p class="text-secondary small mb-0">Courses created here become immediately available for student enrollment and public viewing.</p>
-            </div>
-            <a href="{% url 'courses:course_list' %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
-                <i class="bi bi-arrow-left me-1"></i> Cancel
-            </a>
+    <!-- Header Card -->
+    <div class="studio-header-card d-flex justify-content-between align-items-start flex-wrap gap-3">
+      <div style="position:relative;z-index:2;">
+        <div class="studio-header-badge">
+          <i class="bi bi-shield-lock-fill"></i> Admin &amp; Instructor Studio
         </div>
+        <h1 class="studio-header-title">
+          {% if form.instance.pk %}
+            Edit <span>Course</span>
+          {% else %}
+            Create &amp; <span>Publish Course</span>
+          {% endif %}
+        </h1>
+        <p class="studio-header-sub">
+          {% if form.instance.pk %}
+            Update course details, pricing, curriculum and visibility settings.
+          {% else %}
+            Courses created here are immediately available for student enrollment.
+          {% endif %}
+        </p>
+      </div>
+      <div class="studio-header-actions">
+        <a href="{% url 'courses:course_list' %}" class="btn-cancel-studio">
+          <i class="bi bi-arrow-left"></i> Cancel
+        </a>
+      </div>
+    </div>
 
-        <form method="POST" enctype="multipart/form-data">
-            {% csrf_token %}
+    <!-- Step Progress Bar -->
+    <div class="steps-nav" id="steps-nav" role="tablist">
+      <div class="step-item active" data-step="0" role="tab" tabindex="0">
+        <div class="step-bubble">1</div>
+        <div>
+          <div class="step-label">Basic Info</div>
+        </div>
+      </div>
+      <div class="step-connector" id="conn-0"></div>
+      <div class="step-item pending" data-step="1" role="tab" tabindex="0">
+        <div class="step-bubble">2</div>
+        <div>
+          <div class="step-label">Content</div>
+        </div>
+      </div>
+      <div class="step-connector" id="conn-1"></div>
+      <div class="step-item pending" data-step="2" role="tab" tabindex="0">
+        <div class="step-bubble">3</div>
+        <div>
+          <div class="step-label">Pricing &amp; Batch</div>
+        </div>
+      </div>
+      <div class="step-connector" id="conn-2"></div>
+      <div class="step-item pending" data-step="3" role="tab" tabindex="0">
+        <div class="step-bubble">4</div>
+        <div>
+          <div class="step-label">Media &amp; Settings</div>
+        </div>
+      </div>
+    </div>
 
-            {% if form.non_field_errors %}
-                <div class="alert alert-danger py-2 small rounded-3 mb-3">
-                    {{ form.non_field_errors }}
-                </div>
-            {% endif %}
+    <!-- Non-Field Errors -->
+    {% if form.non_field_errors %}
+    <div class="studio-alert error">
+      <i class="bi bi-exclamation-triangle-fill" style="margin-top:2px;flex-shrink:0;"></i>
+      <div>{{ form.non_field_errors }}</div>
+    </div>
+    {% endif %}
+
+    <!-- FORM -->
+    <form method="POST" enctype="multipart/form-data" id="course-form" novalidate>
+      {% csrf_token %}
+
+      <!-- ==============================
+           STEP 1: BASIC INFO
+           ============================== -->
+      <div class="step-panel active" id="panel-0">
+        <!-- Course Identity -->
+        <div class="studio-card">
+          <div class="studio-card-header">
+            <div class="studio-card-icon icon-purple"><i class="bi bi-mortarboard-fill"></i></div>
+            <div>
+              <p class="studio-card-title">Course Identity</p>
+              <p class="studio-card-sub">The fundamental details students first see</p>
+            </div>
+          </div>
+          <div class="studio-card-body">
 
             <!-- Title -->
-            <div class="mb-3">
-                <label class="form-label fw-semibold small text-slate-700">Course Title <span class="text-danger">*</span></label>
-                {{ form.title }}
-                {% if form.title.errors %}<div class="text-danger smaller mt-1">{{ form.title.errors }}</div>{% endif %}
+            <div class="field-group">
+              <label class="field-label" for="{{ form.title.id_for_label }}">
+                Course Title <span class="req">*</span>
+              </label>
+              {{ form.title }}
+              <div class="char-counter" id="title-counter"></div>
+              {% if form.title.errors %}<div class="field-error">{{ form.title.errors }}</div>{% endif %}
             </div>
 
-            <!-- Category & New Category -->
-            <div class="row g-3 mb-3">
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold small text-slate-700">Category</label>
-                    {{ form.category }}
-                    {% if form.category.errors %}<div class="text-danger smaller mt-1">{{ form.category.errors }}</div>{% endif %}
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold small text-slate-700">Or Type New Category</label>
-                    {{ form.new_category_name }}
-                </div>
+            <!-- Category -->
+            <div class="field-row col-2">
+              <div class="field-group">
+                <label class="field-label" for="{{ form.category.id_for_label }}">
+                  Category <span class="req">*</span>
+                </label>
+                {{ form.category }}
+                {% if form.category.errors %}<div class="field-error">{{ form.category.errors }}</div>{% endif %}
+              </div>
+              <div class="field-group">
+                <label class="field-label" for="{{ form.new_category_name.id_for_label }}">
+                  Or Create New Category <span class="opt">optional</span>
+                </label>
+                {{ form.new_category_name }}
+              </div>
             </div>
 
-            <!-- Difficulty & Estimated Hours -->
-            <div class="row g-3 mb-3">
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold small text-slate-700">Difficulty Level</label>
-                    {{ form.difficulty }}
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold small text-slate-700">Estimated Duration (Hours)</label>
-                    {{ form.estimated_hours }}
-                </div>
+            <!-- Difficulty & Hours -->
+            <div class="field-row col-2">
+              <div class="field-group">
+                <label class="field-label" for="{{ form.difficulty.id_for_label }}">Difficulty Level</label>
+                {{ form.difficulty }}
+              </div>
+              <div class="field-group">
+                <label class="field-label" for="{{ form.estimated_hours.id_for_label }}">Estimated Duration (Hours)</label>
+                {{ form.estimated_hours }}
+              </div>
             </div>
+
+            <!-- Language & Prerequisites -->
+            <div class="field-row col-2">
+              <div class="field-group">
+                <label class="field-label" for="{{ form.language.id_for_label }}">
+                  Language <span class="opt">optional</span>
+                </label>
+                {{ form.language }}
+              </div>
+              <div class="field-group">
+                <label class="field-label" for="{{ form.prerequisites.id_for_label }}">
+                  Prerequisites <span class="opt">optional</span>
+                </label>
+                {{ form.prerequisites }}
+                <p class="field-hint">e.g. Basic HTML/CSS or "No Prior Experience"</p>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ==============================
+           STEP 2: CONTENT
+           ============================== -->
+      <div class="step-panel" id="panel-1">
+        <div class="studio-card">
+          <div class="studio-card-header">
+            <div class="studio-card-icon icon-blue"><i class="bi bi-file-earmark-text-fill"></i></div>
+            <div>
+              <p class="studio-card-title">Course Content &amp; Description</p>
+              <p class="studio-card-sub">Describe what students will learn</p>
+            </div>
+          </div>
+          <div class="studio-card-body">
 
             <!-- Short Description -->
-            <div class="mb-3">
-                <label class="form-label fw-semibold small text-slate-700">Short Summary <span class="text-danger">*</span></label>
-                {{ form.short_description }}
-                <div class="form-text smaller text-muted">Shown on course cards and search previews.</div>
-                {% if form.short_description.errors %}<div class="text-danger smaller mt-1">{{ form.short_description.errors }}</div>{% endif %}
+            <div class="field-group">
+              <label class="field-label" for="{{ form.short_description.id_for_label }}">
+                Short Summary <span class="req">*</span>
+              </label>
+              {{ form.short_description }}
+              <div class="char-counter" id="short-desc-counter"></div>
+              <p class="field-hint">Shown on course cards and search previews — keep it punchy (max 255 chars).</p>
+              {% if form.short_description.errors %}<div class="field-error">{{ form.short_description.errors }}</div>{% endif %}
             </div>
 
             <!-- Full Description -->
-            <div class="mb-3">
-                <label class="form-label fw-semibold small text-slate-700">Full Description / Syllabus <span class="text-danger">*</span></label>
-                {{ form.description }}
-                {% if form.description.errors %}<div class="text-danger smaller mt-1">{{ form.description.errors }}</div>{% endif %}
+            <div class="field-group">
+              <label class="field-label" for="{{ form.description.id_for_label }}">
+                Full Description / Syllabus <span class="req">*</span>
+              </label>
+              {{ form.description }}
+              <p class="field-hint">Markdown &amp; HTML supported. Cover topics, outcomes and curriculum outline.</p>
+              {% if form.description.errors %}<div class="field-error">{{ form.description.errors }}</div>{% endif %}
             </div>
 
-            <!-- Thumbnail Options -->
-            <div class="row g-3 mb-4">
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold small text-slate-700">Thumbnail Image URL (Optional)</label>
-                    {{ form.thumbnail_url }}
-                    <div class="form-text smaller text-muted">Direct image URL (e.g., Unsplash photo)</div>
-                </div>
-                <div class="col-md-6">
-                    <label class="form-label fw-semibold small text-slate-700">Or Upload Thumbnail File</label>
-                    {{ form.thumbnail }}
-                </div>
+            <!-- GitHub URL -->
+            <div class="github-url-box">
+              <label class="field-label" for="{{ form.github_repo_url.id_for_label }}">
+                <i class="bi bi-github" style="margin-right:.35rem;font-size:1rem;"></i>
+                GitHub Repository / Source Code URL
+                <span class="opt" style="background:rgba(255,255,255,0.1);border-color:rgba(255,255,255,0.15);color:#8b949e;">optional</span>
+              </label>
+              {{ form.github_repo_url }}
+              <p class="field-hint">
+                Paste your course repo link (e.g., <code style="background:#161b22;color:#79c0ff;">https://github.com/user/course-repo</code>). Students can clone &amp; explore code directly.
+              </p>
+              {% if form.github_repo_url.errors %}<div class="field-error">{{ form.github_repo_url.errors }}</div>{% endif %}
             </div>
 
-            <!-- Checkboxes -->
-            <div class="p-3 bg-light rounded-3 border mb-4 d-flex flex-wrap gap-4 align-items-center">
-                <div class="form-check mb-0">
-                    {{ form.is_published }}
-                    <label class="form-check-label small fw-semibold" for="{{ form.is_published.id_for_label }}">
-                        <i class="bi bi-eye text-primary me-1"></i> Published Live (Visible to All Users & Admin)
-                    </label>
-                </div>
-                <div class="form-check mb-0">
-                    {{ form.is_featured }}
-                    <label class="form-check-label small fw-semibold" for="{{ form.is_featured.id_for_label }}">
-                        <i class="bi bi-star-fill text-warning me-1"></i> Featured on Homepage
-                    </label>
-                </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ==============================
+           STEP 3: PRICING & BATCH
+           ============================== -->
+      <div class="step-panel" id="panel-2">
+        <div class="studio-card">
+          <div class="studio-card-header">
+            <div class="studio-card-icon icon-amber"><i class="bi bi-currency-rupee"></i></div>
+            <div>
+              <p class="studio-card-title">Pricing &amp; Batch Details</p>
+              <p class="studio-card-sub">Control access price, discounts and batch metadata</p>
+            </div>
+          </div>
+          <div class="studio-card-body">
+
+            <!-- Pricing Row -->
+            <div class="field-row col-2">
+              <div class="field-group">
+                <label class="field-label" for="{{ form.price.id_for_label }}">Price (₹ INR) <span class="req">*</span></label>
+                {{ form.price }}
+                <p class="field-hint">Set 0 to make the course completely free.</p>
+                {% if form.price.errors %}<div class="field-error">{{ form.price.errors }}</div>{% endif %}
+              </div>
+              <div class="field-group">
+                <label class="field-label" for="{{ form.original_price.id_for_label }}">Original Price (₹ INR) <span class="opt">optional</span></label>
+                {{ form.original_price }}
+                <p class="field-hint">Used to show strikethrough &amp; discount %.</p>
+              </div>
             </div>
 
-            <div class="d-flex justify-content-end gap-2 pt-2 border-top">
-                <a href="{% url 'courses:course_list' %}" class="btn btn-outline-secondary rounded-pill px-4">Cancel</a>
-                <button type="submit" class="btn btn-primary rounded-pill px-5 fw-semibold shadow-sm hover-lift">
-                    <i class="bi bi-cloud-arrow-up-fill me-1"></i> Publish Course to Platform
-                </button>
+            <!-- Price Preview (React-driven) -->
+            <div id="price-preview-container"></div>
+
+            <!-- Batch Name, Tag, Start Date -->
+            <div class="field-row col-3" style="margin-top:1rem;">
+              <div class="field-group">
+                <label class="field-label" for="{{ form.batch_name.id_for_label }}">Batch Name <span class="opt">optional</span></label>
+                {{ form.batch_name }}
+                <p class="field-hint">e.g. Delta 5.0, Sigma 4.0</p>
+              </div>
+              <div class="field-group">
+                <label class="field-label" for="{{ form.tag.id_for_label }}">Badge / Tag <span class="opt">optional</span></label>
+                {{ form.tag }}
+                <p class="field-hint">e.g. Bestseller, Trending</p>
+              </div>
+              <div class="field-group">
+                <label class="field-label" for="{{ form.batch_start_date.id_for_label }}">Batch Start Date <span class="opt">optional</span></label>
+                {{ form.batch_start_date }}
+              </div>
             </div>
-        </form>
-    </div>
+
+          </div>
+        </div>
+      </div>
+
+      <!-- ==============================
+           STEP 4: MEDIA & SETTINGS
+           ============================== -->
+      <div class="step-panel" id="panel-3">
+
+        <!-- Thumbnail -->
+        <div class="studio-card">
+          <div class="studio-card-header">
+            <div class="studio-card-icon icon-rose"><i class="bi bi-image-fill"></i></div>
+            <div>
+              <p class="studio-card-title">Course Thumbnail</p>
+              <p class="studio-card-sub">Upload an image or provide an external URL</p>
+            </div>
+          </div>
+          <div class="studio-card-body">
+            <div class="field-row col-2">
+              <div class="field-group">
+                <label class="field-label" for="{{ form.thumbnail_url.id_for_label }}">Thumbnail Image URL <span class="opt">optional</span></label>
+                {{ form.thumbnail_url }}
+                <p class="field-hint">Direct image URL (e.g., from Unsplash)</p>
+                {% if form.thumbnail_url.errors %}<div class="field-error">{{ form.thumbnail_url.errors }}</div>{% endif %}
+              </div>
+              <div class="field-group">
+                <label class="field-label" for="{{ form.thumbnail.id_for_label }}">Upload Thumbnail File <span class="opt">optional</span></label>
+                {{ form.thumbnail }}
+              </div>
+            </div>
+
+            <!-- Thumbnail Preview (React) -->
+            <div id="thumb-preview-root"></div>
+          </div>
+        </div>
+
+        <!-- Visibility Settings -->
+        <div class="studio-card">
+          <div class="studio-card-header">
+            <div class="studio-card-icon icon-indigo"><i class="bi bi-toggles"></i></div>
+            <div>
+              <p class="studio-card-title">Visibility &amp; Publishing</p>
+              <p class="studio-card-sub">Control where and how this course appears</p>
+            </div>
+          </div>
+          <div class="studio-card-body">
+
+            <!-- hidden original checkboxes for form submission -->
+            <div style="display:none;">{{ form.is_published }}{{ form.is_featured }}</div>
+
+            <!-- React Toggle Mount -->
+            <div id="toggle-root"></div>
+
+          </div>
+        </div>
+
+        <!-- Submit Card -->
+        <div class="studio-card">
+          <div class="studio-nav">
+            <div class="studio-nav-left">
+              <button type="button" class="btn-studio-prev" id="final-prev-btn">
+                <i class="bi bi-arrow-left"></i> Back
+              </button>
+            </div>
+            <div id="step-dots" class="step-dot-bar">
+              <div class="step-dot done"></div>
+              <div class="step-dot done"></div>
+              <div class="step-dot done"></div>
+              <div class="step-dot active"></div>
+            </div>
+            <div class="studio-nav-right">
+              <button type="submit" class="btn-studio-submit" id="submit-btn">
+                <div class="spinner"></div>
+                <span class="btn-text">
+                  <i class="bi bi-cloud-arrow-up-fill"></i>
+                  {% if form.instance.pk %}Save Changes{% else %}Publish Course{% endif %}
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Shared Navigation (steps 0-2) -->
+      <div class="studio-card" id="shared-nav-card">
+        <div class="studio-nav">
+          <div class="studio-nav-left">
+            <button type="button" class="btn-studio-prev" id="prev-btn" style="display:none;">
+              <i class="bi bi-arrow-left"></i> Back
+            </button>
+          </div>
+          <div id="step-dots-shared" class="step-dot-bar">
+            <div class="step-dot active" id="dot-0"></div>
+            <div class="step-dot" id="dot-1"></div>
+            <div class="step-dot" id="dot-2"></div>
+            <div class="step-dot" id="dot-3"></div>
+          </div>
+          <div class="studio-nav-right">
+            <button type="button" class="btn-studio-next" id="next-btn">
+              Continue <i class="bi bi-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+    </form>
+  </div>
 </div>
+
+<!-- React + Babel via CDN (no build step) -->
+<script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+{% verbatim %}
+<script type="text/babel">
+  const { useState, useEffect, useCallback } = React;
+
+  /* ========================================================
+     PRICE PREVIEW COMPONENT
+  ======================================================== */
+  function PricePreview() {
+    const [price, setPrice] = useState('');
+    const [originalPrice, setOriginalPrice] = useState('');
+
+    useEffect(() => {
+      const priceEl = document.getElementById('id_price');
+      const origEl = document.getElementById('id_original_price');
+      if (!priceEl || !origEl) return;
+
+      const update = () => {
+        setPrice(priceEl.value);
+        setOriginalPrice(origEl.value);
+      };
+      update();
+      priceEl.addEventListener('input', update);
+      origEl.addEventListener('input', update);
+      return () => {
+        priceEl.removeEventListener('input', update);
+        origEl.removeEventListener('input', update);
+      };
+    }, []);
+
+    const p = parseInt(price) || 0;
+    const op = parseInt(originalPrice) || 0;
+    const discount = op > p && op > 0 ? Math.round(((op - p) / op) * 100) : 0;
+    const isFree = p === 0;
+
+    if (!price && !originalPrice) return null;
+
+    return (
+      <div style={{
+        marginTop: '1rem',
+        padding: '1rem 1.25rem',
+        borderRadius: '12px',
+        border: '1px solid',
+        display: 'flex',
+        alignItems: 'center',
+        gap: '1rem',
+        flexWrap: 'wrap',
+        background: isFree ? 'linear-gradient(135deg,#ecfdf5,#d1fae5)' : 'linear-gradient(135deg,#eff6ff,#dbeafe)',
+        borderColor: isFree ? '#a7f3d0' : '#93c5fd',
+        color: isFree ? '#065f46' : '#1e40af',
+        fontSize: '.85rem',
+        fontWeight: 600,
+        animation: 'fadeInSlide .3s ease'
+      }}>
+        {isFree ? (
+          <>
+            <span style={{fontSize:'1.25rem'}}>🎉</span>
+            <span><strong>FREE Course</strong> — 100% Open Access for all students</span>
+          </>
+        ) : (
+          <>
+            <span style={{fontSize:'1.25rem'}}>💰</span>
+            <span>Price: <strong>₹{p.toLocaleString('en-IN')}</strong></span>
+            {discount > 0 && (
+              <>
+                <span style={{textDecoration:'line-through', color:'#6b7280', fontWeight:400}}>₹{op.toLocaleString('en-IN')}</span>
+                <span style={{
+                  background:'#dc2626', color:'#fff',
+                  padding:'.15rem .6rem', borderRadius:'100px',
+                  fontSize:'.72rem'
+                }}>{discount}% OFF</span>
+              </>
+            )}
+          </>
+        )}
+      </div>
+    );
+  }
+
+  /* ========================================================
+     THUMBNAIL PREVIEW COMPONENT
+  ======================================================== */
+  function ThumbnailPreview() {
+    const [src, setSrc] = useState('');
+
+    useEffect(() => {
+      const urlEl = document.getElementById('id_thumbnail_url');
+      const fileEl = document.getElementById('id_thumbnail');
+
+      const handleUrl = () => {
+        const val = urlEl?.value?.trim();
+        if (val) setSrc(val);
+        else if (!fileEl?.files?.[0]) setSrc('');
+      };
+      const handleFile = () => {
+        const file = fileEl?.files?.[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = (e) => setSrc(e.target.result);
+          reader.readAsDataURL(file);
+        } else {
+          setSrc(urlEl?.value?.trim() || '');
+        }
+      };
+
+      urlEl?.addEventListener('input', handleUrl);
+      fileEl?.addEventListener('change', handleFile);
+      // Init with existing value
+      if (urlEl?.value) setSrc(urlEl.value.trim());
+
+      return () => {
+        urlEl?.removeEventListener('input', handleUrl);
+        fileEl?.removeEventListener('change', handleFile);
+      };
+    }, []);
+
+    return (
+      <div style={{marginTop:'1rem'}}>
+        <p style={{fontSize:'.8rem',fontWeight:600,color:'#374151',marginBottom:'.5rem'}}>
+          Preview
+        </p>
+        <div style={{
+          border: `2px ${src ? 'solid' : 'dashed'} ${src ? '#a5b4fc' : '#e5e7eb'}`,
+          borderRadius: '12px',
+          minHeight: '160px',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          overflow: 'hidden',
+          background: src ? '#000' : '#f9fafb',
+          transition: 'all .3s'
+        }}>
+          {src ? (
+            <img
+              src={src}
+              alt="Thumbnail preview"
+              style={{width:'100%',height:'160px',objectFit:'cover',borderRadius:'10px'}}
+              onError={() => setSrc('')}
+            />
+          ) : (
+            <div style={{textAlign:'center',color:'#d1d5db',padding:'2rem'}}>
+              <i className="bi bi-image" style={{fontSize:'2.5rem',display:'block',marginBottom:'.5rem'}}></i>
+              <span style={{fontSize:'.8rem'}}>Thumbnail preview will appear here</span>
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  /* ========================================================
+     TOGGLE SWITCH COMPONENT
+  ======================================================== */
+  function ToggleSwitch({ fieldId, label, description, icon, iconColor, accentColor = '#4f46e5' }) {
+    const [checked, setChecked] = useState(false);
+
+    useEffect(() => {
+      const el = document.getElementById(fieldId);
+      if (el) {
+        setChecked(el.checked);
+        const syncBack = () => setChecked(el.checked);
+        el.addEventListener('change', syncBack);
+        return () => el.removeEventListener('change', syncBack);
+      }
+    }, [fieldId]);
+
+    const toggle = useCallback(() => {
+      const el = document.getElementById(fieldId);
+      if (el) {
+        el.checked = !el.checked;
+        el.dispatchEvent(new Event('change'));
+        setChecked(!checked);
+      }
+    }, [fieldId, checked]);
+
+    return (
+      <div
+        onClick={toggle}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '1rem 1.25rem',
+          borderRadius: '12px',
+          background: checked ? `${accentColor}10` : '#f9fafb',
+          border: `1.5px solid ${checked ? accentColor : '#e5e7eb'}`,
+          cursor: 'pointer',
+          transition: 'all .2s',
+          marginBottom: '.75rem',
+          userSelect: 'none'
+        }}
+      >
+        <div style={{display:'flex',alignItems:'center',gap:'.75rem'}}>
+          <div style={{
+            width:'36px',height:'36px',borderRadius:'10px',
+            background: checked ? `${accentColor}20` : '#f3f4f6',
+            display:'flex',alignItems:'center',justifyContent:'center',
+            fontSize:'1.1rem',color: checked ? accentColor : '#9ca3af',
+            transition:'all .2s',flexShrink:0
+          }}>
+            <i className={`bi ${icon}`}></i>
+          </div>
+          <div>
+            <div style={{fontSize:'.875rem',fontWeight:600,color:'#111827'}}>{label}</div>
+            <div style={{fontSize:'.75rem',color:'#9ca3af',marginTop:'.15rem'}}>{description}</div>
+          </div>
+        </div>
+        <div style={{
+          width:'46px',height:'26px',borderRadius:'100px',
+          background: checked ? accentColor : '#e5e7eb',
+          position:'relative',
+          transition:'background .25s',
+          flexShrink:0
+        }}>
+          <div style={{
+            position:'absolute',
+            width:'20px',height:'20px',
+            borderRadius:'50%',
+            background:'#fff',
+            top:'3px',
+            left: checked ? '23px' : '3px',
+            transition:'left .25s',
+            boxShadow:'0 1px 4px rgba(0,0,0,0.2)'
+          }}></div>
+        </div>
+      </div>
+    );
+  }
+
+  function TogglesPanel() {
+    return (
+      <div>
+        <ToggleSwitch
+          fieldId="id_is_published"
+          label="Published &amp; Live"
+          description="Course is visible to all users and open for enrollment"
+          icon="bi-eye-fill"
+          accentColor="#4f46e5"
+        />
+        <ToggleSwitch
+          fieldId="id_is_featured"
+          label="Featured on Homepage"
+          description="Displayed prominently in the homepage featured section"
+          icon="bi-star-fill"
+          accentColor="#d97706"
+        />
+      </div>
+    );
+  }
+
+  /* ========================================================
+     CHAR COUNTER
+  ======================================================== */
+  function CharCounter({ fieldId, max, dangerAt, warnAt }) {
+    const [count, setCount] = useState(0);
+
+    useEffect(() => {
+      const el = document.getElementById(fieldId);
+      if (!el) return;
+      setCount(el.value.length);
+      const update = () => setCount(el.value.length);
+      el.addEventListener('input', update);
+      return () => el.removeEventListener('input', update);
+    }, [fieldId]);
+
+    const pct = max ? (count / max) * 100 : 0;
+    const color = count >= (dangerAt || max) ? '#ef4444'
+      : count >= (warnAt || max * 0.8) ? '#f59e0b'
+      : '#9ca3af';
+
+    return (
+      <div style={{fontSize:'.7rem',color,marginTop:'.3rem',textAlign:'right',fontWeight:count >= (warnAt || 0) ? 600 : 400}}>
+        {count}{max ? `/${max}` : ''} characters
+        {max && count > max && <span style={{marginLeft:'.5rem',background:'#fef2f2',color:'#ef4444',padding:'.1rem .4rem',borderRadius:'4px'}}>Over limit!</span>}
+      </div>
+    );
+  }
+
+  /* ========================================================
+     MOUNT ALL COMPONENTS
+  ======================================================== */
+  // Price Preview
+  const priceRoot = document.getElementById('price-preview-container');
+  if (priceRoot) ReactDOM.createRoot(priceRoot).render(<PricePreview />);
+
+  // Thumbnail Preview
+  const thumbRoot = document.getElementById('thumb-preview-root');
+  if (thumbRoot) ReactDOM.createRoot(thumbRoot).render(<ThumbnailPreview />);
+
+  // Toggles
+  const toggleRoot = document.getElementById('toggle-root');
+  if (toggleRoot) ReactDOM.createRoot(toggleRoot).render(<TogglesPanel />);
+
+  // Char counters
+  const titleCounterEl = document.getElementById('title-counter');
+  if (titleCounterEl) ReactDOM.createRoot(titleCounterEl).render(<CharCounter fieldId="id_title" max={200} warnAt={160} dangerAt={190} />);
+
+  const shortDescCounterEl = document.getElementById('short-desc-counter');
+  if (shortDescCounterEl) ReactDOM.createRoot(shortDescCounterEl).render(<CharCounter fieldId="id_short_description" max={255} warnAt={200} dangerAt={245} />);
+</script>
+{% endverbatim %}
+
+<script>
+  /* ========================================================
+     MULTI-STEP WIZARD NAVIGATION (vanilla JS)
+  ======================================================== */
+  (function() {
+    const STEPS = 4;
+    let currentStep = 0;
+
+    const panels = Array.from({length: STEPS}, (_, i) => document.getElementById(`panel-${i}`));
+    const stepItems = document.querySelectorAll('.step-item');
+    const connectors = Array.from({length: STEPS-1}, (_, i) => document.getElementById(`conn-${i}`));
+    const dots = Array.from({length: STEPS}, (_, i) => document.getElementById(`dot-${i}`));
+
+    const prevBtn = document.getElementById('prev-btn');
+    const nextBtn = document.getElementById('next-btn');
+    const sharedNav = document.getElementById('shared-nav-card');
+    const finalPrevBtn = document.getElementById('final-prev-btn');
+    const submitBtn = document.getElementById('submit-btn');
+
+    // Check if this is a Django form error reload — show all fields
+    const hasErrors = document.querySelectorAll('.field-error li').length > 0;
+
+    function goTo(step) {
+      // Clamp
+      step = Math.max(0, Math.min(STEPS - 1, step));
+
+      // Hide all panels
+      panels.forEach(p => p && p.classList.remove('active'));
+
+      // Show target
+      panels[step] && panels[step].classList.add('active');
+
+      // Update step items
+      stepItems.forEach((item, i) => {
+        item.classList.remove('active', 'done', 'pending');
+        if (i < step) item.classList.add('done');
+        else if (i === step) item.classList.add('active');
+        else item.classList.add('pending');
+
+        // Update bubble text (add check icon for done)
+        const bubble = item.querySelector('.step-bubble');
+        if (bubble) {
+          if (i < step) bubble.innerHTML = '<i class="bi bi-check-lg"></i>';
+          else bubble.textContent = i + 1;
+        }
+      });
+
+      // Update connectors
+      connectors.forEach((c, i) => {
+        if (c) c.classList.toggle('done', i < step);
+      });
+
+      // Update dots
+      dots.forEach((d, i) => {
+        if (!d) return;
+        d.classList.remove('active', 'done');
+        if (i < step) d.classList.add('done');
+        else if (i === step) d.classList.add('active');
+      });
+
+      // Show/hide nav
+      if (step === STEPS - 1) {
+        sharedNav.style.display = 'none';
+      } else {
+        sharedNav.style.display = '';
+        prevBtn.style.display = step > 0 ? '' : 'none';
+      }
+
+      currentStep = step;
+
+      // Scroll to top of form
+      document.getElementById('steps-nav')?.scrollIntoView({behavior:'smooth', block:'start'});
+    }
+
+    // Clickable step items
+    stepItems.forEach((item, i) => {
+      item.addEventListener('click', () => goTo(i));
+      item.addEventListener('keydown', (e) => { if (e.key === 'Enter' || e.key === ' ') goTo(i); });
+    });
+
+    nextBtn && nextBtn.addEventListener('click', () => goTo(currentStep + 1));
+    prevBtn && prevBtn.addEventListener('click', () => goTo(currentStep - 1));
+    finalPrevBtn && finalPrevBtn.addEventListener('click', () => goTo(currentStep - 1));
+
+    // Loading state on submit
+    const form = document.getElementById('course-form');
+    form && form.addEventListener('submit', function() {
+      submitBtn && submitBtn.classList.add('loading');
+    });
+
+    // Init: Auto-focus the first panel that contains validation errors and mark error steps
+    let targetStep = 0;
+    let foundFirstError = false;
+    panels.forEach((p, idx) => {
+      if (p && p.querySelector('.field-error')) {
+        if (!foundFirstError) {
+          targetStep = idx;
+          foundFirstError = true;
+        }
+        if (stepItems[idx]) {
+          const bubble = stepItems[idx].querySelector('.step-bubble');
+          if (bubble) {
+            bubble.style.border = '2px solid #ef4444';
+            bubble.style.color = '#ef4444';
+          }
+        }
+      }
+    });
+    goTo(targetStep);
+  })();
+</script>
 {% endblock %}

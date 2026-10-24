@@ -9,6 +9,8 @@ from roadmaps.models import Roadmap, UserRoadmapEnrollment
 from tutorials.models import TutorialTopic, TutorialCategory
 from notes.models import Note
 from accounts.models import UserProfile, Badge, UserBadge, check_and_award_badges
+from code_sources.models import CodeSource
+from community.models import DoubtQuestion
 from courses.forms import CourseForm, LessonForm
 from live_classes.forms import LiveClassScheduleForm
 from roadmaps.forms import RoadmapForm
@@ -197,8 +199,8 @@ def student_dashboard(request):
             'is_completed': daily_solved,
         },
         {
-            'title': 'Code Sandbox Run',
-            'desc': 'Execute any solution in the live compiler',
+            'title': 'Practice Set Challenge',
+            'desc': 'Solve a curated problem from the practice sets',
             'icon': 'bi-code-square',
             'color': 'primary',
             'xp': 15,
@@ -217,14 +219,14 @@ def student_dashboard(request):
             'is_completed': total_completed_lessons > 0,
         },
         {
-            'title': 'AI Quiz Challenge',
-            'desc': 'Test your concepts with 5-minute technical AI quiz',
-            'icon': 'bi-stars',
+            'title': 'Tutorial Study Session',
+            'desc': 'Review topic guides and master core engineering fundamentals',
+            'icon': 'bi-book-half',
             'color': 'purple',
             'xp': 20,
-            'progress': 0,
+            'progress': 1 if total_completed_lessons > 0 else 0,
             'target': 1,
-            'is_completed': False,
+            'is_completed': total_completed_lessons > 0,
         }
     ]
 
@@ -250,7 +252,8 @@ def student_dashboard(request):
     # 8. All Platform Resources for All-in-One Student Dashboard Suite
     tutorial_tracks = TutorialCategory.objects.all().prefetch_related('topics')[:6]
     dsa_questions = CodingQuestion.objects.all().select_related('category')[:30]
-    all_upcoming_classes = LiveClass.objects.filter(status__in=['upcoming', 'live']).order_by('scheduled_date', 'start_time')[:6]
+    recent_code_sources = CodeSource.objects.select_related('author').order_by('-created_at')[:6]
+    recent_doubts = DoubtQuestion.objects.select_related('author').order_by('-created_at')[:6]
 
     context = {
         'profile': profile,
@@ -259,9 +262,6 @@ def student_dashboard(request):
         'completed_courses_count': completed_courses_count,
         'primary_course': primary_course,
         'total_completed_lessons': total_completed_lessons,
-        'upcoming_classes': upcoming_classes,
-        'live_now_class': live_now_class,
-        'all_upcoming_classes': all_upcoming_classes,
         'solved_count': solved_count,
         'attempted_count': attempted_count,
         'total_questions': total_questions,
@@ -299,6 +299,8 @@ def student_dashboard(request):
         'recommended_courses': recommended_courses,
         'tutorial_tracks': tutorial_tracks,
         'dsa_questions': dsa_questions,
+        'recent_code_sources': recent_code_sources,
+        'recent_doubts': recent_doubts,
     }
     return render(request, 'dashboard/student_dashboard.html', context)
 
@@ -335,7 +337,8 @@ def admin_dashboard(request):
         'total_tutorial_categories': TutorialCategory.objects.count(),
         'total_courses': Course.objects.count(),
         'total_coding_questions': CodingQuestion.objects.count(),
-        'total_live_classes': LiveClass.objects.count(),
+        'total_code_sources': CodeSource.objects.count(),
+        'total_doubts': DoubtQuestion.objects.count(),
         'total_roadmaps': Roadmap.objects.count(),
         'total_notes': Note.objects.count(),
         'total_features': PlatformFeature.objects.count(),
@@ -347,7 +350,7 @@ def admin_dashboard(request):
     all_tutorial_categories = TutorialCategory.objects.annotate(topics_count=Count('topics')).order_by('order', 'name')
     recent_courses = Course.objects.select_related('category', 'instructor').order_by('-created_at')[:8]
     recent_questions = CodingQuestion.objects.select_related('category').order_by('-id')[:8]
-    recent_classes = LiveClass.objects.select_related('instructor').order_by('-created_at')[:8]
+    recent_code_sources = CodeSource.objects.select_related('author').order_by('-created_at')[:8]
     recent_roadmaps = Roadmap.objects.order_by('-created_at')[:8]
     recent_notes = Note.objects.select_related('category', 'uploader').order_by('-uploaded_at')[:8]
     recent_features = PlatformFeature.objects.all().order_by('order', '-created_at')[:12]
@@ -364,13 +367,12 @@ def admin_dashboard(request):
         'recent_lessons': recent_lessons,
         'all_courses_list': all_courses_list,
         'recent_questions': recent_questions,
-        'recent_classes': recent_classes,
+        'recent_code_sources': recent_code_sources,
         'recent_roadmaps': recent_roadmaps,
         'recent_features': recent_features,
         'course_form': CourseForm(),
         'lesson_form': LessonForm(),
         'question_form': CodingQuestionForm(),
-        'class_form': LiveClassScheduleForm(),
         'roadmap_form': RoadmapForm(),
         'topic_form': TutorialTopicForm(),
         'category_form': TutorialCategoryForm(),

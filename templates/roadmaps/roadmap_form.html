@@ -71,6 +71,26 @@
                 </div>
             </div>
 
+            <!-- External Roadmap Website Link (Admin feature) -->
+            <div class="p-3 mb-3 rounded-3 border" style="background: rgba(14, 165, 233, 0.04); border-color: rgba(14, 165, 233, 0.25) !important;">
+                <div class="row g-3">
+                    <div class="col-md-8">
+                        <label class="form-label fw-semibold small text-slate-700">
+                            <i class="bi bi-globe2 text-primary me-1"></i> External Roadmap Website Link <span class="text-muted fw-normal">(Optional)</span>
+                        </label>
+                        {{ form.website_url }}
+                        <div class="form-text smaller text-muted">Add any external website link (e.g. roadmap.sh, official documentation, or interactive tool link) that you want learners to visit.</div>
+                        {% if form.website_url.errors %}<div class="text-danger smaller mt-1">{{ form.website_url.errors }}</div>{% endif %}
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label fw-semibold small text-slate-700">Link Button Label <span class="text-muted fw-normal">(Optional)</span></label>
+                        {{ form.website_link_label }}
+                        <div class="form-text smaller text-muted">e.g. "Visit roadmap.sh" or "Official Guide"</div>
+                        {% if form.website_link_label.errors %}<div class="text-danger smaller mt-1">{{ form.website_link_label.errors }}</div>{% endif %}
+                    </div>
+                </div>
+            </div>
+
             <!-- Short Description -->
             <div class="mb-3">
                 <label class="form-label fw-semibold small text-slate-700">Short Summary <span class="text-danger">*</span></label>

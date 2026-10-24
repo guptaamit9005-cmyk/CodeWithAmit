@@ -1,0 +1,374 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Manage Sections & Links: {{ course.title }} — CodeWithAmit Studio{% endblock %}
+
+{% block content %}
+<div class="container py-4 py-md-5" style="max-width: 1140px;">
+
+    <!-- Top Breadcrumb & Nav -->
+    <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb smaller mb-0">
+            <li class="breadcrumb-item"><a href="{% url 'courses:course_list' %}" class="text-decoration-none">Courses</a></li>
+            <li class="breadcrumb-item"><a href="{% url 'courses:course_detail' course.slug %}" class="text-decoration-none">{{ course.title|truncatechars:35 }}</a></li>
+            <li class="breadcrumb-item active text-muted" aria-current="page">Curriculum &amp; Sections Manager</li>
+        </ol>
+    </nav>
+
+    <!-- Header Banner -->
+    <div class="card border-0 p-4 p-md-4 rounded-4 shadow-sm mb-4 position-relative overflow-hidden" 
+         style="background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 60%, #1e293b 100%); color: #fff;">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 position-relative z-1">
+            <div>
+                <div class="d-flex align-items-center gap-2 mb-2 flex-wrap">
+                    <span class="badge rounded-pill px-3 py-1 fw-bold" style="background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3);">
+                        <i class="bi bi-diagram-3-fill me-1"></i> Curriculum &amp; Section Studio
+                    </span>
+                    <span class="badge rounded-pill px-2.5 py-1" style="background: rgba(255, 255, 255, 0.1); color: #e2e8f0;">
+                        {{ sections.count }} Sections
+                    </span>
+                    <span class="badge rounded-pill px-2.5 py-1" style="background: rgba(255, 255, 255, 0.1); color: #e2e8f0;">
+                        {{ course.total_lessons }} Lessons
+                    </span>
+                    {% if course.has_github %}
+                        <a href="{{ course.github_repo_url }}" target="_blank" rel="noopener noreferrer" class="badge rounded-pill px-2.5 py-1 text-decoration-none" style="background: #24292e; color: #fff; border: 1px solid rgba(255, 255, 255, 0.2);">
+                            <i class="bi bi-github me-1"></i> {{ course.github_repo_name|default:'GitHub Repo' }}
+                        </a>
+                    {% endif %}
+                </div>
+                <h1 class="h3 fw-bold font-heading mb-1 text-white">{{ course.title }}</h1>
+                <p class="small text-slate-300 mb-0">Organize your course into structured sections/modules, connect GitHub source code repositories, and attach official documentation or starter assets.</p>
+            </div>
+            <div class="d-flex flex-wrap gap-2">
+                <a href="{% url 'courses:course_detail' course.slug %}" class="btn btn-outline-light btn-sm rounded-pill px-3 fw-semibold">
+                    <i class="bi bi-eye me-1"></i> View Live Course
+                </a>
+                <a href="{% url 'courses:add_lesson' %}?course={{ course.slug }}" class="btn btn-success btn-sm rounded-pill px-3 fw-semibold text-white shadow-sm">
+                    <i class="bi bi-plus-lg me-1"></i> Add New Lesson
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4">
+        <!-- Left Column: Add New Section Form & Fast Tools -->
+        <div class="col-lg-4">
+            
+            <!-- Add Section Card -->
+            <div class="card border rounded-4 p-4 shadow-sm bg-white mb-4 sticky-top" style="top: 80px;">
+                <div class="d-flex align-items-center gap-2 mb-3 pb-2 border-bottom">
+                    <div class="rounded-circle d-flex align-items-center justify-content-center bg-primary-subtle text-primary" style="width: 36px; height: 36px;">
+                        <i class="bi bi-folder-plus fs-5"></i>
+                    </div>
+                    <div>
+                        <h5 class="fw-bold mb-0 text-slate-900">Add New Section</h5>
+                        <span class="smaller text-muted">Create a module or chapter</span>
+                    </div>
+                </div>
+
+                <form action="{% url 'courses:add_section' course.slug %}" method="POST">
+                    {% csrf_token %}
+                    <input type="hidden" name="next" value="manage_sections">
+
+                    <div class="mb-3">
+                        <label class="form-label smaller fw-semibold text-slate-700">Section Title <span class="text-danger">*</span></label>
+                        {{ section_form.title }}
+                        <div class="smaller text-muted mt-1">e.g. Module 1: Getting Started &amp; Git Setup</div>
+                    </div>
+
+                    <div class="row g-2 mb-3">
+                        <div class="col-5">
+                            <label class="form-label smaller fw-semibold text-slate-700">Order #</label>
+                            {{ section_form.order }}
+                        </div>
+                        <div class="col-7">
+                            <label class="form-label smaller fw-semibold text-slate-700">
+                                <i class="bi bi-github me-1"></i> GitHub Folder/URL
+                            </label>
+                            {{ section_form.github_url }}
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label smaller fw-semibold text-slate-700">Section Overview (Optional)</label>
+                        {{ section_form.description }}
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 rounded-pill fw-semibold py-2 shadow-sm">
+                        <i class="bi bi-plus-circle-fill me-1"></i> Create Section
+                    </button>
+                </form>
+
+                <!-- Course-level GitHub Repo Link quick preview/edit -->
+                <div class="mt-4 pt-3 border-top">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <span class="smaller fw-bold text-slate-800">
+                            <i class="bi bi-github me-1"></i> Course GitHub Repository
+                        </span>
+                        <a href="{% url 'courses:edit_course' course.slug %}" class="smaller text-primary text-decoration-none">Edit</a>
+                    </div>
+                    {% if course.has_github %}
+                        <div class="p-2.5 rounded-3 bg-light border d-flex align-items-center justify-content-between gap-2 overflow-hidden">
+                            <div class="d-flex align-items-center gap-2 overflow-hidden">
+                                <i class="bi bi-git text-danger fs-5"></i>
+                                <span class="smaller text-truncate font-monospace text-dark">{{ course.github_repo_url }}</span>
+                            </div>
+                            <a href="{{ course.github_repo_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-xs btn-outline-dark rounded-pill px-2">
+                                <i class="bi bi-box-arrow-up-right"></i>
+                            </a>
+                        </div>
+                    {% else %}
+                        <div class="p-2.5 rounded-3 bg-light border text-center">
+                            <span class="smaller text-muted d-block mb-1">No repository linked to this course yet.</span>
+                            <a href="{% url 'courses:edit_course' course.slug %}" class="btn btn-xs btn-outline-primary rounded-pill px-3">
+                                <i class="bi bi-link-45deg me-1"></i> Link GitHub Repository
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Right Column: Sections List & Section Links Management -->
+        <div class="col-lg-8">
+
+            {% if sections %}
+                <div class="d-flex flex-column gap-4">
+                    {% for sec in sections %}
+                        <div class="card border rounded-4 shadow-sm bg-white overflow-hidden" id="section-card-{{ sec.id }}">
+                            <!-- Section Header Bar -->
+                            <div class="p-3.5 p-md-4 border-bottom bg-light d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
+                                <div class="d-flex align-items-center gap-3">
+                                    <span class="badge bg-primary text-white rounded-circle p-2 d-flex align-items-center justify-content-center fw-bold" style="width: 32px; height: 32px; font-size: 0.9rem;">
+                                        {{ sec.order }}
+                                    </span>
+                                    <div>
+                                        <h5 class="fw-bold mb-0 text-slate-900 font-heading">{{ sec.title }}</h5>
+                                        <div class="d-flex align-items-center gap-2 smaller text-muted mt-0.5">
+                                            <span><i class="bi bi-play-circle me-1"></i>{{ sec.total_lessons }} lessons</span>
+                                            <span>&bull;</span>
+                                            <span><i class="bi bi-clock me-1"></i>{{ sec.total_duration_minutes }} mins</span>
+                                            {% if sec.has_github %}
+                                                <span>&bull;</span>
+                                                <a href="{{ sec.github_url }}" target="_blank" rel="noopener noreferrer" class="text-dark fw-semibold text-decoration-none">
+                                                    <i class="bi bi-github text-primary me-1"></i>Section GitHub
+                                                </a>
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="d-flex align-items-center gap-1.5 flex-wrap">
+                                    <a href="{% url 'courses:add_lesson' %}?course={{ course.slug }}&section={{ sec.id }}" class="btn btn-xs btn-success text-white rounded-pill px-2.5 py-1 fw-semibold shadow-xs" title="Add lesson directly to this section">
+                                        <i class="bi bi-plus-lg me-1"></i> Add Lesson
+                                    </a>
+                                    <button class="btn btn-xs btn-outline-primary rounded-pill px-2.5 py-1 fw-semibold" type="button" data-bs-toggle="collapse" data-bs-target="#addLinkCollapse-{{ sec.id }}" aria-expanded="false" aria-controls="addLinkCollapse-{{ sec.id }}">
+                                        <i class="bi bi-link-45deg me-1"></i> Add Link
+                                    </button>
+                                    <a href="{% url 'courses:edit_section' sec.id %}" class="btn btn-xs btn-outline-secondary rounded-pill px-2 py-1" title="Edit Section Details">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <form action="{% url 'courses:delete_section' sec.id %}" method="POST" class="d-inline" onsubmit="return confirm('Delete this section? Lessons in it will NOT be deleted, only unsectioned.');">
+                                        {% csrf_token %}
+                                        <button type="submit" class="btn btn-xs btn-outline-danger rounded-pill px-2 py-1" title="Delete Section">
+                                            <i class="bi bi-trash3"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+
+                            <div class="p-3 p-md-4">
+                                {% if sec.description %}
+                                    <p class="smaller text-secondary mb-3">{{ sec.description }}</p>
+                                {% endif %}
+
+                                <!-- Section Links Pill Strip -->
+                                <div class="mb-3">
+                                    <div class="d-flex align-items-center justify-content-between mb-2">
+                                        <span class="smaller fw-bold text-slate-800">
+                                            <i class="bi bi-paperclip me-1 text-primary"></i> Attached Links &amp; Resources ({{ sec.links.count }}):
+                                        </span>
+                                    </div>
+
+                                    {% if sec.links.all %}
+                                        <div class="d-flex flex-wrap gap-2">
+                                            {% for link in sec.links.all %}
+                                                <div class="d-inline-flex align-items-center gap-1.5 px-2.5 py-1 rounded-pill smaller border shadow-xs" style="background: var(--cwa-bg-subtle, #f8fafc);">
+                                                    <i class="bi {{ link.icon_class }} {% if link.link_type == 'github' %}text-dark{% elif link.link_type == 'docs' %}text-primary{% elif link.link_type == 'download' %}text-success{% else %}text-info{% endif %}"></i>
+                                                    <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" class="fw-semibold text-slate-900 text-decoration-none hover-primary">
+                                                        {{ link.title }}
+                                                    </a>
+                                                    <span class="badge rounded-pill bg-light text-muted border px-1.5 py-0" style="font-size: 0.65rem;">{{ link.get_link_type_display }}</span>
+                                                    <form action="{% url 'courses:delete_section_link' link.id %}" method="POST" class="d-inline ms-1" onsubmit="return confirm('Remove this link?');">
+                                                        {% csrf_token %}
+                                                        <button type="submit" class="btn-close" style="font-size: 0.55rem;" aria-label="Remove link"></button>
+                                                    </form>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        <div class="smaller text-muted py-1 fst-italic">
+                                            No links attached yet. Click "Add Link" above to add GitHub repo, official documentation, or notes for this section.
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                                <!-- Collapsible Inline Link Adder Form -->
+                                <div class="collapse mb-3" id="addLinkCollapse-{{ sec.id }}">
+                                    <div class="p-3 rounded-3 bg-light border">
+                                        <div class="d-flex justify-content-between align-items-center mb-2">
+                                            <span class="smaller fw-bold text-slate-900">
+                                                <i class="bi bi-link me-1 text-primary"></i> Add Resource / Link to "{{ sec.title }}"
+                                            </span>
+                                            <button type="button" class="btn-close" data-bs-toggle="collapse" data-bs-target="#addLinkCollapse-{{ sec.id }}" aria-label="Close"></button>
+                                        </div>
+                                        <form action="{% url 'courses:add_section_link' sec.id %}" method="POST">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="next" value="manage_sections">
+                                            <div class="row g-2">
+                                                <div class="col-md-5">
+                                                    <input type="text" name="title" required class="form-control form-control-sm" placeholder="Link Title (e.g. GitHub Starter Code, Docs)">
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <input type="url" name="url" required class="form-control form-control-sm" placeholder="https://github.com/... or https://...">
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <select name="link_type" class="form-select form-select-sm">
+                                                        <option value="github">GitHub Repo / Code</option>
+                                                        <option value="docs">Official Documentation</option>
+                                                        <option value="notes">Notes &amp; Cheat Sheet</option>
+                                                        <option value="download">Starter Files / Assets</option>
+                                                        <option value="external">Reference / Article</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="d-flex justify-content-end gap-2 mt-2">
+                                                <button type="button" class="btn btn-outline-secondary btn-xs rounded-pill px-3" data-bs-toggle="collapse" data-bs-target="#addLinkCollapse-{{ sec.id }}">Cancel</button>
+                                                <button type="submit" class="btn btn-primary btn-xs rounded-pill px-3 fw-semibold">
+                                                    <i class="bi bi-plus-lg me-1"></i> Save Link
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+
+                                <!-- Lessons Inside This Section -->
+                                <div>
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <span class="smaller fw-bold text-slate-800">
+                                            <i class="bi bi-collection-play me-1 text-primary"></i> Lessons in this Section ({{ sec.lessons.count }}):
+                                        </span>
+                                    </div>
+
+                                    {% if sec.lessons.all %}
+                                        <div class="list-group list-group-flush border rounded-3 overflow-hidden">
+                                            {% for l in sec.lessons.all %}
+                                                <div class="list-group-item px-3 py-2 d-flex justify-content-between align-items-center">
+                                                    <div class="d-flex align-items-center gap-2 overflow-hidden">
+                                                        <span class="badge bg-light text-muted border smaller px-2 py-0.5">#{{ l.order }}</span>
+                                                        <a href="{% url 'courses:lesson_detail' course.slug l.slug %}" class="smaller fw-semibold text-slate-900 text-decoration-none hover-primary text-truncate">
+                                                            {{ l.title }}
+                                                        </a>
+                                                        {% if l.has_github %}
+                                                            <a href="{{ l.github_url }}" target="_blank" rel="noopener noreferrer" class="badge bg-dark text-white rounded-pill px-2 py-0.5 text-decoration-none smaller" title="Lesson GitHub Code">
+                                                                <i class="bi bi-github me-1"></i>Code
+                                                            </a>
+                                                        {% endif %}
+                                                        {% if l.is_free_preview %}
+                                                            <span class="badge bg-success-subtle text-success smaller rounded-pill">Preview</span>
+                                                        {% endif %}
+                                                    </div>
+                                                    <div class="d-flex align-items-center gap-2">
+                                                        <span class="smaller text-muted">{{ l.duration_minutes }}m</span>
+                                                        <a href="{% url 'courses:edit_lesson' course.slug l.slug %}" class="btn btn-xs btn-outline-secondary rounded-pill px-2 py-0.5" title="Edit Lesson">
+                                                            <i class="bi bi-pencil"></i>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        <div class="p-3 bg-light rounded-3 border text-center smaller text-muted">
+                                            No lessons assigned to this section yet. 
+                                            <a href="{% url 'courses:add_lesson' %}?course={{ course.slug }}&section={{ sec.id }}" class="fw-semibold text-primary text-decoration-none">
+                                                + Add a lesson now
+                                            </a>
+                                        </div>
+                                    {% endif %}
+                                </div>
+
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="card border rounded-4 p-5 text-center bg-white shadow-sm mb-4">
+                    <div class="rounded-circle d-inline-flex align-items-center justify-content-center bg-primary-subtle text-primary mb-3" style="width: 56px; height: 56px;">
+                        <i class="bi bi-folder2-open fs-2"></i>
+                    </div>
+                    <h4 class="fw-bold text-slate-900 font-heading mb-1">No Sections Created Yet</h4>
+                    <p class="small text-secondary mb-3" style="max-width: 480px; margin: 0 auto;">
+                        Group your lessons into well-organized modules like "Module 1: Fundamentals", "Module 2: Advanced Projects", and add direct links to GitHub repositories and documentation!
+                    </p>
+                    <p class="smaller text-muted">Use the "Add New Section" form on the left to create your first module.</p>
+                </div>
+            {% endif %}
+
+            <!-- Unsectioned Lessons (Lessons not in any section yet) -->
+            {% if unsectioned_lessons %}
+                <div class="card border rounded-4 shadow-sm bg-white overflow-hidden mt-4">
+                    <div class="p-3.5 p-md-4 border-bottom bg-warning-subtle d-flex justify-content-between align-items-center">
+                        <div class="d-flex align-items-center gap-2">
+                            <i class="bi bi-exclamation-circle-fill text-warning fs-5"></i>
+                            <div>
+                                <h6 class="fw-bold mb-0 text-slate-900">Unassigned Lessons ({{ unsectioned_lessons.count }})</h6>
+                                <span class="smaller text-muted">These lessons are currently published without a specific section/module</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-3 p-md-4">
+                        <div class="list-group list-group-flush border rounded-3 overflow-hidden">
+                            {% for l in unsectioned_lessons %}
+                                <div class="list-group-item px-3 py-2.5 d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-2">
+                                    <div class="d-flex align-items-center gap-2 overflow-hidden">
+                                        <span class="badge bg-light text-muted border smaller px-2 py-0.5">#{{ l.order }}</span>
+                                        <a href="{% url 'courses:lesson_detail' course.slug l.slug %}" class="smaller fw-semibold text-slate-900 text-decoration-none hover-primary text-truncate">
+                                            {{ l.title }}
+                                        </a>
+                                        {% if l.has_github %}
+                                            <a href="{{ l.github_url }}" target="_blank" rel="noopener noreferrer" class="badge bg-dark text-white rounded-pill px-2 py-0.5 text-decoration-none smaller">
+                                                <i class="bi bi-github me-1"></i>Code
+                                            </a>
+                                        {% endif %}
+                                    </div>
+
+                                    {% if sections %}
+                                        <!-- Quick Assign Dropdown Form -->
+                                        <form action="{% url 'courses:manage_sections' course.slug %}" method="POST" class="d-flex align-items-center gap-2">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="assign_lesson">
+                                            <input type="hidden" name="lesson_id" value="{{ l.id }}">
+                                            <select name="section_id" class="form-select form-select-sm" style="font-size: 0.8rem; width: auto;" onchange="this.form.submit()">
+                                                <option value="">Move to Section...</option>
+                                                {% for s in sections %}
+                                                    <option value="{{ s.id }}">Section {{ s.order }}: {{ s.title|truncatechars:28 }}</option>
+                                                {% endfor %}
+                                            </select>
+                                            <a href="{% url 'courses:edit_lesson' course.slug l.slug %}" class="btn btn-xs btn-outline-secondary rounded-pill px-2 py-1" title="Edit Lesson">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                        </form>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+        </div>
+    </div>
+
+</div>
+{% endblock %}

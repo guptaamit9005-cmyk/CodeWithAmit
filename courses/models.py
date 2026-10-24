@@ -16,7 +16,13 @@ class CourseCategory(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.name)
+            base_slug = slugify(self.name) or 'category'
+            slug = base_slug
+            counter = 1
+            while CourseCategory.objects.filter(slug=slug).exclude(pk=self.pk).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            self.slug = slug
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -33,16 +39,17 @@ class Course(models.Model):
     title = models.CharField(max_length=200)
     slug = models.SlugField(max_length=220, unique=True, blank=True)
     category = models.ForeignKey(CourseCategory, on_delete=models.CASCADE, related_name='courses')
-    instructor = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='taught_courses')
+    instructor = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='taught_courses')
     short_description = models.CharField(max_length=255)
     description = models.TextField()
     difficulty = models.CharField(max_length=20, choices=DIFFICULTY_CHOICES, default='Beginner')
     thumbnail = models.ImageField(upload_to='courses/thumbnails/', blank=True, null=True)
     thumbnail_url = models.URLField(blank=True, help_text="External image URL fallback")
-    estimated_hours = models.PositiveIntegerField(default=10)
+    github_repo_url = models.URLField(blank=True, default='', help_text="Direct link to course GitHub repository or source code")
+    estimated_hours = models.PositiveIntegerField(default=10, blank=True)
     batch_name = models.CharField(max_length=100, blank=True, default='', help_text="e.g. Delta 5.0, Sigma 4.0, Alpha")
-    price = models.PositiveIntegerField(default=0, help_text="Discounted Price in ₹ (INR), 0 for Free")
-    original_price = models.PositiveIntegerField(default=0, help_text="Original Price before discount in ₹ (INR)")
+    price = models.PositiveIntegerField(default=0, blank=True, help_text="Discounted Price in ₹ (INR), 0 for Free")
+    original_price = models.PositiveIntegerField(default=0, blank=True, help_text="Original Price before discount in ₹ (INR)")
     batch_start_date = models.CharField(max_length=100, default='Starts Soon', blank=True)
     language = models.CharField(max_length=100, default='Hinglish (Hindi + English)', blank=True)
     tag = models.CharField(max_length=50, default='Bestseller', blank=True, help_text="e.g. Bestseller, Trending, Placement Special")
@@ -72,6 +79,23 @@ class Course(models.Model):
     @property
     def total_lessons(self):
         return self.lessons.count()
+
+    @property
+    def total_sections(self):
+        return self.sections.count()
+
+    @property
+    def has_github(self):
+        return bool(self.github_repo_url and self.github_repo_url.strip())
+
+    @property
+    def github_repo_name(self):
+        if not self.github_repo_url:
+            return ""
+        clean = self.github_repo_url.strip().rstrip('/')
+        if 'github.com/' in clean:
+            return clean.split('github.com/', 1)[1]
+        return clean
 
     @property
     def total_enrollments(self):
@@ -104,16 +128,90 @@ class Course(models.Model):
         return int((completed / total) * 100)
 
 
+class CourseSection(models.Model):
+    course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='sections')
+    title = models.CharField(max_length=200)
+    order = models.PositiveIntegerField(default=1)
+    description = models.TextField(blank=True, help_text="Overview of what is covered in this module/section")
+    github_url = models.URLField(blank=True, default='', help_text="GitHub folder or code repository for this section")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['order', 'id']
+
+    def __str__(self):
+        return f"{self.course.title} - Section #{self.order}: {self.title}"
+
+    @property
+    def total_lessons(self):
+        return self.lessons.count()
+
+    @property
+    def total_duration_minutes(self):
+        return sum(l.duration_minutes for l in self.lessons.all())
+
+    @property
+    def has_github(self):
+        return bool(self.github_url and self.github_url.strip())
+
+
+class SectionLink(models.Model):
+    LINK_TYPE_CHOICES = [
+        ('github', 'GitHub Repository / Code'),
+        ('docs', 'Official Documentation'),
+        ('notes', 'Notes & Cheat Sheet'),
+        ('download', 'Starter Assets / Files'),
+        ('external', 'Reference / Article'),
+    ]
+
+    section = models.ForeignKey(CourseSection, on_delete=models.CASCADE, related_name='links')
+    title = models.CharField(max_length=200, help_text="Display title for this link")
+    url = models.URLField(help_text="Direct target link (https://...)")
+    link_type = models.CharField(max_length=20, choices=LINK_TYPE_CHOICES, default='github')
+    order = models.PositiveIntegerField(default=1)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['order', 'id']
+
+    def __str__(self):
+        return f"{self.section.title} -> {self.title} ({self.get_link_type_display()})"
+
+    @property
+    def icon_class(self):
+        icons = {
+            'github': 'bi-github',
+            'docs': 'bi-book-half',
+            'notes': 'bi-file-earmark-text-fill',
+            'download': 'bi-download',
+            'external': 'bi-box-arrow-up-right',
+        }
+        return icons.get(self.link_type, 'bi-link-45deg')
+
+    @property
+    def badge_class(self):
+        badges = {
+            'github': 'bg-dark text-white',
+            'docs': 'bg-primary-subtle text-primary border border-primary-subtle',
+            'notes': 'bg-info-subtle text-info-emphasis border border-info-subtle',
+            'download': 'bg-success-subtle text-success border border-success-subtle',
+            'external': 'bg-secondary-subtle text-secondary border border-secondary-subtle',
+        }
+        return badges.get(self.link_type, 'bg-light text-dark')
+
+
 class Lesson(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='lessons')
+    section = models.ForeignKey(CourseSection, on_delete=models.SET_NULL, null=True, blank=True, related_name='lessons')
     title = models.CharField(max_length=200)
     slug = models.SlugField(max_length=220, blank=True)
-    order = models.PositiveIntegerField(default=1)
-    duration_minutes = models.PositiveIntegerField(default=15)
+    order = models.PositiveIntegerField(default=1, blank=True)
+    duration_minutes = models.PositiveIntegerField(default=15, blank=True)
     video_url = models.URLField(blank=True, help_text="YouTube video URL or embed link")
-    content = models.TextField(help_text="Detailed lesson content (Markdown / HTML supported)")
+    github_url = models.URLField(blank=True, default='', help_text="Direct GitHub link for this lesson code, commit, or repository")
+    content = models.TextField(blank=True, default='', help_text="Detailed lesson content (Markdown / HTML supported)")
     code_snippet = models.TextField(blank=True, help_text="Example code snippet")
-    code_language = models.CharField(max_length=30, default='python')
+    code_language = models.CharField(max_length=30, default='python', blank=True)
     is_free_preview = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -123,7 +221,13 @@ class Lesson(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.title)
+            base_slug = slugify(self.title) or 'lesson'
+            slug = base_slug
+            counter = 1
+            while Lesson.objects.filter(course=self.course, slug=slug).exclude(pk=self.pk).exists():
+                slug = f"{base_slug}-{counter}"
+                counter += 1
+            self.slug = slug
         super().save(*args, **kwargs)
 
     def __str__(self):
@@ -136,6 +240,10 @@ class Lesson(models.Model):
             return None
         match = re.search(r'(?:v=|\/|youtu\.be\/|embed\/)([0-9A-Za-z_-]{11})', self.video_url)
         return match.group(1) if match else None
+
+    @property
+    def has_github(self):
+        return bool(self.github_url and self.github_url.strip())
 
 
 class Quiz(models.Model):

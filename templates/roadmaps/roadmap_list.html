@@ -81,9 +81,16 @@
                         <!-- Card Banner Header with Custom Gradient & Icon -->
                         <div class="p-4 position-relative text-white overflow-hidden d-flex flex-column justify-content-between" style="background: {{ r.banner_color }}; min-height: 150px;">
                             <div class="d-flex justify-content-between align-items-start position-relative" style="z-index: 2;">
-                                <span class="badge rounded-pill px-2.5 py-1 smaller fw-bold" style="background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.3); color: #ffffff;">
-                                    <i class="bi bi-briefcase-fill me-1"></i> {{ r.target_role|default:'Tech Track' }}
-                                </span>
+                                <div class="d-flex flex-wrap gap-1.5 align-items-center">
+                                    <span class="badge rounded-pill px-2.5 py-1 smaller fw-bold" style="background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(8px); border: 1px solid rgba(255, 255, 255, 0.3); color: #ffffff;">
+                                        <i class="bi bi-briefcase-fill me-1"></i> {{ r.target_role|default:'Tech Track' }}
+                                    </span>
+                                    {% if r.website_url %}
+                                        <a href="{{ r.website_url }}" target="_blank" rel="noopener noreferrer" class="badge rounded-pill px-2 py-1 smaller fw-semibold text-white text-decoration-none d-inline-flex align-items-center gap-1" style="background: rgba(0, 0, 0, 0.35); backdrop-filter: blur(6px); border: 1px solid rgba(255, 255, 255, 0.25);" title="Visit official roadmap website">
+                                            <i class="bi bi-globe2"></i> <span>Website</span> <i class="bi bi-arrow-up-right"></i>
+                                        </a>
+                                    {% endif %}
+                                </div>
                                 
                                 <span class="badge rounded-pill px-2.5 py-1 smaller" style="background: rgba(0, 0, 0, 0.25); color: #ffffff;">
                                     <i class="bi bi-clock me-1"></i> {{ r.estimated_time }}
@@ -132,10 +139,18 @@
 
                             <!-- Actions Row -->
                             <div class="d-flex justify-content-between align-items-center mt-auto pt-1">
-                                <a href="{% url 'roadmaps:roadmap_detail' r.slug %}" class="btn btn-primary btn-sm rounded-pill px-4 py-2 fw-semibold shadow-xs hover-lift d-inline-flex align-items-center gap-1.5">
-                                    <span>{% if r.is_enrolled %}Continue Track{% else %}Explore Roadmap{% endif %}</span>
-                                    <i class="bi bi-arrow-right"></i>
-                                </a>
+                                <div class="d-flex align-items-center gap-1.5 flex-wrap">
+                                    <a href="{% url 'roadmaps:roadmap_detail' r.slug %}" class="btn btn-primary btn-sm rounded-pill px-4 py-2 fw-semibold shadow-xs hover-lift d-inline-flex align-items-center gap-1.5">
+                                        <span>{% if r.is_enrolled %}Continue Track{% else %}Explore Roadmap{% endif %}</span>
+                                        <i class="bi bi-arrow-right"></i>
+                                    </a>
+                                    {% if r.website_url %}
+                                        <a href="{{ r.website_url }}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-info rounded-pill px-2.5 py-1.5 fw-semibold d-inline-flex align-items-center gap-1" title="Open {{ r.website_link_label|default:'Roadmap Website' }}">
+                                            <i class="bi bi-box-arrow-up-right"></i>
+                                            <span class="smaller">{{ r.website_link_label|default:'Website' }}</span>
+                                        </a>
+                                    {% endif %}
+                                </div>
 
                                 <!-- Admin Quick Actions -->
                                 {% if request.user.is_staff or request.user.is_superuser %}
@@ -198,11 +213,11 @@
             </div>
             <div class="row g-3">
                 <div class="col-md-3 col-6">
-                    <a href="{% url 'coding_practice:code_editor' %}" class="p-3 rounded-3 border bg-white d-flex align-items-center gap-2.5 text-decoration-none text-dark hover-lift">
-                        <i class="bi bi-terminal-fill fs-5 text-success"></i>
+                    <a href="{% url 'tutorials:tutorial_list' %}" class="p-3 rounded-3 border bg-white d-flex align-items-center gap-2.5 text-decoration-none text-dark hover-lift">
+                        <i class="bi bi-book-half fs-5 text-success"></i>
                         <div>
-                            <div class="fw-semibold smaller">Code Compiler</div>
-                            <div class="smaller text-muted">Python, C++, Java</div>
+                            <div class="fw-semibold smaller">Tutorial Tracks</div>
+                            <div class="smaller text-muted">Step-by-Step Guides</div>
                         </div>
                     </a>
                 </div>
@@ -216,11 +231,11 @@
                     </a>
                 </div>
                 <div class="col-md-3 col-6">
-                    <a href="{% url 'live_classes:class_list' %}" class="p-3 rounded-3 border bg-white d-flex align-items-center gap-2.5 text-decoration-none text-dark hover-lift">
-                        <i class="bi bi-broadcast fs-5 text-danger"></i>
+                    <a href="{% url 'code_sources:list' %}" class="p-3 rounded-3 border bg-white d-flex align-items-center gap-2.5 text-decoration-none text-dark hover-lift">
+                        <i class="bi bi-github fs-5 text-info"></i>
                         <div>
-                            <div class="fw-semibold smaller">Live Sessions</div>
-                            <div class="smaller text-muted">Mentor Doubt Calls</div>
+                            <div class="fw-semibold smaller">Code Sources</div>
+                            <div class="smaller text-muted">GitHub Repos &amp; Code</div>
                         </div>
                     </a>
                 </div>

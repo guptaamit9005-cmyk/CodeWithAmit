@@ -3,83 +3,121 @@
 {% block title %}Doubt Community & Tech Q&A — CodeWithAmit{% endblock %}
 
 {% block content %}
-<div class="container py-4">
+<div class="container py-4 py-md-5">
+
     <!-- Community Header Banner -->
-    <div class="card border-0 rounded-4 overflow-hidden mb-4 shadow-sm" style="background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%); color: #fff;">
-        <div class="card-body p-4 p-md-5">
-            <div class="row align-items-center g-4">
-                <div class="col-lg-8">
-                    <span class="badge bg-primary text-white fw-bold px-3 py-1.5 rounded-pill mb-2">
-                        <i class="bi bi-chat-heart-fill me-1"></i> Peer Doubt Resolution & Q&A
+    <div class="cwa-glass-card p-4 p-md-5 rounded-4 mb-4 position-relative overflow-hidden" style="background: radial-gradient(circle at 85% 20%, rgba(245, 158, 11, 0.12) 0%, transparent 50%), var(--cwa-bg-card); border: 1px solid var(--cwa-border);">
+        <div class="row align-items-center g-4">
+            <div class="col-lg-8">
+                <div class="d-flex align-items-center gap-2 mb-2">
+                    <span class="badge rounded-pill px-3 py-1 fw-semibold d-inline-flex align-items-center gap-1.5" style="background: rgba(245, 158, 11, 0.12); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.25);">
+                        <i class="bi bi-patch-question-fill fs-6"></i> 24/7 Doubt Resolution
                     </span>
-                    <h1 class="display-6 fw-bold mb-2">Student Doubt Community</h1>
-                    <p class="text-light-50 fs-6 mb-3" style="max-width: 650px;">
-                        Stuck on a tricky bug, algorithm recursion, or system design concept? Ask your peers and instructors, get step-by-step verified solutions, and earn community XP.
-                    </p>
-                    <div class="d-flex flex-wrap gap-3 align-items-center">
-                        <div class="d-flex align-items-center gap-2">
-                            <i class="bi bi-check2-circle text-success fs-4"></i>
-                            <div>
-                                <div class="fw-bold fs-6">{{ solved_doubts }} Doubts Solved</div>
-                                <div class="smaller text-light-50">Verified Accepted Answers</div>
-                            </div>
+                    <span class="badge rounded-pill px-3 py-1 fw-semibold" style="background: rgba(16, 185, 129, 0.12); color: #34d399; border: 1px solid rgba(52, 211, 153, 0.25);">
+                        <i class="bi bi-shield-check me-1"></i> Admin &amp; Instructor Solutions
+                    </span>
+                </div>
+                <h1 class="h2 fw-bold font-heading mb-2" style="color: var(--cwa-text-heading);">
+                    Student Doubt Community
+                </h1>
+                <p class="text-secondary mb-3 mb-lg-0" style="font-size: 0.95rem; max-width: 680px;">
+                    Stuck on code errors, recursion depth, LeetCode edge cases, or database performance? Post your problem below and get step-by-step verified solutions directly from platform instructors and community peers.
+                </p>
+                <div class="d-flex flex-wrap gap-4 align-items-center pt-3 border-top mt-3" style="border-color: var(--cwa-border) !important;">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-shield-fill-check text-warning fs-4"></i>
+                        <div>
+                            <div class="fw-bold" style="color: var(--cwa-text-heading);">{{ admin_solved_doubts }} Admin Solutions</div>
+                            <div class="smaller text-muted">Verified by Lead Mentors</div>
                         </div>
-                        <div class="vr bg-secondary d-none d-sm-block" style="height: 35px;"></div>
-                        <div class="d-flex align-items-center gap-2">
-                            <i class="bi bi-award-fill text-warning fs-4"></i>
-                            <div>
-                                <div class="fw-bold fs-6">+25 to +50 XP Rewards</div>
-                                <div class="smaller text-light-50">For Quality Answers</div>
-                            </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-check2-circle text-success fs-4"></i>
+                        <div>
+                            <div class="fw-bold" style="color: var(--cwa-text-heading);">{{ solved_doubts }} Total Solved</div>
+                            <div class="smaller text-muted">Accepted Answers</div>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-question-circle text-info fs-4"></i>
+                        <div>
+                            <div class="fw-bold" style="color: var(--cwa-text-heading);">{{ unanswered_doubts }} Awaiting Help</div>
+                            <div class="smaller text-muted">Be the First to Answer</div>
                         </div>
                     </div>
                 </div>
+            </div>
 
-                <div class="col-lg-4 text-center text-lg-end">
-                    <a href="{% url 'community:ask_doubt' %}" class="btn btn-primary rounded-pill px-4 py-2.5 fw-bold shadow-lg d-inline-flex align-items-center gap-2">
-                        <i class="bi bi-plus-circle-fill fs-5"></i>
-                        <span>Ask a Doubt (+15 XP)</span>
-                    </a>
-                </div>
+            <div class="col-lg-4 text-lg-end d-flex flex-wrap gap-2 justify-content-lg-end">
+                <a href="{% url 'community:ask_doubt' %}" class="cwa-btn-primary py-2.5 px-4 shadow-sm">
+                    <i class="bi bi-plus-circle-fill"></i> Ask a Doubt (+15 XP)
+                </a>
+                <a href="{% url 'code_sources:list' %}" class="cwa-btn-secondary py-2.5 px-3.5">
+                    <i class="bi bi-github text-primary"></i> Code Sources Hub
+                </a>
             </div>
         </div>
     </div>
 
+    <!-- Admin Prompt if Staff/Admin is Logged In -->
+    {% if request.user.is_staff or request.user.is_superuser or request.user.profile.role == 'admin' %}
+        <div class="card p-3 rounded-4 mb-4" style="background: linear-gradient(90deg, rgba(245, 158, 11, 0.08), transparent); border: 1px solid rgba(245, 158, 11, 0.3);">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-2">
+                <div class="d-flex align-items-center gap-2.5">
+                    <div class="rounded-circle p-2 d-flex align-items-center justify-content-center text-white" style="background: #f59e0b; width: 34px; height: 34px;">
+                        <i class="bi bi-shield-fill-check"></i>
+                    </div>
+                    <div>
+                        <div class="fw-bold small" style="color: var(--cwa-text-heading);">
+                            Admin &amp; Instructor Action Center
+                        </div>
+                        <div class="smaller text-muted">
+                            You are in Administrator mode. Provide verified answers to students — your answers are automatically badged as <strong>"Official Admin Solution"</strong>.
+                        </div>
+                    </div>
+                </div>
+                <a href="?filter=unanswered" class="btn btn-warning btn-sm rounded-pill px-3 fw-bold text-dark">
+                    <i class="bi bi-lightning-charge-fill me-1"></i> Answer Pending Doubts ({{ unanswered_doubts }})
+                </a>
+            </div>
+        </div>
+    {% endif %}
+
     <!-- Filter & Search Controls -->
-    <div class="card bg-surface border-0 rounded-4 shadow-sm p-3 mb-4">
+    <div class="card p-3 rounded-4 mb-4" style="background: var(--cwa-bg-card); border: 1px solid var(--cwa-border);">
         <form method="GET" class="row g-2 align-items-center">
             <div class="col-md-5">
-                <div class="input-group">
-                    <span class="input-group-text bg-transparent border-end-0 text-muted">
+                <div class="input-group input-group-sm rounded-pill overflow-hidden" style="border: 1px solid var(--cwa-border); background: var(--cwa-bg-subtle);">
+                    <span class="input-group-text bg-transparent border-0 text-muted ps-3">
                         <i class="bi bi-search"></i>
                     </span>
-                    <input type="text" name="q" class="form-control border-start-0" placeholder="Search questions, errors, or keywords..." value="{{ query }}">
-                </div>
-            </div>
-
-            <div class="col-md-4">
-                <div class="btn-group w-100" role="group">
-                    <a href="?filter=all{% if selected_tag %}&tag={{ selected_tag }}{% endif %}" class="btn btn-sm {% if filter_type == 'all' %}btn-primary{% else %}btn-outline-secondary{% endif %}">
-                        All Doubts
-                    </a>
-                    <a href="?filter=unanswered{% if selected_tag %}&tag={{ selected_tag }}{% endif %}" class="btn btn-sm {% if filter_type == 'unanswered' %}btn-primary{% else %}btn-outline-secondary{% endif %}">
-                        Unanswered
-                    </a>
-                    <a href="?filter=solved{% if selected_tag %}&tag={{ selected_tag }}{% endif %}" class="btn btn-sm {% if filter_type == 'solved' %}btn-primary{% else %}btn-outline-secondary{% endif %}">
-                        Solved ✅
-                    </a>
-                    {% if user.is_authenticated %}
-                        <a href="?filter=my_doubts{% if selected_tag %}&tag={{ selected_tag }}{% endif %}" class="btn btn-sm {% if filter_type == 'my_doubts' %}btn-primary{% else %}btn-outline-secondary{% endif %}">
-                            My Doubts
-                        </a>
+                    <input type="text" name="q" class="form-control bg-transparent border-0 py-2" placeholder="Search questions, errors, or keywords..." value="{{ query }}">
+                    {% if query %}
+                        <a href="{% url 'community:doubt_list' %}" class="input-group-text bg-transparent border-0 text-muted pe-3"><i class="bi bi-x-circle"></i></a>
                     {% endif %}
                 </div>
             </div>
 
-            <div class="col-md-3 text-md-end">
-                <button type="submit" class="btn btn-outline-primary btn-sm rounded-pill px-4">
-                    Filter Results
-                </button>
+            <div class="col-md-7">
+                <div class="cwa-filter-scroll gap-1.5 justify-content-md-end mb-0">
+                    <a href="?filter=all{% if selected_tag %}&tag={{ selected_tag }}{% endif %}{% if query %}&q={{ query }}{% endif %}" class="cwa-filter-btn flex-shrink-0 text-decoration-none {% if filter_type == 'all' %}active{% endif %}">
+                        All Doubts ({{ total_doubts }})
+                    </a>
+                    <a href="?filter=admin_solved{% if selected_tag %}&tag={{ selected_tag }}{% endif %}{% if query %}&q={{ query }}{% endif %}" class="cwa-filter-btn flex-shrink-0 text-decoration-none {% if filter_type == 'admin_solved' %}active{% endif %}" style="border-color: rgba(245, 158, 11, 0.35);">
+                        <i class="bi bi-shield-check text-warning"></i> Admin Solved ({{ admin_solved_doubts }})
+                    </a>
+                    <a href="?filter=unanswered{% if selected_tag %}&tag={{ selected_tag }}{% endif %}{% if query %}&q={{ query }}{% endif %}" class="cwa-filter-btn flex-shrink-0 text-decoration-none {% if filter_type == 'unanswered' %}active{% endif %}">
+                        <i class="bi bi-question-circle"></i> Unanswered ({{ unanswered_doubts }})
+                    </a>
+                    <a href="?filter=solved{% if selected_tag %}&tag={{ selected_tag }}{% endif %}{% if query %}&q={{ query }}{% endif %}" class="cwa-filter-btn flex-shrink-0 text-decoration-none {% if filter_type == 'solved' %}active{% endif %}">
+                        <i class="bi bi-check2"></i> Solved ({{ solved_doubts }})
+                    </a>
+                    {% if user.is_authenticated %}
+                        <a href="?filter=my_doubts{% if selected_tag %}&tag={{ selected_tag }}{% endif %}" class="cwa-filter-btn flex-shrink-0 text-decoration-none {% if filter_type == 'my_doubts' %}active{% endif %}">
+                            <i class="bi bi-person"></i> My Doubts
+                        </a>
+                    {% endif %}
+                </div>
             </div>
         </form>
     </div>
@@ -89,52 +127,77 @@
         <div class="col-lg-8">
             <div class="d-flex flex-column gap-3">
                 {% for q in questions %}
-                    <div class="card bg-surface border-0 rounded-4 shadow-sm p-3 p-md-4 hover-lift">
+                    <div class="cwa-card p-3.5 p-md-4 hover-lift position-relative" style="border-radius: var(--cwa-radius-lg); {% if q.has_admin_solution %}border: 1.5px solid rgba(245, 158, 11, 0.35); background: linear-gradient(180deg, rgba(245, 158, 11, 0.02), var(--cwa-bg-card));{% endif %}">
                         <div class="d-flex gap-3">
                             <!-- Stats badges (Upvotes & Answers) -->
-                            <div class="d-flex flex-column align-items-center gap-2 flex-shrink-0" style="min-width: 60px;">
-                                <div class="text-center p-2 rounded-3 bg-surface-dark border border-light-subtle w-100">
-                                    <div class="fw-bold text-dark fs-6">{{ q.total_upvotes }}</div>
-                                    <div class="smaller text-muted" style="font-size: 11px;">votes</div>
+                            <div class="d-flex flex-column align-items-center gap-2 flex-shrink-0" style="min-width: 65px;">
+                                <div class="text-center p-2 rounded-3 w-100" style="background: var(--cwa-bg-subtle); border: 1px solid var(--cwa-border);">
+                                    <div class="fw-bold fs-6" style="color: var(--cwa-text-heading);">{{ q.total_upvotes }}</div>
+                                    <div class="smaller text-muted" style="font-size: 10px;">VOTES</div>
                                 </div>
 
-                                <div class="text-center p-2 rounded-3 {% if q.has_accepted_answer %}bg-success text-white{% elif q.total_answers > 0 %}bg-primary-subtle text-primary border border-primary-subtle{% else %}bg-surface-dark text-muted border border-light-subtle{% endif %} w-100">
+                                <div class="text-center p-2 rounded-3 w-100 {% if q.has_admin_solution %}text-warning border border-warning{% elif q.has_accepted_answer %}bg-success text-white{% elif q.total_answers > 0 %}text-primary border border-primary-subtle{% else %}text-muted border{% endif %}" style="{% if not q.has_accepted_answer %}background: var(--cwa-bg-subtle); border-color: var(--cwa-border);{% endif %}">
                                     <div class="fw-bold fs-6">
-                                        {% if q.has_accepted_answer %}<i class="bi bi-check-lg"></i>{% endif %}
+                                        {% if q.has_admin_solution %}
+                                            <i class="bi bi-shield-check"></i>
+                                        {% elif q.has_accepted_answer %}
+                                            <i class="bi bi-check-lg"></i>
+                                        {% endif %}
                                         {{ q.total_answers }}
                                     </div>
-                                    <div class="smaller" style="font-size: 11px;">answers</div>
+                                    <div class="smaller" style="font-size: 10px;">ANSWERS</div>
                                 </div>
                             </div>
 
                             <!-- Question Content -->
                             <div class="flex-grow-1 overflow-hidden">
-                                <h5 class="fw-bold mb-1">
-                                    <a href="{% url 'community:doubt_detail' q.slug %}" class="text-decoration-none text-dark hover-primary">
+                                
+                                <!-- Top status badge -->
+                                <div class="d-flex flex-wrap align-items-center gap-2 mb-1.5">
+                                    {% if q.has_admin_solution %}
+                                        <span class="badge rounded-pill fw-bold px-2.5 py-0.5 d-inline-flex align-items-center gap-1" style="background: rgba(245, 158, 11, 0.15); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3); font-size: 0.72rem;">
+                                            <i class="bi bi-patch-check-fill"></i> Official Admin Solution Available
+                                        </span>
+                                    {% elif q.has_accepted_answer %}
+                                        <span class="badge bg-success-subtle text-success border border-success-subtle rounded-pill px-2.5 py-0.5 smaller fw-semibold">
+                                            <i class="bi bi-check2-circle me-1"></i> Solved
+                                        </span>
+                                    {% else %}
+                                        <span class="badge rounded-pill px-2.5 py-0.5 smaller" style="background: var(--cwa-bg-subtle); color: var(--cwa-text-muted); border: 1px solid var(--cwa-border);">
+                                            Open Question
+                                        </span>
+                                    {% endif %}
+                                    <span class="smaller text-muted">• {{ q.views_count }} views</span>
+                                </div>
+
+                                <h2 class="h5 fw-bold mb-1.5">
+                                    <a href="{% url 'community:doubt_detail' q.slug %}" class="text-decoration-none" style="color: var(--cwa-text-heading);">
                                         {{ q.title }}
                                     </a>
-                                </h5>
-                                <p class="text-secondary smaller mb-2 text-truncate" style="max-height: 44px;">
-                                    {{ q.body|truncatewords:30 }}
+                                </h2>
+                                <p class="text-secondary smaller mb-3" style="line-height: 1.55; max-height: 48px; overflow: hidden;">
+                                    {{ q.body|truncatewords:28 }}
                                 </p>
 
-                                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 pt-2 border-top border-light-subtle">
-                                    <div class="d-flex flex-wrap gap-1">
+                                <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 pt-2 border-top" style="border-color: var(--cwa-border) !important;">
+                                    <div class="d-flex flex-wrap gap-1 align-items-center">
                                         {% for tag in q.get_tag_list %}
-                                            <a href="?tag={{ tag|slugify }}" class="badge bg-secondary-subtle text-secondary rounded-pill text-decoration-none smaller">
+                                            <a href="?tag={{ tag|slugify }}" class="badge rounded-pill text-decoration-none smaller" style="background: var(--cwa-bg-subtle); color: var(--cwa-text-muted); border: 1px solid var(--cwa-border);">
                                                 #{{ tag }}
                                             </a>
                                         {% endfor %}
                                         {% if q.language and q.language != 'general' %}
-                                            <span class="badge bg-dark text-cyan smaller">{{ q.language }}</span>
+                                            <span class="badge rounded-pill px-2 py-0.5 font-monospace text-uppercase" style="background: var(--cwa-bg-subtle); color: #38bdf8; border: 1px solid var(--cwa-border); font-size: 0.68rem;">
+                                                {{ q.language }}
+                                            </span>
                                         {% endif %}
                                     </div>
 
                                     <div class="d-flex align-items-center gap-2 smaller text-muted">
-                                        <div class="avatar-circle-sm bg-primary text-white rounded-circle d-flex align-items-center justify-content-center fw-bold" style="width: 24px; height: 24px; font-size: 11px;">
+                                        <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center fw-bold" style="width: 22px; height: 22px; font-size: 10px;">
                                             {{ q.author.username|first|upper }}
                                         </div>
-                                        <span>{{ q.author.username }}</span>
+                                        <span>@{{ q.author.username }}</span>
                                         <span>• {{ q.created_at|timesince }} ago</span>
                                     </div>
                                 </div>
@@ -142,29 +205,66 @@
                         </div>
                     </div>
                 {% empty %}
-                    <div class="card bg-surface border-0 rounded-4 shadow-sm p-5 text-center">
-                        <i class="bi bi-chat-square-dots display-4 text-muted mb-3 d-block"></i>
-                        <h5 class="text-dark fw-bold">No Doubts Found</h5>
-                        <p class="text-secondary smaller mb-3">Be the first to ask a question or explore different tags.</p>
-                        <a href="{% url 'community:ask_doubt' %}" class="btn btn-primary rounded-pill px-4 mx-auto">
-                            Ask a Doubt (+15 XP)
-                        </a>
+                    <div class="card p-5 rounded-4 text-center" style="background: var(--cwa-bg-card); border: 1px solid var(--cwa-border);">
+                        <div class="rounded-circle d-inline-flex p-3 mb-3 mx-auto" style="background: rgba(37, 99, 235, 0.1); color: #2563eb;">
+                            <i class="bi bi-chat-square-dots fs-1"></i>
+                        </div>
+                        <h4 class="fw-bold font-heading mb-2" style="color: var(--cwa-text-heading);">No Doubts Found</h4>
+                        <p class="text-secondary small mb-4">No questions match your current filter. Ask the community or reset filters.</p>
+                        <div class="d-flex justify-content-center gap-2">
+                            <a href="{% url 'community:doubt_list' %}" class="cwa-btn-secondary btn-sm py-2 px-3">
+                                Reset Filters
+                            </a>
+                            <a href="{% url 'community:ask_doubt' %}" class="cwa-btn-primary btn-sm py-2 px-3">
+                                <i class="bi bi-plus-circle me-1"></i> Ask a Doubt
+                            </a>
+                        </div>
                     </div>
                 {% endfor %}
             </div>
         </div>
 
-        <!-- Right Sidebar: Popular Tags & Community Guidelines -->
+        <!-- Right Sidebar: Verified Admin Info & Topics -->
         <div class="col-lg-4">
-            <!-- Popular Tags Cloud -->
-            <div class="card bg-surface border-0 rounded-4 shadow-sm p-4 mb-4">
-                <h5 class="fw-bold mb-3 text-dark">
+            
+            <!-- Admin Verified Guarantee Card -->
+            <div class="card p-4 rounded-4 mb-4" style="background: linear-gradient(135deg, rgba(245, 158, 11, 0.08), rgba(245, 158, 11, 0.02)), var(--cwa-bg-card); border: 1.5px solid rgba(245, 158, 11, 0.25);">
+                <div class="d-flex align-items-center gap-2.5 mb-2">
+                    <span class="rounded-circle p-2 text-warning d-flex align-items-center justify-content-center" style="background: rgba(245, 158, 11, 0.15); width: 36px; height: 36px;">
+                        <i class="bi bi-shield-check fs-5"></i>
+                    </span>
+                    <h5 class="fw-bold font-heading mb-0" style="color: var(--cwa-text-heading);">
+                        Admin Verified Solutions
+                    </h5>
+                </div>
+                <p class="text-secondary smaller mb-3" style="line-height: 1.55;">
+                    Every doubt asked in this community is actively monitored by CodeWithAmit administrators and mentors. Verified answers feature direct code fixes and complexity breakdowns.
+                </p>
+                <div class="d-flex flex-column gap-2 smaller text-secondary">
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-check2 text-warning"></i>
+                        <span>Detailed code snippets with explanation</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-check2 text-warning"></i>
+                        <span>Official badge pinned at the top</span>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <i class="bi bi-check2 text-warning"></i>
+                        <span>Time &amp; Space complexity breakdowns</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Popular Topics Cloud -->
+            <div class="card p-4 rounded-4 mb-4" style="background: var(--cwa-bg-card); border: 1px solid var(--cwa-border);">
+                <h5 class="fw-bold font-heading mb-3" style="color: var(--cwa-text-heading);">
                     <i class="bi bi-tags-fill text-primary me-2"></i>Popular Topics
                 </h5>
-                <div class="d-flex flex-wrap gap-2">
+                <div class="d-flex flex-wrap gap-1.5">
                     {% for tag in popular_tags %}
-                        <a href="?tag={{ tag.slug }}" class="badge bg-surface-dark border border-light-subtle text-dark p-2 rounded-pill text-decoration-none hover-primary">
-                            #{{ tag.name }} <span class="badge bg-primary text-white rounded-pill ms-1">{{ tag.q_count }}</span>
+                        <a href="?tag={{ tag.slug }}" class="badge rounded-pill text-decoration-none py-1.5 px-2.5 d-inline-flex align-items-center gap-1" style="background: var(--cwa-bg-subtle); color: var(--cwa-text-muted); border: 1px solid var(--cwa-border); font-size: 0.78rem;">
+                            #{{ tag.name }} <span class="badge rounded-pill bg-primary text-white ms-1" style="font-size: 0.65rem;">{{ tag.q_count }}</span>
                         </a>
                     {% empty %}
                         <span class="smaller text-muted">python, dsa, recursion, dynamic-programming, hashmap</span>
@@ -172,31 +272,26 @@
                 </div>
             </div>
 
-            <!-- How Community Works -->
-            <div class="card bg-surface border-0 rounded-4 shadow-sm p-4">
-                <h5 class="fw-bold mb-3 text-dark">
-                    <i class="bi bi-lightning-charge-fill text-warning me-2"></i>Earn XP & Badges
-                </h5>
-                <div class="d-flex flex-column gap-2 smaller text-secondary">
-                    <div class="d-flex align-items-center justify-content-between p-2 rounded bg-surface-dark">
-                        <span>Ask a thoughtful doubt</span>
-                        <strong class="text-success">+15 XP</strong>
+            <!-- Code Sources Link Card -->
+            <div class="card p-4 rounded-4" style="background: var(--cwa-bg-card); border: 1px solid var(--cwa-border);">
+                <div class="d-flex align-items-center gap-2.5 mb-2">
+                    <div class="rounded-3 p-2 d-flex align-items-center justify-content-center text-info" style="background: rgba(56, 189, 248, 0.12); width: 36px; height: 36px;">
+                        <i class="bi bi-github fs-5"></i>
                     </div>
-                    <div class="d-flex align-items-center justify-content-between p-2 rounded bg-surface-dark">
-                        <span>Write an answer</span>
-                        <strong class="text-success">+25 XP</strong>
-                    </div>
-                    <div class="d-flex align-items-center justify-content-between p-2 rounded bg-surface-dark">
-                        <span>Your answer accepted as solution</span>
-                        <strong class="text-warning">+50 XP</strong>
-                    </div>
-                    <div class="d-flex align-items-center justify-content-between p-2 rounded bg-surface-dark">
-                        <span>Receive an upvote</span>
-                        <strong class="text-primary">+5 XP</strong>
-                    </div>
+                    <h5 class="fw-bold font-heading mb-0" style="color: var(--cwa-text-heading);">
+                        Need Working Code?
+                    </h5>
                 </div>
+                <p class="text-secondary smaller mb-3">
+                    Check out our <strong>Code Sources Section</strong> for complete GitHub boilerplates, algorithms, and 1-click copyable solutions.
+                </p>
+                <a href="{% url 'code_sources:list' %}" class="cwa-btn-secondary btn-sm rounded-pill w-100 justify-content-center">
+                    Browse Code &amp; GitHub Repos <i class="bi bi-arrow-right"></i>
+                </a>
             </div>
+
         </div>
     </div>
+
 </div>
 {% endblock %}
