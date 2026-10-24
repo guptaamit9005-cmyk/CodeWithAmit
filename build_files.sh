@@ -8,13 +8,8 @@ else
     PY_BIN="python"
 fi
 
-if command -v uv &> /dev/null; then
-    echo "Using uv to install dependencies..."
-    uv pip install -r requirements.txt --system
-else
-    echo "Using pip to install dependencies..."
-    $PY_BIN -m pip install -r requirements.txt --break-system-packages 2>/dev/null || $PY_BIN -m pip install -r requirements.txt
-fi
+echo "Using pip to install dependencies..."
+$PY_BIN -m pip install -r requirements.txt --break-system-packages 2>/dev/null || $PY_BIN -m pip install -r requirements.txt || pip install -r requirements.txt
 
 echo "=== Collecting static files ==="
 $PY_BIN manage.py collectstatic --no-input --clear
